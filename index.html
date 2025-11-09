@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>#0000AA</title>
+<style>
+  body {
+    background-color: #0000AA;
+    color: #FFFFFF;
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-size: 16px;
+    margin: 0;
+    padding: 60px;
+    cursor: none;
+  }
+  .logo {
+    border: 2px solid #FFFFFF;
+    display: inline-block;
+    padding: 4px 16px;
+    margin-bottom: 20px;
+  }
+  .logo span {
+    background-color: #FFFFFF;
+    color: #0000AA;
+    padding: 0 4px;
+    font-weight: bold;
+  }
+  p {
+    margin: 10px 0;
+  }
+  .blink {
+    display: inline-block;
+    animation: blink 1s steps(2, start) infinite;
+  }
+  @keyframes blink {
+    to { visibility: hidden; }
+  }
+</style>
+<script>
+  // Redirection après clic ou touche pressée
+  function goToMenu() {
+    window.location.href = "menu.html";
+  }
+
+  document.addEventListener("keydown", goToMenu);
+  document.addEventListener("click", goToMenu);
+</script>
+</head>
+<body>
+  <div class="logo"><span>bluejeanism</span></div>
+
+  <p>An exception 0E has occurred at 0028:C0011E36 in VXD VMM(01) +<br>
+  00010E36. This was called from 0028:C0044B1A in VXD VFAT(01) +<br>
+  0000E21A. It may be possible to continue normally.</p>
+
+  <p>* Press any key to attempt to continue.<br>
+     * Press CTRL+ALT+DEL to restart your computer. You will<br>
+     &nbsp;&nbsp;lose any unsaved information in all applications.</p>
+
+  <p><br>Current application will be terminated.</p>
+
+  <p><br>*** Press any key to continue <span class="blink">_</span></p>
+</body>
+</html>
