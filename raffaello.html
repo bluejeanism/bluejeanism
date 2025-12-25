@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RΔFF~ΞLLO_2Φ</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
 <style>
 @keyframes blink {
   0%, 49% { opacity: 1; }
@@ -18,6 +20,35 @@
 @keyframes scanline {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100vh); }
+}
+
+@keyframes socialPulse {
+  0%, 100% { transform: scale(1); box-shadow: 1px 1px 0 #000000; }
+  50% { transform: scale(1.05); box-shadow: 3px 3px 8px rgba(255, 255, 255, 0.6); }
+}
+
+@keyframes unfoldCover {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 250px;
+    opacity: 1;
+  }
+}
+
+@keyframes badgeGlow {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 2px 2px 0 #000000;
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(1.1); 
+    box-shadow: 0 0 15px #FFD700, 2px 2px 0 #000000;
+    filter: brightness(1.2);
+  }
 }
 
 * {
@@ -76,6 +107,7 @@ body::after {
 }
 
 .logo {
+
   border: 2px solid #FFFFFF;
   display: inline-block;
   padding: 4px 16px;
@@ -88,9 +120,6 @@ body::after {
   background: #FFFFFF;
 }
 
-.logo:hover span {
-  color: #0000AA;
-}
 
 .logo span {
   background-color: #FFFFFF;
@@ -123,8 +152,7 @@ body::after {
   padding: 25px;
   box-sizing: border-box;
   background-color: #0000AA;
-  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1),
-              4px 4px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1), 4px 4px 0 rgba(0, 0, 0, 0.5);
 }
 
 .system-info {
@@ -163,10 +191,10 @@ body::after {
   justify-content: center;
   font-size: 3em;
   box-shadow: 0 0 15px #FFFFFF;
-  background-image: url('raffaello.jpg');
   background-size: cover;
   background-position: center;
   border-radius: 5px;
+  transition: all 0.5s ease;
 }
 
 .avatar-flag {
@@ -194,10 +222,12 @@ body::after {
   font-weight: bold;
   margin: 0 0 10px 0;
   letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+}
+
+.alias {
+  font-size: 0.7em;
+  color: #FFD700;
+  font-style: italic;
 }
 
 .socials {
@@ -218,11 +248,7 @@ body::after {
   margin-bottom: 5px;
   box-shadow: 1px 1px 0 #000000;
   font-family: "MS Sans Serif", "Lucida Console", monospace;
-}
-
-.socials a:active {
-  border-color: #000000 #FFFFFF #FFFFFF #000000;
-  box-shadow: inset 1px 1px 0 #000000;
+  animation: socialPulse 2s infinite;
 }
 
 .bio {
@@ -304,6 +330,27 @@ body::after {
   text-shadow: 2px 2px #000000;
 }
 
+.stat-period-btn {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  color: #000000;
+  font-weight: bold;
+  margin-left: 5px;
+}
+.stat-period-btn:hover {
+  background: #DFDFDF;
+}
+.stat-period-btn.active {
+  background: #000080;
+  color: #FFFFFF;
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
 .category-content {
   font-size: 0.95em;
   line-height: 1.8em;
@@ -311,6 +358,259 @@ body::after {
   font-family: "Courier New", monospace;
 }
 
+/* Citation */
+.quote-simple {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 255, 255, 0.1));
+  border: 2px solid #FFD700;
+  padding: 15px 20px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.quote-simple-text {
+  flex: 1;
+  font-style: italic;
+  font-size: 1.1em;
+}
+
+.quote-simple-btn {
+  background: #FFD700;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+}
+
+.quote-simple-btn:hover {
+  background: #FFFF00;
+}
+
+/* Livres */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.book-card {
+  background: #C0C0C0;
+  padding: 10px;
+  border: 2px solid #000000;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 5px 0 #000000;
+  border-color: #FFD700;
+}
+
+.book-info-text {
+  position: relative;
+  z-index: 2;
+  background: #C0C0C0;
+  padding: 5px;
+}
+
+.book-cover {
+  width: 100%;
+  height: 0;
+  max-height: 0;
+  overflow: hidden;
+  border: 2px solid #000000;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #808080;
+  transition: max-height 0.5s ease, height 0.5s ease;
+  opacity: 0;
+}
+
+.book-card:hover .book-cover {
+  height: 250px;
+  max-height: 250px;
+  opacity: 1;
+  animation: unfoldCover 0.5s ease forwards;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-title {
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.book-info {
+  font-size: 12px;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.book-formats {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.format-badge {
+  background: #000080;
+  color: #FFF;
+  padding: 4px 8px;
+  text-decoration: none;
+  border: 1px solid #000000;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s;
+  box-shadow: 1px 1px 0 #000000;
+  font-size: 11px;
+}
+
+.format-badge:hover {
+  background: #0000FF;
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 #000000;
+  border: 1px solid #FFFFFF;
+}
+
+/* Traductions */
+.translation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.translation-card {
+  background: #C0C0C0;
+  padding: 10px;
+  border: 2px solid #008000;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.translation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 5px 0 #000000;
+  border-color: #00FF00;
+}
+
+.translation-author {
+  font-size: 11px;
+  color: #008000;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+.translation-title {
+  font-weight: bold;
+  color: #000080;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.translation-info {
+  font-size: 11px;
+  color: #000000;
+}
+
+/* Articles */
+.article-filters {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  color: #000000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #DFDFDF;
+}
+
+.filter-btn.active {
+  background: #000080;
+  color: #FFFFFF;
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.articles-dropdown {
+  background: #C0C0C0;
+  border: 2px solid #000000;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.article-item {
+  background: #FFFFFF;
+  padding: 10px;
+  border: 2px solid #000000;
+  color: #000000;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.article-item:hover {
+  background: #FFFFCC;
+  transform: translateX(5px);
+  box-shadow: 3px 3px 0 #000000;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pagination-btn {
+  padding: 8px 20px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  color: #000000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #DFDFDF;
+}
+
+/* Timeline - plus haute */
 .timeline-graph-container {
   overflow-x: auto;
   padding: 10px;
@@ -318,12 +618,6 @@ body::after {
   border-color: #000000 #FFFFFF #FFFFFF #000000;
   background-color: rgba(0, 0, 80, 0.5);
   box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.5);
-}
-
-.timeline-graph {
-  min-width: 2000px;
-  height: 280px;
-  position: relative;
 }
 
 .graph-canvas {
@@ -356,89 +650,76 @@ body::after {
   line-height: 1.5;
 }
 
-.achievement-box {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
-
-.achievement {
-  border: 2px solid;
-  padding: 8px;
-  flex: 1;
-  min-width: 150px;
-}
-
-/* Badges cliquables */
-.badge-link {
-  text-decoration: none;
-  display: inline-block;
-  position: relative;
-  transition: all 0.3s;
-}
-
+/* Badges */
 .badge-item {
-  display: inline-block;
+  background: #FFD700;
+  color: #000000;
   padding: 5px 12px;
   font-size: 11px;
   border: 2px solid #000000;
   font-weight: bold;
   box-shadow: 2px 2px 0 #000000;
+  display: inline-block;
   transition: all 0.3s;
-  cursor: pointer;
+  cursor: help;
   position: relative;
 }
 
-.badge-link:hover .badge-item {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 4px 4px 0 #000000, 0 0 20px rgba(255, 255, 255, 0.8);
-  filter: brightness(1.3);
-  animation: badgePulse 0.6s infinite;
+.badge-item:hover {
+  animation: badgeGlow 0.8s ease-in-out infinite;
+  z-index: 10;
 }
 
-.badge-link:active .badge-item {
-  transform: translateY(0) scale(1);
-  box-shadow: 1px 1px 0 #000000;
-}
-
-/* Tooltip pour les badges */
-.badge-link::after {
-  content: attr(data-tooltip);
+.badge-item::after {
+  content: attr(data-description);
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%) translateY(-10px);
+  transform: translateX(-50%) translateY(-5px);
   background: #FFFFE1;
   color: #000000;
-  padding: 8px 12px;
-  border: 2px solid #000000;
+  padding: 5px 10px;
+  border: 1px solid #000000;
   font-size: 11px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.3s;
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
-  font-family: "Courier New", monospace;
-  font-weight: normal;
 }
 
-.badge-link:hover::after {
+.badge-item:hover::after {
   opacity: 1;
-  transform: translateX(-50%) translateY(-5px);
+  transform: translateX(-50%) translateY(-10px);
 }
 
-@keyframes badgePulse {
-  0%, 100% { 
-    box-shadow: 4px 4px 0 #000000, 0 0 20px rgba(255, 255, 255, 0.8);
-  }
-  50% { 
-    box-shadow: 4px 4px 0 #000000, 0 0 30px rgba(255, 255, 255, 1);
-  }
+/* Curseur */
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 15px;
+  background-color: #FFFFFF;
+  animation: blink 1s infinite;
+  margin-left: 5px;
 }
 
-/* Modal viewer styles */
+.fake-cursor {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  display: none;
+}
+
+body:hover .fake-cursor {
+  display: block;
+}
+
+/* Modal */
 .modal-viewer {
   display: none;
   position: fixed;
@@ -529,10 +810,6 @@ body::after {
   background: #DFDFDF;
 }
 
-.modal-maximize:active {
-  border-color: #000000 #FFFFFF #FFFFFF #000000;
-}
-
 .modal-close {
   background: #C0C0C0;
   border: 2px solid;
@@ -546,10 +823,6 @@ body::after {
 
 .modal-close:hover {
   background: #DFDFDF;
-}
-
-.modal-close:active {
-  border-color: #000000 #FFFFFF #FFFFFF #000000;
 }
 
 .modal-toolbar {
@@ -596,81 +869,6 @@ body::after {
   background: #DFDFDF;
 }
 
-.download-btn:active {
-  border-color: #000000 #FFFFFF #FFFFFF #000000;
-}
-
-/* Améliorer visuellement les cartes */
-.book-item > div, .article-item, .video-item {
-  transition: all 0.2s;
-}
-
-.book-item > div:hover, .article-item:hover, .video-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 3px 3px 0 #000000;
-  border-color: #FFFF00;
-}
-
-.book-item > div:active, .article-item:active, .video-item:active {
-  transform: translateY(0);
-  box-shadow: 1px 1px 0 #000000;
-}
-
-/* Badges PDF/EPUB cliquables */
-.format-badge {
-  background: #000080;
-  color: #FFF;
-  padding: 2px 6px;
-  text-decoration: none;
-  border: 1px solid #000000;
-  cursor: pointer !important;
-  display: inline-block;
-  transition: all 0.2s;
-  box-shadow: 1px 1px 0 #000000;
-}
-
-.format-badge:hover {
-  background: #0000FF;
-  transform: translateY(-2px);
-  box-shadow: 2px 2px 0 #000000;
-  border: 1px solid #FFFFFF;
-}
-
-.format-badge:active {
-  transform: translateY(0);
-  box-shadow: 0px 0px 0 #000000;
-  background: #000060;
-}
-
-.cursor {
-  display: inline-block;
-  width: 10px;
-  height: 15px;
-  background-color: #FFFFFF;
-  animation: blink 1s infinite;
-  margin-left: 5px;
-}
-
-.fake-cursor {
-  position: fixed;
-  width: 16px;
-  height: 16px;
-  background-color: #FFFFFF;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-  display: none;
-}
-
-body:hover .fake-cursor {
-  display: block;
-}
-
-.modal-viewer.active ~ .content-wrapper .fake-cursor,
-.modal-viewer:not([style*="display: none"]) ~ .content-wrapper .fake-cursor {
-  display: none !important;
-}
-
 .footer-error {
   max-width: 900px;
   margin: 30px auto 0 auto;
@@ -693,6 +891,10 @@ body:hover .fake-cursor {
   .error-code {
     font-size: 1.5em;
   }
+  
+  .book-grid, .translation-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 </head>
@@ -706,39 +908,39 @@ body:hover .fake-cursor {
   </a>
 
   <div class="error-header">
-    <div class="error-code">*** STOP: 0x0000VITAL (0xBELLINO, 0x00000002)</div>
+    <div class="error-code">*** STOP: 0x0000VIRISM (0xRAFFAELLO, 0x00000002)</div>
     <div>PROFIL_SYSTEM_DATA</div>
   </div>
 
   <div class="fiche">
     <div class="system-info">
       *** Adresse: 0xBF7C2A84 base à 0xBF7C0000, DateStamp 4a5bc600 - profil.sys<br>
-      *** Synchronisé avec: classement.html | Dernière MAJ: <span id="lastUpdate">Chargement...</span>
+      *** Synchronisé avec: data.json | Dernière MAJ: <span id="lastUpdate">--</span>
     </div>
 
     <div class="header">
       <div class="avatar-container">
-        <div class="avatar"></div>
+        <div class="avatar" id="mainAvatar"></div>
         <div class="avatar-flag">
-          <div style="width: 33.33%; background-color: #0055A4;"></div>
+          <!-- Drapeau italien -->
+          <div style="width: 33.33%; background-color: #009246;"></div>
           <div style="width: 33.33%; background-color: #FFFFFF;"></div>
-          <div style="width: 33.33%; background-color: #EF4135;"></div>
+          <div style="width: 33.33%; background-color: #CE2B37;"></div>
         </div>
       </div>
       <div class="info">
-        <p class="name">
-          &gt; Raffaello Bellino<span class="cursor"></span>
-        </p>
+        <p class="name">&gt; Raffaello Bellino<span class="cursor"></span></p>
+        <span class="alias">alias "Il Maestro"</span>
         <div class="socials">
-          <a href="https://x.com/RaffaelloBelli1" target="_blank" title="Twitter">[Twitter]</a>
-          <a href="https://lestroisetendards.com/" target="_blank" title="Website">[Website]</a>
-          <a href="https://lestroisetendards.com/2025/07/27/la-boutique-hermetique-achetez-des-livres-rares-confidentiels/" title="Boutique">[Boutique]</a>
+          <a href="https://x.com/RaffaelloBelli1" target="_blank">Twitter</a>
+          <a href="https://lestroisetendards.com/" target="_blank">Website</a>
+          <a href="https://lestroisetendards.com/2025/07/27/la-boutique-hermetique-achetez-des-livres-rares-confidentiels/" target="_blank">Boutique</a>
         </div>
         <div class="bio">
           &gt; STATUS: <span style="color: #00FF00; font-weight: bold;">● ACTIF</span><br>
-          &gt; Explorateur des idées, philosophe et observateur du monde.<br>
-          &gt; Passionné par l'intersection entre technologie et humanité.<br>
-          &gt; <span style="color: #FFD700;">★ Membre Vitaliste depuis 2025</span>
+          &gt; Écrivain prolifique et penseur vitaliste italien.<br>
+          &gt; Auteur et traducteur d'œuvres fondamentales.<br>
+          &gt; <span style="color: #FFD700;">★ Membre vitaliste depuis 2007</span>
         </div>
       </div>
       <div class="stats-container">
@@ -746,52 +948,27 @@ body:hover .fake-cursor {
       </div>
     </div>
 
-    <div class="category">
-      <div class="category-title">*** Stats Hebdomadaires (Synchronisées)</div>
-      <div class="category-content">
-        [0x01] Livres (semaine) : <strong style="color: #FFD700;" id="stat-books-week">--</strong><br>
-        [0x02] Articles (semaine) : <strong style="color: #00BFFF;" id="stat-articles-week">--</strong><br>
-        [0x03] Vidéos (semaine) : <strong style="color: #FF69B4;" id="stat-videos-week">--</strong><br>
-        [0x04] Retweets (semaine) : <strong style="color: #00FF00;" id="stat-retweets-week">--</strong><br>
-        [0x05] Likes (semaine) : <strong style="color: #FFFFFF;" id="stat-likes-week">--</strong><br>
-        [0x06] Score Total : <strong style="color: #FF0000;" id="stat-score-week">--</strong>
-      </div>
+    <!-- Citation -->
+    <div class="quote-simple">
+      <div class="quote-simple-text" id="quoteSimpleText">"Cliquez pour révéler une citation..."</div>
+      <button class="quote-simple-btn" onclick="spinQuote()">🎲</button>
     </div>
 
     <div class="category">
       <div class="category-title">📚 Bibliothèque / Livres</div>
       <div class="category-content">
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 10px;">
-          <div class="book-item" data-pdf="fondementsduvitalisme.pdf" data-epub="fondementsduvitalisme.epub" data-title="Fondements du Vitalisme">
-            <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;" onclick="openBook(this.parentElement)">
-              <div style="font-weight: bold; color: #000080;">📖 Fondements du Vitalisme</div>
-              <div style="font-size: 0.85em; margin-top: 5px;">2020 • 245 pages</div>
-              <div style="margin-top: 8px; font-size: 0.8em; display: flex; gap: 5px;">
-                <a href="fondementsduvitalisme.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF">PDF</a>
-                <a href="fondementsduvitalisme.epub" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger EPUB">EPUB</a>
-              </div>
-            </div>
-          </div>
-          <div class="book-item" data-pdf="manifesteneonietzscheen.pdf" data-epub="manifesteneonietzscheen.epub" data-title="Manifeste Néo-Nietzschéen">
-            <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;" onclick="openBook(this.parentElement)">
-              <div style="font-weight: bold; color: #000080;">📖 Manifeste Néo-Nietzschéen</div>
-              <div style="font-size: 0.85em; margin-top: 5px;">2021 • 312 pages</div>
-              <div style="margin-top: 8px; font-size: 0.8em; display: flex; gap: 5px;">
-                <a href="manifesteneonietzscheen.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF">PDF</a>
-                <a href="manifesteneonietzscheen.epub" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger EPUB">EPUB</a>
-              </div>
-            </div>
-          </div>
-          <div class="book-item" data-pdf="philosophiedelia.pdf" data-epub="philosophiedelia.epub" data-title="Philosophie de l'IA">
-            <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;" onclick="openBook(this.parentElement)">
-              <div style="font-weight: bold; color: #000080;">📖 Philosophie de l'IA</div>
-              <div style="font-size: 0.85em; margin-top: 5px;">2022 • 189 pages</div>
-              <div style="margin-top: 8px; font-size: 0.8em; display: flex; gap: 5px;">
-                <a href="philosophiedelia.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF">PDF</a>
-                <a href="philosophiedelia.epub" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger EPUB">EPUB</a>
-              </div>
-            </div>
-          </div>
+        <div class="book-grid" id="booksGrid"></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">🔄 Traductions</div>
+      <div class="category-content">
+        <div class="translation-grid" id="translationsGrid"></div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" id="prevTransBtn" onclick="changeTransPage(-1)">◀ PRÉCÉDENT</button>
+          <span id="transPageInfo" style="color: #FFFFFF; font-weight: bold;">Page 1</span>
+          <button class="pagination-btn" id="nextTransBtn" onclick="changeTransPage(1)">SUIVANT ▶</button>
         </div>
       </div>
     </div>
@@ -799,96 +976,68 @@ body:hover .fake-cursor {
     <div class="category">
       <div class="category-title">📄 Articles & Essais</div>
       <div class="category-content">
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-          <div class="article-item" data-pdf="nietzscheauxxiesiecle.pdf" data-title="Nietzsche au XXIe Siècle" style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; color: #000000; cursor: pointer;" onclick="openArticle(this)">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong>✍️ Nietzsche au XXIe Siècle</strong>
-                <div style="font-size: 0.85em; color: #000080;">2023 • 15 pages</div>
-              </div>
-              <a href="nietzscheauxxiesiecle.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF" style="padding: 4px 10px; font-size: 0.85em;">PDF</a>
-            </div>
-          </div>
-          <div class="article-item" data-pdf="democratieerenumerique.pdf" data-title="La Démocratie à l'Ère Numérique" style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; color: #000000; cursor: pointer;" onclick="openArticle(this)">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong>✍️ La Démocratie à l'Ère Numérique</strong>
-                <div style="font-size: 0.85em; color: #000080;">2024 • 22 pages</div>
-              </div>
-              <a href="democratieerenumerique.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF" style="padding: 4px 10px; font-size: 0.85em;">PDF</a>
-            </div>
-          </div>
-          <div class="article-item" data-pdf="nihilismenumerique.pdf" data-title="Le Nihilisme Numérique" style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; color: #000000; cursor: pointer;" onclick="openArticle(this)">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <strong>✍️ Le Nihilisme Numérique</strong>
-                <div style="font-size: 0.85em; color: #000080;">2025 • 18 pages</div>
-              </div>
-              <a href="nihilismenumerique.pdf" download onclick="event.stopPropagation();" class="format-badge" title="Télécharger PDF" style="padding: 4px 10px; font-size: 0.85em;">PDF</a>
-            </div>
-          </div>
+        <div class="article-filters" id="articleFilters"></div>
+        <div class="articles-dropdown" id="articlesContainer"></div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">◀ PRÉCÉDENT</button>
+          <span id="pageInfo" style="color: #FFFFFF; font-weight: bold;">Page 1</span>
+          <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">SUIVANT ▶</button>
         </div>
       </div>
     </div>
 
     <div class="category">
       <div class="category-title">🎥 Vidéos & Conférences</div>
-      <div class="category-content">
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
-          <div class="video-item" data-video="philosophieetmodernite.mp4" data-title="Philosophie et Modernité" style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;" onclick="openVideo(this)">
-            <div style="background: #000000; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-              <div style="font-size: 3em;">▶️</div>
-            </div>
-            <div style="font-weight: bold; color: #000080;">Philosophie et Modernité</div>
-            <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">2019 • 45:32 • MP4</div>
-          </div>
-          <div class="video-item" data-video="ethiquedelia.mp4" data-title="Éthique de l'IA" style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;" onclick="openVideo(this)">
-            <div style="background: #000000; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-              <div style="font-size: 3em;">▶️</div>
-            </div>
-            <div style="font-weight: bold; color: #000080;">Éthique de l'IA</div>
-            <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">2025 • 52:18 • MP4</div>
-          </div>
-        </div>
-      </div>
+      <div class="category-content" id="videosContainer"></div>
     </div>
 
     <div class="category">
-      <div class="category-title">🐦 Derniers Tweets de @visitor_xyz</div>
+      <div class="category-title">🎧 Audio & Podcasts</div>
+      <div class="category-content" id="audioContainer"></div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">🐦 Twitter/X Feed</div>
       <div class="category-content">
-        <div id="tweetsContainer" style="margin-top: 10px; min-height: 400px; background: #FFFFFF; padding: 10px; border: 2px solid; border-color: #808080 #FFFFFF #FFFFFF #808080;">
+        <div id="tweetsContainer" style="min-height: 150px; background: #FFFFFF; padding: 10px; border: 2px solid; border-color: #808080 #FFFFFF #FFFFFF #808080;">
           <div style="text-align: center; padding: 20px; color: #000080;">
             <div style="font-size: 24px; margin-bottom: 10px;">🔄</div>
-            <div>Chargement des tweets en direct...</div>
+            <div>Chargement du feed Twitter/X...</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="category">
-      <div class="category-title">*** Production Timeline (2018-2025)</div>
+      <div class="category-title">*** Production Timeline</div>
       <div class="timeline-graph-container">
         <canvas class="graph-canvas" id="timelineCanvas"></canvas>
       </div>
     </div>
 
     <div class="category">
+      <div class="category-title">*** Stats
+        <span style="float: right;">
+          <button class="stat-period-btn active" id="btnStatYear" onclick="showYearStats()">2025</button>
+          <button class="stat-period-btn" id="btnStatMonth" onclick="showMonthStats()">MOIS</button>
+        </span>
+      </div>
+      <div class="category-content">
+        [0x01] Pages livres : <strong style="color: #FFD700;" id="stat-pages-livres">0</strong><br>
+        [0x02] Pages traductions : <strong style="color: #00FF00;" id="stat-pages-trad">0</strong><br>
+        [0x03] Pages articles : <strong style="color: #00BFFF;" id="stat-pages-articles">0</strong><br>
+        [0x04] Vidéo (min) : <strong style="color: #FF69B4;" id="stat-video-min">0</strong><br>
+        [0x05] Audio (min) : <strong style="color: #FFA500;" id="stat-audio-min">0</strong><br>
+        [0x06] Retweets : <strong style="color: #808080;" id="stat-retweets">0</strong><br>
+        [0x07] Likes : <strong style="color: #808080;" id="stat-likes">0</strong><br>
+        [0x08] Score : <strong style="color: #FF0000;" id="stat-score">0</strong>
+      </div>
+    </div>
+
+    <div class="category">
       <div class="category-title">*** Achievements / Badges</div>
       <div class="category-content">
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-          <a href="badges.html" class="badge-link" data-tooltip="Classé dans le Top 3 des contributeurs cette semaine">
-            <span class="badge-item" style="background: #FFD700; color: #000000;">🥇 TOP 3</span>
-          </a>
-          <a href="badges.html" class="badge-link" data-tooltip="Plus de 5 livres publiés">
-            <span class="badge-item" style="background: #FFD700; color: #000000;">📚 BOOK MASTER</span>
-          </a>
-          <a href="badges.html" class="badge-link" data-tooltip="Plus de 50 articles écrits">
-            <span class="badge-item" style="background: #C0C0C0; color: #000000;">✍️ WRITER</span>
-          </a>
-          <a href="badges.html" class="badge-link" data-tooltip="Score total supérieur à 500 points">
-            <span class="badge-item" style="background: #FFD700; color: #000000;">⚡ HIGH SCORE</span>
-          </a>
-        </div>
+        <div id="badgesContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
       </div>
     </div>
   </div>
@@ -915,11 +1064,8 @@ body:hover .fake-cursor {
     <div class="modal-toolbar">
       <a href="#" id="downloadPdf" class="download-btn" style="display:none;">📄 Télécharger PDF</a>
       <a href="#" id="downloadEpub" class="download-btn" style="display:none;">📱 Télécharger EPUB</a>
-      <a href="#" id="downloadVideo" class="download-btn" style="display:none;">⬇️ Télécharger Vidéo</a>
     </div>
-    <div class="modal-body" id="modalBody">
-      <!-- Content loaded here -->
-    </div>
+    <div class="modal-body" id="modalBody"></div>
   </div>
 </div>
 
@@ -934,384 +1080,490 @@ document.addEventListener('mousemove', (e) => {
   fakeCursor.style.top = e.clientY + 'px';
 });
 
-// Synchronisation avec classement.html
-async function loadRankingData() {
+// Données
+let statsData = null;
+let contributorData = null;
+let allArticles = [];
+let filteredArticles = [];
+let currentArticlePage = 0;
+const articlesPerPage = 3;
+
+let allTranslations = [];
+let currentTransPage = 0;
+const translationsPerPage = 3;
+
+// Chargement des données
+async function loadData() {
   try {
-    // Simuler le chargement des données depuis classement.html
-    // Dans un vrai cas, vous feriez un fetch du fichier ou utiliseriez localStorage
-    const contributorName = 'Raffaello Bellino'; // Ou récupérer depuis l'URL
+    const response = await fetch('data.json');
+    const data = await response.json();
+    statsData = data; // Stocker pour accès global (formule scoring)
+    contributorData = data.contributors.find(c => c.name === "Raffaello Bellino");
     
-    // Données simulées - à remplacer par un vrai fetch
-    const weeklyStats = {
-      books: 1,
-      articles: 5,
-      videos: 2,
-      retweets: 10,
-      likes: 50,
-      score: 0
-    };
+    if (!contributorData) {
+      console.error('Contributeur Raffaello Bellino non trouvé');
+      return;
+    }
     
-    // Calcul du score (même formule que classement.html)
-    weeklyStats.score = (weeklyStats.books * 10) + (weeklyStats.articles * 5) + 
-                        (weeklyStats.videos * 8) + (weeklyStats.retweets * 0.5) + 
-                        (weeklyStats.likes * 0.1);
+    document.getElementById('lastUpdate').textContent = new Date(data.lastUpdate).toLocaleString('fr-FR');
     
-    // Mise à jour de l'affichage
-    document.getElementById('stat-books-week').textContent = weeklyStats.books;
-    document.getElementById('stat-articles-week').textContent = weeklyStats.articles;
-    document.getElementById('stat-videos-week').textContent = weeklyStats.videos;
-    document.getElementById('stat-retweets-week').textContent = weeklyStats.retweets;
-    document.getElementById('stat-likes-week').textContent = weeklyStats.likes;
-    document.getElementById('stat-score-week').textContent = weeklyStats.score.toFixed(1);
+    // Avatar
+    const avatar = document.getElementById('mainAvatar');
+    avatar.style.backgroundImage = `url('raffaello.jpg')`;
     
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleString('fr-FR');
-  } catch(error) {
-    console.error('Erreur de synchronisation:', error);
-    document.getElementById('lastUpdate').textContent = 'ERREUR';
+    // Initialiser
+    drawRadar();
+    updateBooks();
+    updateTranslations();
+    updateArticles();
+    updateVideos();
+    updateAudio();
+    updateStats();
+    updateBadges();
+    drawTimeline();
+    loadTwitterFeed();
+    
+  } catch (error) {
+    console.error('Erreur de chargement:', error);
   }
 }
 
-// Fonctions d'ouverture des modals
-function openBook(element) {
-  const title = element.getAttribute('data-title');
-  const pdfUrl = element.getAttribute('data-pdf');
-  const epubUrl = element.getAttribute('data-epub');
-  
-  // Cacher le faux curseur
-  document.getElementById('fakeCursor').style.display = 'none';
-  
-  document.getElementById('modalIcon').textContent = '📖';
-  document.getElementById('modalTitle').textContent = title;
-  
-  // Afficher les boutons de téléchargement
-  document.getElementById('downloadPdf').style.display = 'inline-block';
-  document.getElementById('downloadPdf').href = pdfUrl;
-  document.getElementById('downloadPdf').download = pdfUrl;
-  
-  document.getElementById('downloadEpub').style.display = 'inline-block';
-  document.getElementById('downloadEpub').href = epubUrl;
-  document.getElementById('downloadEpub').download = epubUrl;
-  
-  document.getElementById('downloadVideo').style.display = 'none';
-  
-  // Afficher le PDF dans un iframe
-  document.getElementById('modalBody').innerHTML = `
-    <iframe src="${pdfUrl}" class="pdf-viewer" frameborder="0">
-      <p>Votre navigateur ne supporte pas l'affichage de PDF. <a href="${pdfUrl}" download>Télécharger le fichier</a></p>
-    </iframe>
-  `;
-  
-  document.getElementById('modalViewer').style.display = 'flex';
-}
+loadData();
 
-function openArticle(element) {
-  const title = element.getAttribute('data-title');
-  const pdfUrl = element.getAttribute('data-pdf');
-  
-  // Cacher le faux curseur
-  document.getElementById('fakeCursor').style.display = 'none';
-  
-  document.getElementById('modalIcon').textContent = '✍️';
-  document.getElementById('modalTitle').textContent = title;
-  
-  // Afficher le bouton de téléchargement PDF uniquement
-  document.getElementById('downloadPdf').style.display = 'inline-block';
-  document.getElementById('downloadPdf').href = pdfUrl;
-  document.getElementById('downloadPdf').download = pdfUrl;
-  
-  document.getElementById('downloadEpub').style.display = 'none';
-  document.getElementById('downloadVideo').style.display = 'none';
-  
-  // Afficher le PDF dans un iframe
-  document.getElementById('modalBody').innerHTML = `
-    <iframe src="${pdfUrl}" class="pdf-viewer" frameborder="0">
-      <p>Votre navigateur ne supporte pas l'affichage de PDF. <a href="${pdfUrl}" download>Télécharger le fichier</a></p>
-    </iframe>
-  `;
-  
-  document.getElementById('modalViewer').style.display = 'flex';
-}
-
-function openVideo(element) {
-  const title = element.getAttribute('data-title');
-  const videoUrl = element.getAttribute('data-video');
-  
-  // Cacher le faux curseur
-  document.getElementById('fakeCursor').style.display = 'none';
-  
-  document.getElementById('modalIcon').textContent = '🎥';
-  document.getElementById('modalTitle').textContent = title;
-  
-  // Afficher le bouton de téléchargement vidéo uniquement
-  document.getElementById('downloadPdf').style.display = 'none';
-  document.getElementById('downloadEpub').style.display = 'none';
-  document.getElementById('downloadVideo').style.display = 'inline-block';
-  document.getElementById('downloadVideo').href = videoUrl;
-  document.getElementById('downloadVideo').download = videoUrl;
-  
-  // Afficher la vidéo
-  document.getElementById('modalBody').innerHTML = `
-    <video controls style="width: 100%; height: 100%; background: #000000;">
-      <source src="${videoUrl}" type="video/mp4">
-      Votre navigateur ne supporte pas la lecture vidéo.
-    </video>
-  `;
-  
-  document.getElementById('modalViewer').style.display = 'flex';
-}
-
-function closeModal() {
-  document.getElementById('modalViewer').style.display = 'none';
-  // Arrêter toute vidéo en cours
-  const videos = document.getElementById('modalBody').getElementsByTagName('video');
-  for(let video of videos) {
-    video.pause();
+// Citations
+function spinQuote() {
+  const quoteText = document.getElementById('quoteSimpleText');
+  if (contributorData && contributorData.quotes && contributorData.quotes.length > 0) {
+    const quote = contributorData.quotes[Math.floor(Math.random() * contributorData.quotes.length)];
+    quoteText.textContent = `"${quote}"`;
   }
-  // Vider le contenu
-  document.getElementById('modalBody').innerHTML = '';
-  
-  // Réinitialiser la taille du modal
-  document.getElementById('modalContent').classList.remove('fullscreen');
-  document.getElementById('maximizeBtn').textContent = '□';
-  
-  // Réafficher le faux curseur
-  setTimeout(() => {
-    document.getElementById('fakeCursor').style.display = 'block';
-  }, 100);
 }
 
-// Fonction pour agrandir/réduire le modal
-function toggleMaximize() {
-  const modalContent = document.getElementById('modalContent');
-  const maximizeBtn = document.getElementById('maximizeBtn');
+// Formule de score
+function getArticlePagesPerContributor(name) {
+  switch(name) {
+    case "Venehon": return 1;
+    case "Caverne": return 5;
+    case "Raffaello Bellino": return 5;
+    default: return 3;
+  }
+}
+
+function calculateScore(year) {
+  const yearKey = 'y' + year;
+  const data = contributorData[yearKey];
+  if (!data) return 0;
   
-  if (modalContent.classList.contains('fullscreen')) {
-    modalContent.classList.remove('fullscreen');
-    maximizeBtn.textContent = '□';
+  // Récupérer les poids depuis le JSON centralisé
+  const weights = statsData?.scoring?.weights || {
+    page: 15, page_traduction: 7.5, video_minute: 7, audio_minute: 3.5, retweets: 1, likes: 0.3
+  };
+  
+  const yearBooks = (contributorData.books || []).filter(b => b.year === year);
+  const bookPages = yearBooks.reduce((sum, b) => sum + (b.pages || 0), 0);
+  
+  const yearTrans = (contributorData.translations || []).filter(t => t.year === year);
+  const transPages = yearTrans.reduce((sum, t) => sum + (t.pages || 0), 0);
+  
+  let articleCount = data.articles || 0;
+  const pagesPerArticle = getArticlePagesPerContributor(contributorData.name);
+  const articlePages = articleCount * pagesPerArticle;
+  
+  // Minutes vidéo et audio
+  const videoMinutes = data.video_minutes || 0;
+  const audioMinutes = data.audio_minutes || 0;
+  
+  // Nouvelle formule
+  const score = (bookPages * weights.page) + 
+                (transPages * weights.page_traduction) + 
+                (articlePages * weights.page) + 
+                (videoMinutes * weights.video_minute) + 
+                (audioMinutes * weights.audio_minute) + 
+                ((data.retweets || 0) * weights.retweets) + 
+                ((data.likes || 0) * weights.likes);
+  
+  return Math.round(score);
+}
+
+function calculateTotalScore() {
+  let total = 0;
+  for (let y = 2007; y <= 2025; y++) {
+    total += calculateScore(y);
+  }
+  return total;
+}
+
+// Livres
+function updateBooks() {
+  const books = contributorData.books || [];
+  document.getElementById('booksGrid').innerHTML = books.map(book => `
+    <div class="book-card" onclick="openBookModal('${book.title.replace(/'/g, "\\'")}', ${book.year}, ${book.pages})">
+      <div class="book-cover">
+        <img src="covers/${book.title.toLowerCase().replace(/[^a-z0-9]/g, '')}.jpg" alt="${book.title}" onerror="this.style.display='none'">
+      </div>
+      <div class="book-info-text">
+        <div class="book-title">${book.title}</div>
+        <div class="book-info">${book.year} • ${book.pages} pages</div>
+        <div class="book-formats">
+          <span class="format-badge">PDF</span>
+          <span class="format-badge">EPUB</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Traductions avec pagination
+function updateTranslations() {
+  allTranslations = contributorData.translations || [];
+  renderTranslationsPage();
+}
+
+function renderTranslationsPage() {
+  const start = currentTransPage * translationsPerPage;
+  const pageTrans = allTranslations.slice(start, start + translationsPerPage);
+  
+  document.getElementById('translationsGrid').innerHTML = pageTrans.map(trans => {
+    const parts = trans.title.split(' - ');
+    const author = parts.length > 1 ? parts[0] : '';
+    const title = parts.length > 1 ? parts.slice(1).join(' - ') : trans.title;
+    
+    return `
+      <div class="translation-card" onclick="openTranslationModal('${trans.title.replace(/'/g, "\\'")}', ${trans.year}, ${trans.pages})">
+        <div class="translation-author">${author}</div>
+        <div class="translation-title">${title}</div>
+        <div class="translation-info">${trans.year} • ${trans.pages} pages</div>
+        <div class="book-formats" style="margin-top: 8px;">
+          <span class="format-badge" style="background: #008000;">PDF</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  const totalPages = Math.ceil(allTranslations.length / translationsPerPage) || 1;
+  document.getElementById('transPageInfo').textContent = `Page ${currentTransPage + 1} / ${totalPages}`;
+  document.getElementById('prevTransBtn').disabled = currentTransPage === 0;
+  document.getElementById('nextTransBtn').disabled = currentTransPage >= totalPages - 1;
+}
+
+function changeTransPage(dir) {
+  currentTransPage += dir;
+  if (currentTransPage < 0) currentTransPage = 0;
+  const maxPage = Math.ceil(allTranslations.length / translationsPerPage) - 1;
+  if (currentTransPage > maxPage) currentTransPage = maxPage;
+  renderTranslationsPage();
+}
+
+// Articles avec pagination
+function updateArticles() {
+  // Vérifier si des articles détaillés existent dans le JSON
+  const detailedArticles = contributorData.articles || [];
+  
+  if (detailedArticles.length > 0) {
+    // Utiliser les articles détaillés du JSON
+    allArticles = detailedArticles.map(a => ({
+      title: a.title,
+      year: a.year,
+      date: a.date || `${a.year}`,
+      pdf: a.pdf || ''
+    }));
   } else {
-    modalContent.classList.add('fullscreen');
-    maximizeBtn.textContent = '❐';
+    // Générer un résumé par année (articles non détaillés)
+    allArticles = [];
+    for (let y = 2007; y <= 2025; y++) {
+      const yearKey = 'y' + y;
+      const data = contributorData[yearKey];
+      if (data && data.articles > 0) {
+        // Créer une entrée résumée pour chaque année
+        allArticles.push({ 
+          title: `${data.articles} articles publiés`, 
+          year: y, 
+          date: `${y}`,
+          isYearSummary: true,
+          count: data.articles
+        });
+      }
+    }
   }
-}
-
-// Charger les tweets - Version simplifiée avec fallback immédiat
-function loadTwitterFeed() {
-  const tweetsContainer = document.getElementById('tweetsContainer');
-  const twitterUsername = 'visitor_xyz';
   
-  // Afficher directement le widget Twitter
-  tweetsContainer.innerHTML = `
-    <a class="twitter-timeline" 
-       data-height="450" 
-       data-theme="light" 
-       data-chrome="noheader nofooter noborders transparent"
-       data-tweet-limit="3"
-       data-lang="fr"
-       href="https://twitter.com/${twitterUsername}?ref_src=twsrc%5Etfw">
-       Chargement des tweets de @${twitterUsername}...
-    </a>
+  filteredArticles = [...allArticles];
+  const years = [...new Set(allArticles.map(a => a.year))].sort().reverse();
+  
+  // Calculer le total d'articles
+  let totalArticleCount = 0;
+  if (detailedArticles.length > 0) {
+    totalArticleCount = detailedArticles.length;
+  } else {
+    for (let y = 2007; y <= 2025; y++) {
+      const data = contributorData['y' + y];
+      if (data) totalArticleCount += data.articles || 0;
+    }
+  }
+  
+  document.getElementById('articleFilters').innerHTML = `
+    <button class="filter-btn active" onclick="filterArticlesByYear('all')">TOUS (${totalArticleCount})</button>
+    ${years.map(y => {
+      let count;
+      if (detailedArticles.length > 0) {
+        count = allArticles.filter(a => a.year === y).length;
+      } else {
+        count = (contributorData['y' + y] || {}).articles || 0;
+      }
+      return `<button class="filter-btn" onclick="filterArticlesByYear(${y})">${y} (${count})</button>`;
+    }).join('')}
   `;
   
-  // Charger le script Twitter Widgets si pas déjà chargé
-  if (!document.querySelector('script[src*="platform.twitter.com"]')) {
-    const script = document.createElement('script');
-    script.src = 'https://platform.twitter.com/widgets.js';
-    script.async = true;
-    script.charset = 'utf-8';
-    document.head.appendChild(script);
+  renderArticlesPage();
+}
+
+function filterArticlesByYear(year) {
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  filteredArticles = year === 'all' ? [...allArticles] : allArticles.filter(a => a.year === year);
+  currentArticlePage = 0;
+  renderArticlesPage();
+}
+
+function renderArticlesPage() {
+  const start = currentArticlePage * articlesPerPage;
+  const pageArticles = filteredArticles.slice(start, start + articlesPerPage);
+  
+  // Vérifier si ce sont des articles détaillés ou des résumés
+  const hasDetailedArticles = pageArticles.length > 0 && !pageArticles[0].isYearSummary;
+  
+  if (hasDetailedArticles) {
+    // Affichage des articles détaillés (cliquables)
+    document.getElementById('articlesContainer').innerHTML = pageArticles.map(article => `
+      <div class="article-item" ${article.pdf ? `onclick="openArticleModal('${article.title.replace(/'/g, "\\'")}', '${article.date}', '${article.pdf}')"` : ''} style="${article.pdf ? 'cursor: pointer;' : ''}">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>✍️ ${article.title}</strong>
+            <div style="font-size: 0.85em; color: #000080;">${article.date}</div>
+          </div>
+          ${article.pdf ? `<span class="format-badge" style="background: #008000;">PDF</span>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    // Affichage des résumés par année (avec lien vers le site)
+    document.getElementById('articlesContainer').innerHTML = pageArticles.map(article => `
+      <div class="article-item" onclick="window.open('https://lestroisetendards.com/', '_blank')" style="cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong>📅 ${article.year} - ${article.title}</strong>
+            <div style="font-size: 0.85em; color: #000080;">Cliquez pour voir sur lestroisetendards.com</div>
+          </div>
+          <span style="font-size: 24px;">🔗</span>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Calculer le nombre total d'articles pour la pagination
+  let displayCount = filteredArticles.length;
+  if (!hasDetailedArticles && filteredArticles.length > 0) {
+    displayCount = filteredArticles.reduce((sum, a) => sum + (a.count || 1), 0);
+  }
+  
+  const totalPages = Math.ceil(filteredArticles.length / articlesPerPage) || 1;
+  document.getElementById('pageInfo').textContent = `Page ${currentArticlePage + 1} / ${totalPages} (${displayCount} articles)`;
+  document.getElementById('prevBtn').disabled = currentArticlePage === 0;
+  document.getElementById('nextBtn').disabled = currentArticlePage >= totalPages - 1;
+}
+
+function changePage(dir) {
+  currentArticlePage += dir;
+  if (currentArticlePage < 0) currentArticlePage = 0;
+  const maxPage = Math.ceil(filteredArticles.length / articlesPerPage) - 1;
+  if (currentArticlePage > maxPage) currentArticlePage = maxPage;
+  renderArticlesPage();
+}
+
+// Stats
+let statPeriod = 'year';
+
+function showYearStats() {
+  statPeriod = 'year';
+  document.getElementById('btnStatYear').classList.add('active');
+  document.getElementById('btnStatMonth').classList.remove('active');
+  updateStats();
+}
+
+function showMonthStats() {
+  statPeriod = 'month';
+  document.getElementById('btnStatMonth').classList.add('active');
+  document.getElementById('btnStatYear').classList.remove('active');
+  updateStats();
+}
+
+function updateStats() {
+  const currentYear = new Date().getFullYear();
+  const monthKeys = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 
+                     'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
+  const currentMonthKey = monthKeys[new Date().getMonth()];
+  
+  // Récupérer les poids depuis le JSON centralisé
+  const weights = statsData.scoring?.weights || {
+    page: 15, page_traduction: 7.5, video_minute: 7, audio_minute: 3.5, retweets: 1, likes: 0.3
+  };
+  
+  if (statPeriod === 'year') {
+    // Stats de l'année
+    const yearKey = 'y' + currentYear;
+    const yearData = contributorData[yearKey] || {};
     
-    // Fallback si le chargement échoue après 5 secondes
-    setTimeout(() => {
-      if (!window.twttr) {
-        showFallbackTweets();
-      }
-    }, 5000);
-  } else if (window.twttr && window.twttr.widgets) {
-    // Recharger les widgets si déjà présent
-    window.twttr.widgets.load();
+    // Pages des livres de l'année
+    const booksThisYear = (contributorData.books || []).filter(b => b.year === currentYear);
+    const pagesLivres = booksThisYear.reduce((sum, b) => sum + (b.pages || 0), 0);
+    
+    // Pages des traductions de l'année
+    const transThisYear = (contributorData.translations || []).filter(t => t.year === currentYear);
+    const pagesTrad = transThisYear.reduce((sum, t) => sum + (t.pages || 0), 0);
+    
+    // Pages des articles de l'année (depuis tableau OU depuis yXXXX.articles)
+    let pagesArticles = 0;
+    const articlesArray = contributorData.articles || [];
+    if (articlesArray.length > 0) {
+      const articlesThisYear = articlesArray.filter(a => a.year === currentYear);
+      pagesArticles = articlesThisYear.reduce((sum, a) => sum + (a.pages || 3), 0);
+    } else {
+      // Pas de tableau détaillé, utiliser le compteur yXXXX.articles × 3 pages
+      const articlesCount = yearData.articles || 0;
+      pagesArticles = articlesCount * 3;
+    }
+    
+    const videoMin = yearData.video_minutes || 0;
+    const audioMin = yearData.audio_minutes || 0;
+    
+    document.getElementById('stat-pages-livres').textContent = pagesLivres;
+    document.getElementById('stat-pages-articles').textContent = pagesArticles;
+    document.getElementById('stat-video-min').textContent = videoMin;
+    document.getElementById('stat-audio-min').textContent = audioMin;
+    document.getElementById('stat-retweets').textContent = yearData.retweets || 0;
+    document.getElementById('stat-likes').textContent = yearData.likes || 0;
+    
+    // Afficher aussi les traductions si présentes
+    const statTradEl = document.getElementById('stat-pages-trad');
+    if (statTradEl) statTradEl.textContent = pagesTrad;
+    
+    // Score avec nouvelle formule incluant traductions
+    const yearScore = (pagesLivres * weights.page) + 
+                      (pagesTrad * weights.page_traduction) +
+                      (pagesArticles * weights.page) + 
+                      (videoMin * weights.video_minute) + 
+                      (audioMin * weights.audio_minute) + 
+                      ((yearData.retweets || 0) * weights.retweets) + 
+                      ((yearData.likes || 0) * weights.likes);
+    document.getElementById('stat-score').textContent = Math.round(yearScore);
+    
+  } else {
+    // Stats du mois
+    const monthData = contributorData.months?.[currentMonthKey] || {};
+    
+    document.getElementById('stat-pages-livres').textContent = monthData.pages_livres || 0;
+    document.getElementById('stat-pages-articles').textContent = monthData.pages_articles || 0;
+    document.getElementById('stat-video-min').textContent = monthData.video_minutes || 0;
+    document.getElementById('stat-audio-min').textContent = monthData.audio_minutes || 0;
+    document.getElementById('stat-retweets').textContent = monthData.retweets || 0;
+    document.getElementById('stat-likes').textContent = monthData.likes || 0;
+    
+    const pagesTradMonth = monthData.pages_traductions || 0;
+    const statTradEl = document.getElementById('stat-pages-trad');
+    if (statTradEl) statTradEl.textContent = pagesTradMonth;
+    
+    // Score du mois avec nouvelle formule
+    const monthScore = ((monthData.pages_livres || 0) * weights.page) + 
+                       ((pagesTradMonth) * weights.page_traduction) +
+                       ((monthData.pages_articles || 0) * weights.page) + 
+                       ((monthData.video_minutes || 0) * weights.video_minute) + 
+                       ((monthData.audio_minutes || 0) * weights.audio_minute) + 
+                       ((monthData.retweets || 0) * weights.retweets) + 
+                       ((monthData.likes || 0) * weights.likes);
+    document.getElementById('stat-score').textContent = Math.round(monthScore);
   }
 }
 
-// Tweets de secours si l'API Twitter ne charge pas
-function showFallbackTweets() {
-  const tweetsContainer = document.getElementById('tweetsContainer');
-  tweetsContainer.innerHTML = `
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <div style="background: #FFFFFF; padding: 15px; border: 2px solid #000080; color: #000000; border-radius: 3px;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-          <div style="width: 32px; height: 32px; background: #000080; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: bold;">V</div>
-          <div>
-            <div style="font-weight: bold;">Visitor</div>
-            <div style="font-size: 0.85em; color: #657786;">@visitor_xyz · Il y a 2h</div>
+// Vidéos
+function updateVideos() {
+  const videos = contributorData.videos || [];
+  if (videos.length === 0) {
+    document.getElementById('videosContainer').innerHTML = '<div style="color: #808080; padding: 20px; text-align: center;">Aucune vidéo disponible</div>';
+    return;
+  }
+  document.getElementById('videosContainer').innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
+      ${videos.map(v => `
+        <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;">
+          <div style="background: #000000; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+            <div style="font-size: 3em;">▶️</div>
           </div>
+          <div style="font-weight: bold; color: #000080;">${v.title}</div>
+          <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">${v.year} • ${v.duration}</div>
+          <a href="${v.file}" class="format-badge" style="display: inline-block; margin-top: 8px; background: #FF69B4;" download onclick="event.stopPropagation()">⬇️ MP4</a>
         </div>
-        <div style="line-height: 1.5; margin-bottom: 10px;">La philosophie n'est pas morte, elle a simplement migré dans le code. Nietzsche aurait adoré le chaos algorithmique. 🤖💭</div>
-        <div style="display: flex; gap: 20px; font-size: 0.9em; color: #657786;">
-          <span>💬 18</span>
-          <span>🔄 32</span>
-          <span>❤️ 145</span>
-        </div>
-      </div>
-      
-      <div style="background: #FFFFFF; padding: 15px; border: 2px solid #000080; color: #000000; border-radius: 3px;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-          <div style="width: 32px; height: 32px; background: #000080; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: bold;">V</div>
-          <div>
-            <div style="font-weight: bold;">Visitor</div>
-            <div style="font-size: 0.85em; color: #657786;">@visitor_xyz · Il y a 5h</div>
-          </div>
-        </div>
-        <div style="line-height: 1.5; margin-bottom: 10px;">Nouveau chapitre terminé pour "Philosophie du Futur". L'écriture est une forme de résistance contre l'accélération du monde. 📖✨</div>
-        <div style="display: flex; gap: 20px; font-size: 0.9em; color: #657786;">
-          <span>💬 12</span>
-          <span>🔄 21</span>
-          <span>❤️ 89</span>
-        </div>
-      </div>
-      
-      <div style="background: #FFFFFF; padding: 15px; border: 2px solid #000080; color: #000000; border-radius: 3px;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-          <div style="width: 32px; height: 32px; background: #000080; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #FFF; font-weight: bold;">V</div>
-          <div>
-            <div style="font-weight: bold;">Visitor</div>
-            <div style="font-size: 0.85em; color: #657786;">@visitor_xyz · Il y a 1j</div>
-          </div>
-        </div>
-        <div style="line-height: 1.5; margin-bottom: 10px;">Réflexion du jour : Et si l'IA ne remplaçait pas l'humain, mais révélait enfin ce qui nous rend vraiment humains ? 🤔</div>
-        <div style="display: flex; gap: 20px; font-size: 0.9em; color: #657786;">
-          <span>💬 45</span>
-          <span>🔄 67</span>
-          <span>❤️ 203</span>
-        </div>
-      </div>
-      
-      <div style="text-align: center; padding: 10px;">
-        <a href="https://twitter.com/visitor_xyz" target="_blank" style="color: #000080; text-decoration: underline; font-weight: bold;">Voir plus sur Twitter →</a>
-      </div>
+      `).join('')}
     </div>
   `;
 }
 
-// Fermer avec Escape
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') closeModal();
-});
-
-// Données du radar avec acronymes
-const branches = [
-  {name: "RAIS", fullName: "Raisonnement", value: 85},
-  {name: "ETH", fullName: "Éthique", value: 25},
-  {name: "LOG", fullName: "Logique", value: 90},
-  {name: "ESTH", fullName: "Esthétique", value: 86},
-  {name: "META", fullName: "Métaphysique", value: 54},
-  {name: "SOC", fullName: "Sociologie", value: 75}
-];
-
-// Données de production par année
-const productionData = {
-  2018: {
-    count: 3,
-    works: [
-      "Article: Premiers Écrits Philosophiques",
-      "Essai: La Question du Sens",
-      "Contribution: Revue de Philosophie Contemporaine"
-    ]
-  },
-  2019: {
-    count: 5,
-    works: [
-      "Article: Nietzsche Revisité",
-      "Essai: Morale et Pouvoir",
-      "Article: Vers un Nouveau Vitalisme",
-      "Conférence: Philosophie et Modernité",
-      "Publication: Journal des Idées"
-    ]
-  },
-  2020: {
-    count: 4,
-    works: [
-      "Livre: Fondements du Vitalisme",
-      "Article: Crise et Opportunité",
-      "Essai: Le Sujet Post-Moderne",
-      "Podcast: Dialogues Philosophiques"
-    ]
-  },
-  2021: {
-    count: 7,
-    works: [
-      "Article: Éthique Numérique",
-      "Essai: La Fin du Sujet Kantien",
-      "Livre: Manifeste Néo-Nietzschéen",
-      "Conférence: Philosophie du Digital",
-      "Article: Technologie et Humanité",
-      "Essai: Au-delà du Bien et du Mal 2.0",
-      "Publication: Revue Vitaliste"
-    ]
-  },
-  2022: {
-    count: 8,
-    works: [
-      "Livre: Philosophie de l'IA",
-      "Article: Conscience Algorithmique",
-      "Essai: Démocratie Numérique",
-      "Conférence: L'Humain Augmenté",
-      "Article: Cyber-Stoïcisme",
-      "Essai: Éthique Post-Humaniste",
-      "Podcast: Conversations du Futur",
-      "Article: Le Nouvel Homme"
-    ]
-  },
-  2023: {
-    count: 9,
-    works: [
-      "Livre: Manifeste Vitaliste",
-      "Article: Nietzsche au XXIe Siècle",
-      "Essai: La Mort du Sujet",
-      "Conférence: Philosophie et Tech",
-      "Article: Vers une Éthique Nouvelle",
-      "Podcast: Série Conversations Philosophiques",
-      "Essai: Le Nihilisme Numérique",
-      "Article: Cyber-Éthique",
-      "Publication: Archives Philosophiques"
-    ]
-  },
-  2024: {
-    count: 11,
-    works: [
-      "Article: La Démocratie à l'Ère Numérique",
-      "Livre: Éthique et Technologie",
-      "Essai: Vers une Éthique Post-Humaniste",
-      "Conférence: Démocratie et Technologie (Paris)",
-      "Article: Le Transhumanisme en Question",
-      "Essai: Philosophie de l'Attention",
-      "Podcast: Dialogues Contemporains",
-      "Article: Intelligence Artificielle et Conscience",
-      "Livre: Au-delà de l'Humain",
-      "Essai: Nihilisme et Création",
-      "Conférence: Festival de Philosophie"
-    ]
-  },
-  2025: {
-    count: 6,
-    works: [
-      "Article: Le Nihilisme Numérique (Jan)",
-      "Essai: Réflexions sur l'IA Générative (Feb)",
-      "Conférence: Éthique de l'IA (Mar)",
-      "Article: Vers une Nouvelle Humanité (Apr)",
-      "Podcast: Série Spéciale IA (Mai)",
-      "Livre: Philosophie du Futur (en cours)"
-    ]
+// Audio
+function updateAudio() {
+  const audios = contributorData.audio || [];
+  if (audios.length === 0) {
+    document.getElementById('audioContainer').innerHTML = '<div style="color: #808080; padding: 20px; text-align: center;">Aucun audio disponible</div>';
+    return;
   }
-};
+  document.getElementById('audioContainer').innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
+      ${audios.map(a => `
+        <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer;">
+          <div style="background: #1a1a2e; height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+            <div style="font-size: 2.5em;">🎧</div>
+          </div>
+          <div style="font-weight: bold; color: #000080;">${a.title}</div>
+          <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">${a.year} • ${a.duration}</div>
+          <a href="${a.file}" class="format-badge" style="display: inline-block; margin-top: 8px; background: #FFA500;" download onclick="event.stopPropagation()">⬇️ MP3</a>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
 
-// Dessin du radar
-function drawRadar(){
+// Badges
+function updateBadges() {
+  const totalScore = calculateTotalScore();
+  const books = (contributorData.books || []).length;
+  
+  const badges = [];
+  if (totalScore > 100000) badges.push({ icon: '🏆', name: 'LEGEND', desc: 'Score > 100 000', bg: '#FFD700' });
+  if (books >= 5) badges.push({ icon: '📚', name: 'BOOK MASTER', desc: '5+ livres publiés', bg: '#FFD700' });
+  if (allTranslations.length >= 5) badges.push({ icon: '🔄', name: 'TRANSLATOR', desc: '5+ traductions', bg: '#00FF00' });
+  if (allArticles.length >= 1000) badges.push({ icon: '✍️', name: 'PROLIFIC', desc: '1000+ articles', bg: '#C0C0C0' });
+  badges.push({ icon: '🔥', name: 'VITALISTE', desc: 'Membre depuis 2007', bg: '#FF6600' });
+  
+  document.getElementById('badgesContainer').innerHTML = badges.map(b => `
+    <span class="badge-item" style="background: ${b.bg};" data-description="${b.desc}">
+      ${b.icon} ${b.name}
+    </span>
+  `).join('');
+}
+
+// Radar
+function drawRadar() {
   const svg = document.getElementById("radar-svg");
   svg.innerHTML = "";
+  
+  const radar = contributorData.radar;
+  const branches = [
+    {name: "RAIS", fullName: "Raisonnement", value: radar.raisonnement},
+    {name: "ETH", fullName: "Éthique", value: radar.ethique},
+    {name: "LOG", fullName: "Logique", value: radar.logique},
+    {name: "ESTH", fullName: "Esthétique", value: radar.esthetique},
+    {name: "META", fullName: "Métaphysique", value: radar.metaphysique},
+    {name: "SOC", fullName: "Sociologie", value: radar.sociologie}
+  ];
 
-  const cX = 125, cY = 125;
-  const maxR = 80;
-  const levels = 4;
+  const cX = 125, cY = 125, maxR = 80, levels = 4;
 
   for(let i = 1; i <= levels; i++){
     const r = (maxR / levels) * i;
@@ -1328,13 +1580,13 @@ function drawRadar(){
 
   const total = branches.length;
   const pts = [];
+  const tooltip = document.getElementById('tooltip');
 
   branches.forEach((b, i) => {
     const angle = (i / total) * 2 * Math.PI - Math.PI / 2;
     
-    const lineEnd = maxR;
-    const lx2 = cX + lineEnd * Math.cos(angle);
-    const ly2 = cY + lineEnd * Math.sin(angle);
+    const lx2 = cX + maxR * Math.cos(angle);
+    const ly2 = cY + maxR * Math.sin(angle);
     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("x1", cX);
     line.setAttribute("y1", cY);
@@ -1346,35 +1598,41 @@ function drawRadar(){
     svg.appendChild(line);
 
     const rad = maxR * (b.value / 100);
-    const x = cX + rad * Math.cos(angle);
-    const y = cY + rad * Math.sin(angle);
-    pts.push([x, y]);
+    pts.push([cX + rad * Math.cos(angle), cY + rad * Math.sin(angle)]);
 
     const lR = maxR + 28;
-    const lx = cX + lR * Math.cos(angle);
-    const ly = cY + lR * Math.sin(angle);
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", lx);
-    text.setAttribute("y", ly);
+    text.setAttribute("x", cX + lR * Math.cos(angle));
+    text.setAttribute("y", cY + lR * Math.sin(angle));
     text.textContent = b.name;
     text.setAttribute("class", "radar-label");
-    text.setAttribute("data-fullname", b.fullName);
     
     const cosA = Math.cos(angle);
     if(cosA > 0.2) text.setAttribute("text-anchor", "start");
     else if(cosA < -0.2) text.setAttribute("text-anchor", "end");
     else text.setAttribute("text-anchor", "middle");
     text.setAttribute("alignment-baseline", "middle");
+    
+    text.addEventListener('mouseenter', () => {
+      tooltip.innerHTML = `<strong>${b.fullName}</strong>: ${b.value}%`;
+      tooltip.style.display = 'block';
+    });
+    text.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.clientX + 10) + 'px';
+      tooltip.style.top = (e.clientY + 10) + 'px';
+    });
+    text.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+    
     svg.appendChild(text);
   });
-
+  
   const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
   poly.setAttribute("points", pts.map(p => p.join(",")).join(" "));
   poly.setAttribute("fill", "rgba(255, 255, 255, 0.4)");
   poly.setAttribute("stroke", "#FFFFFF");
   poly.setAttribute("stroke-width", "2.5");
   svg.appendChild(poly);
-
+  
   pts.forEach(([x, y]) => {
     const pt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     pt.setAttribute("cx", x);
@@ -1383,44 +1641,34 @@ function drawRadar(){
     pt.setAttribute("class", "radar-point");
     svg.appendChild(pt);
   });
-
-  const labels = svg.querySelectorAll('.radar-label');
-  const tooltip = document.getElementById('tooltip');
-  
-  labels.forEach(label => {
-    label.addEventListener('mouseenter', (e) => {
-      tooltip.textContent = e.target.getAttribute('data-fullname');
-      tooltip.style.display = 'block';
-    });
-    
-    label.addEventListener('mousemove', (e) => {
-      tooltip.style.left = (e.clientX + 10) + 'px';
-      tooltip.style.top = (e.clientY + 10) + 'px';
-    });
-    
-    label.addEventListener('mouseleave', () => {
-      tooltip.style.display = 'none';
-    });
-  });
 }
 
-// Dessin du graphique de production
-function drawTimeline(){
+// Timeline - plus haute (400px)
+function drawTimeline() {
   const canvas = document.getElementById('timelineCanvas');
   const ctx = canvas.getContext('2d');
-  
   canvas.width = 2000;
-  canvas.height = 280;
+  canvas.height = 400; // Plus haute
   
-  const years = Object.keys(productionData).map(Number);
-  const counts = years.map(y => productionData[y].count);
-  const maxCount = Math.max(...counts);
+  const years = [];
+  for (let y = 2007; y <= 2025; y++) years.push(y);
   
-  const padding = 50;
+  const productionData = {};
+  years.forEach(year => {
+    productionData[year] = {
+      score: calculateScore(year),
+      articles: (contributorData['y' + year] || {}).articles || 0
+    };
+  });
+  
+  const scores = years.map(y => productionData[y].score);
+  const maxScore = Math.max(...scores, 1);
+  const padding = 60;
   const graphWidth = canvas.width - padding * 2;
-  const graphHeight = canvas.height - padding * 2 - 50;
+  const graphHeight = canvas.height - padding * 2 - 80;
   const stepX = graphWidth / (years.length - 1);
   
+  // Grille
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
   ctx.lineWidth = 1;
   for(let i = 0; i <= 5; i++){
@@ -1431,132 +1679,224 @@ function drawTimeline(){
     ctx.stroke();
   }
   
+  // Axes
   ctx.strokeStyle = '#FFFFFF';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, canvas.height - padding - 50);
-  ctx.lineTo(canvas.width - padding, canvas.height - padding - 50);
+  ctx.lineTo(padding, canvas.height - padding - 70);
+  ctx.lineTo(canvas.width - padding, canvas.height - padding - 70);
   ctx.stroke();
   
+  // Labels Y
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '14px "Courier New"';
   ctx.textAlign = 'right';
-  for(let i = 0; i <= maxCount; i += 2){
-    const y = canvas.height - padding - 50 - (graphHeight / maxCount) * i;
-    ctx.fillText(i, padding - 10, y + 4);
+  for(let i = 0; i <= 5; i++){
+    const val = Math.round((maxScore / 5) * i);
+    const y = canvas.height - padding - 70 - (graphHeight / maxScore) * val;
+    ctx.fillText(val.toLocaleString('fr-FR'), padding - 10, y + 4);
   }
   
-  ctx.font = 'bold 18px "Courier New"';
+  // Labels X et scores
+  ctx.font = 'bold 16px "Courier New"';
   ctx.textAlign = 'center';
   years.forEach((year, i) => {
     const x = padding + stepX * i;
-    ctx.fillText(year, x, canvas.height - padding - 15);
     
-    ctx.font = '14px "Courier New"';
-    ctx.fillStyle = '#00FF00';
-    ctx.fillText(`(${counts[i]})`, x, canvas.height - padding);
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 18px "Courier New"';
+    ctx.fillText(year, x, canvas.height - padding - 50);
+    
+    const scoreText = `★ ${productionData[year].score.toLocaleString('fr-FR')}`;
+    ctx.font = 'bold 14px "Courier New"';
+    const textWidth = ctx.measureText(scoreText).width;
+    
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x - textWidth/2 - 4, canvas.height - padding - 35, textWidth + 8, 20);
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - textWidth/2 - 4, canvas.height - padding - 35, textWidth + 8, 20);
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText(scoreText, x, canvas.height - padding - 20);
+    
+    ctx.font = 'bold 16px "Courier New"';
   });
   
+  // Courbe
   ctx.strokeStyle = '#FFFFFF';
   ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
   ctx.lineWidth = 3;
-  
   ctx.beginPath();
-  ctx.moveTo(padding, canvas.height - padding - 50);
+  ctx.moveTo(padding, canvas.height - padding - 70);
   
   const points = [];
   years.forEach((year, i) => {
     const x = padding + stepX * i;
-    const y = canvas.height - padding - 50 - (graphHeight / maxCount) * counts[i];
-    points.push({x, y, year});
-    
-    if(i === 0) ctx.lineTo(x, y);
-    else ctx.lineTo(x, y);
+    const y = canvas.height - padding - 70 - (graphHeight / maxScore) * scores[i];
+    points.push({x, y, year, data: productionData[year]});
+    ctx.lineTo(x, y);
   });
   
-  ctx.lineTo(canvas.width - padding, canvas.height - padding - 50);
+  ctx.lineTo(canvas.width - padding, canvas.height - padding - 70);
   ctx.closePath();
   ctx.fill();
-  
-  ctx.beginPath();
-  points.forEach((p, i) => {
-    if(i === 0) ctx.moveTo(p.x, p.y);
-    else ctx.lineTo(p.x, p.y);
-  });
   ctx.stroke();
   
-  ctx.font = '20px "Courier New"';
-  ctx.textAlign = 'center';
-  
+  // Points
   points.forEach(p => {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
     ctx.fillStyle = '#FFFFFF';
     ctx.fill();
     ctx.strokeStyle = '#0000AA';
     ctx.lineWidth = 2;
     ctx.stroke();
-    
-    const mainBook = productionData[p.year].works.find(w => w.includes('Livre:'));
-    if(mainBook) {
-      ctx.fillText('📖', p.x, p.y - 20);
-    }
   });
   
+  // Popup
   const yearPopup = document.getElementById('yearPopup');
-  
   canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const adjustedX = mx * scaleX;
-    const adjustedY = my * scaleY;
-    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
     let found = false;
+    
     points.forEach(p => {
-      const dist = Math.sqrt((adjustedX - p.x) ** 2 + (adjustedY - p.y) ** 2);
-      if(dist < 20){
+      if (Math.sqrt((mouseX - p.x) ** 2 + (mouseY - p.y) ** 2) < 50) {
         found = true;
-        const data = productionData[p.year];
-        const mainBook = data.works.find(w => w.includes('Livre:'));
-        const bookDisplay = mainBook ? mainBook.replace('Livre:', '').trim() : '(Aucun livre cette année)';
-        
-        yearPopup.innerHTML = `
-          <div class="year-popup-title">📅 ${p.year} - ${data.count} publications</div>
-          <div style="background: #FFFFE1; padding: 8px; margin: 8px 0; border: 2px solid #000000;">
-            📖 <strong>Livre principal:</strong><br>
-            <span style="color: #0000AA;">${bookDisplay}</span>
-          </div>
-          <div class="year-popup-list"><strong>Toutes les productions:</strong><br>${data.works.map(w => `• ${w}`).join('<br>')}</div>
-        `;
         yearPopup.style.display = 'block';
-        yearPopup.style.left = (e.clientX + 15) + 'px';
-        yearPopup.style.top = (e.clientY - 10) + 'px';
+        yearPopup.style.left = (e.clientX + 10) + 'px';
+        yearPopup.style.top = (e.clientY + 10) + 'px';
+        yearPopup.innerHTML = `
+          <div class="year-popup-title">📅 ${p.year}</div>
+          <div class="year-popup-list">
+            <strong style="color: #FF0000;">⚡ SCORE: ${p.data.score.toLocaleString('fr-FR')}</strong><br>
+            ✍️ Articles: ${p.data.articles}
+          </div>
+        `;
       }
     });
     
-    if(!found) yearPopup.style.display = 'none';
+    if (!found) yearPopup.style.display = 'none';
   });
   
-  canvas.addEventListener('mouseleave', () => {
-    yearPopup.style.display = 'none';
-  });
+  canvas.addEventListener('mouseleave', () => yearPopup.style.display = 'none');
 }
 
-// Initialisation
-drawRadar();
-drawTimeline();
-loadRankingData();
-loadTwitterFeed();
+// Twitter
+function loadTwitterFeed() {
+  const container = document.getElementById('tweetsContainer');
+  container.innerHTML = `
+    <a class="twitter-timeline" data-height="400" data-theme="light" data-chrome="noheader nofooter noborders" data-tweet-limit="5" href="https://twitter.com/RaffaelloBelli1">Tweets</a>
+  `;
+  if (!document.querySelector('script[src*="platform.twitter.com"]')) {
+    const script = document.createElement('script');
+    script.src = 'https://platform.twitter.com/widgets.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+}
 
-// Actualiser les stats toutes les 30 secondes
-setInterval(loadRankingData, 30000);
+// Modal
+function openBookModal(title, year, pages) {
+  document.getElementById('fakeCursor').style.display = 'none';
+  document.getElementById('modalIcon').textContent = '📖';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('downloadPdf').style.display = 'inline-block';
+  document.getElementById('downloadPdf').href = '#';
+  document.getElementById('downloadEpub').style.display = 'inline-block';
+  document.getElementById('downloadEpub').href = '#';
+  document.getElementById('modalBody').innerHTML = `
+    <div style="padding: 50px; text-align: center; color: #000;">
+      <div style="font-size: 4em; margin-bottom: 20px;">📖</div>
+      <h2>${title}</h2>
+      <p style="font-size: 1.2em;">${year} • ${pages} pages</p>
+      <p style="margin-top: 30px; color: #666;">Fichier PDF à configurer</p>
+    </div>
+  `;
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+function openArticleModal(title, date, pdfUrl) {
+  document.getElementById('fakeCursor').style.display = 'none';
+  document.getElementById('modalIcon').textContent = '✍️';
+  document.getElementById('modalTitle').textContent = title;
+  
+  // Afficher le bouton PDF si disponible
+  if (pdfUrl && pdfUrl !== '') {
+    document.getElementById('downloadPdf').style.display = 'inline-block';
+    document.getElementById('downloadPdf').href = pdfUrl;
+    document.getElementById('downloadPdf').download = pdfUrl;
+  } else {
+    document.getElementById('downloadPdf').style.display = 'none';
+  }
+  document.getElementById('downloadEpub').style.display = 'none';
+  
+  // Afficher le PDF dans un iframe si disponible
+  if (pdfUrl && pdfUrl !== '') {
+    document.getElementById('modalBody').innerHTML = `
+      <iframe src="${pdfUrl}" class="pdf-viewer" frameborder="0">
+        <p>Votre navigateur ne supporte pas l'affichage de PDF. <a href="${pdfUrl}" download>Télécharger le fichier</a></p>
+      </iframe>
+    `;
+  } else {
+    document.getElementById('modalBody').innerHTML = `
+      <div style="padding: 50px; text-align: center; color: #000;">
+        <div style="font-size: 4em; margin-bottom: 20px;">✍️</div>
+        <h2>${title}</h2>
+        <p style="font-size: 1.2em;">${date}</p>
+        <p style="margin-top: 30px; color: #666;">PDF non disponible</p>
+        <a href="https://lestroisetendards.com/" target="_blank" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #000080; color: #FFF; text-decoration: none; border: 2px solid #000;">Voir sur lestroisetendards.com</a>
+      </div>
+    `;
+  }
+  
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+function openTranslationModal(title, year, pages) {
+  document.getElementById('fakeCursor').style.display = 'none';
+  document.getElementById('modalIcon').textContent = '🔄';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('downloadPdf').style.display = 'inline-block';
+  document.getElementById('downloadPdf').href = '#';
+  document.getElementById('downloadEpub').style.display = 'none';
+  document.getElementById('modalBody').innerHTML = `
+    <div style="padding: 50px; text-align: center; color: #000;">
+      <div style="font-size: 4em; margin-bottom: 20px;">🔄</div>
+      <h2>Traduction</h2>
+      <h3>${title}</h3>
+      <p style="font-size: 1.2em;">${year} • ${pages} pages</p>
+      <p style="margin-top: 30px; color: #666;">Fichier PDF à configurer</p>
+    </div>
+  `;
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modalViewer').style.display = 'none';
+  document.getElementById('modalBody').innerHTML = '';
+  document.getElementById('modalContent').classList.remove('fullscreen');
+  setTimeout(() => document.getElementById('fakeCursor').style.display = 'block', 100);
+}
+
+function toggleMaximize() {
+  const modal = document.getElementById('modalContent');
+  const btn = document.getElementById('maximizeBtn');
+  if (modal.classList.contains('fullscreen')) {
+    modal.classList.remove('fullscreen');
+    btn.textContent = '□';
+  } else {
+    modal.classList.add('fullscreen');
+    btn.textContent = '❐';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeModal();
+});
 </script>
 
 </body>

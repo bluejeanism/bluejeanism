@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIN DU LABYRINTHE</title>
+<style>
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.96}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes breathe{0%,100%{opacity:0.7}50%{opacity:1}}
+@keyframes glitch{0%,100%{filter:none}33%{filter:hue-rotate(90deg)}66%{filter:invert(0.1)}}
+@keyframes pulse{0%,100%{text-shadow:0 0 5px #AA0000}50%{text-shadow:0 0 20px #AA0000,0 0 30px #ff0000}}
+@keyframes healthDrain{0%{width:100%}100%{width:0%}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:none}
+body{background:#0000AA;color:#fff;font-family:"Courier New",monospace;font-size:14px;min-height:100vh;padding:30px;animation:flicker 0.15s infinite;display:flex;flex-direction:column;align-items:center}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(transparent,rgba(255,255,255,0.1),transparent);animation:scanline 8s linear infinite;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15),rgba(0,0,0,0.15) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:999}
+
+.content{max-width:700px;width:100%;position:relative;z-index:1;text-align:center}
+.logo{border:2px solid #fff;display:inline-block;padding:4px 16px;margin-bottom:20px;text-decoration:none;color:#fff}
+.logo span{background:#fff;color:#0000AA;padding:0 4px;font-weight:bold}
+.ascii{font-size:7px;line-height:1;color:#AA0000;margin:20px 0;animation:breathe 4s infinite;white-space:pre;display:inline-block;text-shadow:0 0 10px #AA0000}
+.divider{color:#555;margin:15px 0;letter-spacing:5px}
+.message{margin:20px 0;line-height:2;color:#aaa}
+.message .highlight{color:#AA0000;text-shadow:0 0 5px #AA0000}
+
+/* Barre de vie du Minotaure */
+.boss-container{margin:25px 0;padding:15px;border:1px solid #AA0000;background:rgba(170,0,0,0.1)}
+.boss-name{font-size:18px;color:#AA0000;margin-bottom:10px;letter-spacing:3px;cursor:default;transition:all 0.3s;user-select:all}
+.boss-name::selection{background:#AA0000;color:#fff}
+.boss-name::-moz-selection{background:#AA0000;color:#fff}
+.boss-name.revealed{animation:pulse 1s infinite}
+.health-bar{width:100%;height:20px;background:#333;border:2px solid #AA0000;position:relative;overflow:hidden}
+.health-fill{height:100%;background:linear-gradient(90deg,#ff0000,#AA0000);width:100%;transition:width 0.5s}
+.health-fill.draining{animation:healthDrain 2s forwards}
+.health-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:#fff;text-shadow:1px 1px 0 #000}
+
+.hint-text{font-size:11px;color:#555;margin-top:10px;font-style:italic;opacity:0;transition:opacity 0.5s}
+.hint-text.visible{opacity:1}
+
+.message .dim{opacity:0.5;font-size:12px}
+.question{margin:30px 0;color:#ccc}
+.question p{margin:12px 0}
+.choices{margin:25px 0}
+.choice{display:inline-block;background:transparent;border:2px solid #555;color:#aaa;padding:10px 25px;font-family:inherit;font-size:12px;cursor:pointer;margin:8px;transition:all 0.3s}
+.choice:hover{border-color:#AA0000;color:#AA0000;text-shadow:0 0 5px #AA0000}
+.choice:disabled{opacity:0.3;cursor:not-allowed}
+#response{margin-top:30px;min-height:150px;line-height:1.8}
+.footer-text{margin-top:40px;font-size:11px;color:#555}
+.coords{font-size:9px;color:#333;margin-top:8px;letter-spacing:2px}
+.prophecy{font-size:11px;color:#666;margin-top:15px;font-style:italic;line-height:1.8;max-width:400px;margin-left:auto;margin-right:auto}
+.status-bar{background:#c0c0c0;padding:4px 8px;margin-top:20px;border:2px outset #fff;font-size:11px;color:#000;display:flex;justify-content:space-between;width:100%}
+.status-section{border:2px inset #808080;padding:1px 8px}
+.cursor{position:fixed;width:14px;height:14px;background:#fff;pointer-events:none;z-index:10000;mix-blend-mode:difference;display:none}
+body:hover .cursor{display:block}
+.video-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;align-items:center;justify-content:center}
+.video-overlay.visible{display:flex}
+.video-overlay video{max-width:90vw;max-height:90vh}
+.video-overlay .close{position:absolute;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.victory-text{color:#00ff00;font-size:16px;margin-top:20px;display:none}
+.victory-text.visible{display:block}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+
+<div class="content">
+  <a href="borne.html" class="logo"><span>:vitalism</span></a>
+
+  <pre class="ascii">
+                            ___
+                         .-'   `'.
+                        /         \
+                        |         ;
+                        |         |           ___.--,
+               _.._     |0) ~ (0) |    _.---'`__.-( (_.
+        __.--'`_.. '.__.\    '--. \_.-' ,.--'`     `""`
+       ( ,.--'`   ',__ /./;   ;, '.__.'`    __
+       _`) )  .---.__.' / |   |\   \__..--""  """--.,_
+      `---' .'.''-._.-'`_./  /\ '.  \ _.-~~~````~~~-._`-.__.'
+            | |  .' _.-' |  |  \  \  '.               `~---`
+             \ \/ .'     \  \   '. '-._)
+              \/ /        \  \    `=.__`~-.
+              / /\         `) )    / / `"".`\
+        , _.-'.'\ \        / /    ( (     / /
+         `--~`   ) )    .-'.'      '.'.  | (
+                (/`    ( (`          ) )  '-;
+                 `      '-;         (-'
+  </pre>
+
+  <div class="divider">· · · · · · · · · · · · ·</div>
+
+  <div class="message">
+    <p>Tu as trouvé le centre.</p>
+    <p>Le <span class="highlight">Minotaure</span> t'attendait.</p>
+    <p class="dim">Il t'attendait depuis toujours.</p>
+  </div>
+
+  <div class="boss-container">
+    <div class="boss-name" id="bossName" title="Sélectionne pour révéler...">HUDELERBA</div>
+    <div class="health-bar">
+      <div class="health-fill" id="healthFill"></div>
+      <div class="health-text">████████████████████ 100%</div>
+    </div>
+    <div class="hint-text" id="hintText">Son vrai nom résonne... maintenant tu peux le vaincre.</div>
+  </div>
+
+  <div class="divider">· · · · · · · · · · · · ·</div>
+
+  <div class="question">
+    <p>« Qui es-tu, toi qui as traversé le labyrinthe ? »</p>
+    <p class="dim">Le monstre te regarde avec des yeux qui ont vu des siècles.</p>
+    <p>« Es-tu venu me tuer, comme les autres ? »</p>
+    <p>« Ou es-tu venu <span class="highlight">comprendre</span> ? »</p>
+  </div>
+
+  <div class="prophecy">
+    « Le chemin ancien : deux fois vers le ciel, deux fois vers l'abîme, 
+    puis l'oscillation entre l'orient et l'occident, encore et encore, 
+    et enfin... le commencement. »
+  </div>
+
+  <div class="choices" id="choices">
+    <button class="choice" onclick="choose('fight')">Je suis venu te vaincre.</button>
+    <button class="choice" onclick="choose('understand')">Je suis venu comprendre.</button>
+    <button class="choice" onclick="choose('become')">Je suis venu devenir.</button>
+  </div>
+
+  <div id="response"></div>
+  
+  <div class="victory-text" id="victoryText">
+    ⚔️ Le Minotaure s'effondre... Tu as percé son secret. ⚔️
+  </div>
+
+  <div class="footer-text">
+    <div class="divider">· · · · · · · · · · · · ·</div>
+    <p>Le labyrinthe n'a jamais eu de sortie.</p>
+    <p>Il n'a qu'un centre.</p>
+    <div class="coords">41°53'24.8"N 12°29'32.8"E</div>
+  </div>
+
+  <div class="status-bar">
+    <span><span class="status-section">LABYRINTH.EXE</span> <span class="status-section">Centre atteint</span></span>
+    <span><span class="status-section" id="clock">--:--:--</span></span>
+  </div>
+</div>
+
+<div class="video-overlay" id="videoOverlay">
+  <div class="close" onclick="closeVideo()">×</div>
+  <video id="secretVideo" controls><source src="blond.mp4" type="video/mp4"></video>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+
+const bossName=document.getElementById('bossName');
+const hintText=document.getElementById('hintText');
+const healthFill=document.getElementById('healthFill');
+const victoryText=document.getElementById('victoryText');
+
+let nameRevealed=false;
+let konamiUnlocked=false;
+
+// Détecter la sélection du nom
+document.addEventListener('selectionchange',()=>{
+  const selection=window.getSelection().toString().trim();
+  if(selection==='HUDELERBA'||selection.includes('HUDELERBA')){
+    // Révéler le vrai nom
+    bossName.textContent='UUDDLRLRBA';
+    bossName.classList.add('revealed');
+    hintText.classList.add('visible');
+    nameRevealed=true;
+  }
+});
+
+// Aussi au mouseup sur le nom
+bossName.addEventListener('mouseup',()=>{
+  setTimeout(()=>{
+    const selection=window.getSelection().toString().trim();
+    if(selection.length>0){
+      bossName.textContent='UUDDLRLRBA';
+      bossName.classList.add('revealed');
+      hintText.classList.add('visible');
+      nameRevealed=true;
+    }
+  },10);
+});
+
+const responses={
+  fight:`<p style="color:#AA0000">« Ils disent tous cela. »</p>
+<p style="margin-top:12px;color:#888">Le Minotaure soupire.</p>
+<p style="margin-top:12px;color:#888">« Thésée disait cela aussi. Regarde où cela l'a mené. »</p>
+<p style="margin-top:12px;color:#666;font-size:12px">Tu brandis ton arme. Elle te semble soudain très légère.</p>
+<p style="margin-top:12px;color:#555;font-size:11px">La pièce s'obscurcit...</p>`,
+  understand:`<p style="color:#aaa">« Enfin. »</p>
+<p style="margin-top:12px;color:#888">Le Minotaure s'assoit lourdement.</p>
+<p style="margin-top:12px;color:#888">« Cela faisait longtemps. Depuis Dédale peut-être. »</p>
+<p style="margin-top:12px;color:#888">« Le labyrinthe n'est pas une prison. C'est un filtre. »</p>
+<p style="margin-top:12px;color:#AA0000">« Seuls ceux qui cherchent à comprendre trouvent le centre. »</p>
+<p style="margin-top:12px;color:#555;font-size:11px">Il te tend quelque chose...</p>`,
+  become:`<p style="color:#AA0000">Le Minotaure sourit.</p>
+<p style="margin-top:12px;color:#888">C'est la première fois en trois mille ans.</p>
+<p style="margin-top:12px;color:#888">« Tu as compris plus vite que les autres. »</p>
+<p style="margin-top:12px;color:#888">« Le monstre n'est pas dans le labyrinthe. »</p>
+<p style="margin-top:12px;color:#AA0000">« Le labyrinthe est dans le monstre. »</p>
+<p style="margin-top:12px;color:#aaa">« Et le monstre... »</p>
+<p style="margin-top:12px;color:#fff;font-size:16px">« ...c'est toi. »</p>
+<p style="margin-top:20px;color:#555;font-size:11px">Ta réflexion dans ses yeux change...</p>`
+};
+
+function choose(c){
+  document.getElementById('response').innerHTML=responses[c];
+  document.getElementById('choices').style.display='none';
+}
+
+// Konami code - seulement actif si le nom est révélé
+let konamiSequence=[];
+const konamiCode=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+
+document.addEventListener('keydown',e=>{
+  if(!nameRevealed)return; // Konami ne fonctionne que si le nom est révélé
+  
+  konamiSequence.push(e.key);
+  konamiSequence=konamiSequence.slice(-10);
+  
+  if(konamiSequence.join(',')===konamiCode.join(',')){
+    defeatBoss();
+    konamiSequence=[];
+  }
+});
+
+function defeatBoss(){
+  if(konamiUnlocked)return;
+  konamiUnlocked=true;
+  
+  // Drainer la vie
+  healthFill.classList.add('draining');
+  bossName.style.color='#555';
+  bossName.style.textDecoration='line-through';
+  
+  // Afficher victoire
+  setTimeout(()=>{
+    victoryText.classList.add('visible');
+  },1000);
+  
+  // Afficher la vidéo
+  setTimeout(()=>{
+    showBlondVideo();
+  },2500);
+}
+
+function showBlondVideo(){
+  const overlay=document.getElementById('videoOverlay');
+  const video=document.getElementById('secretVideo');
+  overlay.classList.add('visible');
+  video.play().catch(()=>{});
+}
+
+function closeVideo(){
+  const overlay=document.getElementById('videoOverlay');
+  const video=document.getElementById('secretVideo');
+  overlay.classList.remove('visible');
+  video.pause();
+  video.currentTime=0;
+}
+
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toTimeString().split(' ')[0]},1000);
+</script>
+</body>
+</html>

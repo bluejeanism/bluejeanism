@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOSSIER_7749</title>
+<style>
+@keyframes scanline{0%{top:-100%}100%{top:100%}}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@keyframes flicker{0%,100%{opacity:1}92%{opacity:0.98}96%{opacity:1}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:none}
+body{background:#0a0a0a;color:#0f0;font-family:"Courier New",monospace;font-size:12px;min-height:100vh;padding:30px;line-height:1.6;animation:flicker 0.1s infinite}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:rgba(0,255,0,0.1);animation:scanline 4s linear infinite;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.1) 0px,rgba(0,0,0,0.1) 1px,transparent 1px,transparent 2px);pointer-events:none}
+
+.cursor{position:fixed;width:12px;height:12px;border:1px solid #0f0;pointer-events:none;z-index:10000}
+
+.container{max-width:800px;margin:0 auto}
+
+.header{border:1px solid #0a0;padding:15px;margin-bottom:20px;position:relative}
+.header::before{content:'CLASSIFIED';position:absolute;top:-8px;left:20px;background:#0a0a0a;padding:0 10px;color:#f00;font-size:10px;letter-spacing:2px}
+.classification{color:#f00;font-size:10px;letter-spacing:3px;margin-bottom:10px}
+.doc-id{color:#0a0;font-size:10px}
+
+.section{border:1px solid #050;padding:15px;margin-bottom:15px;background:rgba(0,20,0,0.3)}
+.section-title{color:#0f0;font-size:11px;letter-spacing:2px;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #050}
+
+.data-row{display:flex;margin:5px 0}
+.data-label{color:#060;width:140px;flex-shrink:0}
+.data-value{color:#0f0}
+.data-value.redacted{color:#f00;letter-spacing:2px}
+.data-value.redacted:hover{color:#0f0;letter-spacing:0}
+
+.transcript{background:#000;padding:15px;border:1px solid #030;margin:15px 0}
+.transcript-line{margin:8px 0}
+.speaker{font-weight:bold}
+.speaker.interviewer{color:#f80}
+.speaker.subject{color:#0f0}
+.speech{color:#0a0;margin-left:20px;font-style:italic}
+
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:15px}
+.metric{background:#000;border:1px solid #030;padding:10px;text-align:center}
+.metric-value{font-size:18px;color:#0f0}
+.metric-label{font-size:9px;color:#060;margin-top:5px}
+.metric-value.danger{color:#f00}
+
+.action-link{display:inline-block;margin-top:20px;padding:10px 20px;border:1px solid #0f0;color:#0f0;text-decoration:none;font-size:11px;letter-spacing:2px;transition:all 0.2s}
+.action-link:hover{background:#0f0;color:#000}
+
+.footer{margin-top:30px;padding-top:15px;border-top:1px solid #030;font-size:10px;color:#040}
+
+.logo{position:fixed;top:15px;left:15px;border:1px solid #0f0;padding:4px 12px;text-decoration:none;color:#0f0;font-size:10px;z-index:100}
+.logo:hover{background:#0f0;color:#000}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<a href="borne.html" class="logo">:vitalism</a>
+
+<div class="container">
+  <div class="header">
+    <div class="classification">/// TOP SECRET - EYES ONLY ///</div>
+    <div class="doc-id">DOC_ID: VIT-7749-<span id="sessionId">000000</span> | TIMESTAMP: <span id="timestamp">--</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">► SUBJECT IDENTIFICATION</div>
+    <div class="data-row"><span class="data-label">DESIGNATION:</span><span class="data-value">NUMBER SIX</span></div>
+    <div class="data-row"><span class="data-label">STATUS:</span><span class="data-value">DETAINED</span></div>
+    <div class="data-row"><span class="data-label">LOCATION:</span><span class="data-value redacted">[REDACTED]</span></div>
+    <div class="data-row"><span class="data-label">CLEARANCE:</span><span class="data-value redacted">[INSUFFICIENT]</span></div>
+    <div class="data-row"><span class="data-label">THREAT LEVEL:</span><span class="data-value" style="color:#f00">MAXIMUM</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">► INTERVIEW TRANSCRIPT [EXCERPT]</div>
+    <div class="transcript">
+      <div class="transcript-line"><span class="speaker interviewer">N°2:</span><span class="speech">We want information.</span></div>
+      <div class="transcript-line"><span class="speaker subject">SUBJ:</span><span class="speech">You won't get it.</span></div>
+      <div class="transcript-line"><span class="speaker interviewer">N°2:</span><span class="speech">By hook or by crook, we will.</span></div>
+      <div class="transcript-line"><span class="speaker subject">SUBJ:</span><span class="speech">Who are you?</span></div>
+      <div class="transcript-line"><span class="speaker interviewer">N°2:</span><span class="speech">The new Number Two.</span></div>
+      <div class="transcript-line"><span class="speaker subject">SUBJ:</span><span class="speech">Who is Number One?</span></div>
+      <div class="transcript-line"><span class="speaker interviewer">N°2:</span><span class="speech">You are Number Six.</span></div>
+      <div class="transcript-line"><span class="speaker subject">SUBJ:</span><span class="speech">I am not a number. I am a free man.</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">► PSYCHOLOGICAL PROFILE</div>
+    <div class="metrics">
+      <div class="metric"><div class="metric-value">9.2</div><div class="metric-label">RESISTANCE INDEX</div></div>
+      <div class="metric"><div class="metric-value">14</div><div class="metric-label">ESCAPE ATTEMPTS</div></div>
+      <div class="metric"><div class="metric-value danger">HIGH</div><div class="metric-label">DANGER RATING</div></div>
+      <div class="metric"><div class="metric-value">8%</div><div class="metric-label">COOPERATION</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">► RECOMMENDED ACTION</div>
+    <p style="color:#0a0;margin-bottom:15px">Standard interrogation protocols have proven ineffective. Escalation to advanced extraction methods is recommended. Subject shows exceptional resistance to conventional techniques.</p>
+    <a href="crook.html" class="action-link">► INITIATE EXTRACTION PROTOCOL</a>
+  </div>
+
+  <div class="footer">
+    VILLAGE SECURITY DIVISION | INFORMATION RETRIEVAL DEPT.<br>
+    Authorization required for further access. All interactions logged.
+    <span id="secretVeil" style="opacity:0.15;margin-left:20px;cursor:pointer;font-size:8px">veil</span>
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+document.getElementById('sessionId').textContent=Math.random().toString(16).substr(2,6).toUpperCase();
+document.getElementById('timestamp').textContent=new Date().toISOString().replace('T',' ').substr(0,19);
+
+// SECRET: voile.mp4
+document.getElementById('secretVeil').onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="voile.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+
+// Ambient laboratory sounds
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+function playAmbient(){
+  // Low hum
+  const hum=audioCtx.createOscillator();
+  const humGain=audioCtx.createGain();
+  hum.type='sine';
+  hum.frequency.value=60;
+  humGain.gain.value=0.03;
+  hum.connect(humGain);
+  humGain.connect(audioCtx.destination);
+  hum.start();
+  
+  // Random beeps
+  setInterval(()=>{
+    if(Math.random()<0.3){
+      const beep=audioCtx.createOscillator();
+      const beepGain=audioCtx.createGain();
+      beep.type='square';
+      beep.frequency.value=800+Math.random()*400;
+      beepGain.gain.value=0.02;
+      beep.connect(beepGain);
+      beepGain.connect(audioCtx.destination);
+      beep.start();
+      beepGain.gain.setTargetAtTime(0,audioCtx.currentTime,0.05);
+      setTimeout(()=>beep.stop(),100);
+    }
+  },2000);
+  
+  // Occasional static
+  setInterval(()=>{
+    if(Math.random()<0.2){
+      const bufferSize=audioCtx.sampleRate*0.1;
+      const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
+      const data=buffer.getChannelData(0);
+      for(let i=0;i<bufferSize;i++)data[i]=(Math.random()*2-1)*0.02;
+      const noise=audioCtx.createBufferSource();
+      noise.buffer=buffer;
+      noise.connect(audioCtx.destination);
+      noise.start();
+    }
+  },5000);
+}
+
+document.addEventListener('click',()=>playAmbient(),{once:true});
+document.addEventListener('mousemove',()=>playAmbient(),{once:true});
+document.addEventListener('keydown',()=>playAmbient(),{once:true});
+</script>
+</body>
+</html>

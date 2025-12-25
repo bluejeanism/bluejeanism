@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L@BYR1NTH_153 // The Path That Folds</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>◈</text></svg>">
+<style>
+@keyframes flicker { 0%,100%{opacity:1;}92%{opacity:0.8;}96%{opacity:0.9;} }
+@keyframes glitch { 
+  0%,100%{transform:translate(0);}
+  20%{transform:translate(-2px,1px);}
+  40%{transform:translate(2px,-1px);}
+  60%{transform:translate(-1px,2px);}
+}
+@keyframes pulse { 0%,100%{opacity:0.5;}50%{opacity:1;} }
+@keyframes walkBob { 0%,100%{transform:translateY(0);}50%{transform:translateY(-2px);} }
+
+* { box-sizing: border-box; }
+
+body {
+  background: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  animation: flicker 4s infinite;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Panneau gauche - Labyrinthe visuel */
+.maze-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid #55AAFF;
+  position: relative;
+  background: linear-gradient(180deg, #000066 0%, #0000AA 50%, #000066 100%);
+}
+
+.maze-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border: 3px solid #55AAFF;
+  box-shadow: 0 0 30px rgba(85,170,255,0.3), inset 0 0 50px rgba(0,0,0,0.5);
+}
+
+.maze-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.player {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #FFFF00;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #FFFF00, 0 0 30px #FFAA00;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease-out;
+  z-index: 10;
+}
+
+.player.walking {
+  animation: walkBob 0.2s infinite;
+}
+
+.exit-marker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #00FF00;
+  border-radius: 2px;
+  box-shadow: 0 0 20px #00FF00;
+  animation: pulse 1s infinite;
+  transform: translate(-50%, -50%);
+}
+
+.step-counter {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 12px;
+  color: #55AAFF;
+}
+
+.position-info {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 10px;
+  color: #55AAFF;
+}
+
+.controls {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows: repeat(3, 50px);
+  gap: 5px;
+}
+
+.ctrl-btn {
+  background: #000080;
+  border: 2px solid #55AAFF;
+  color: #FFFFFF;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.ctrl-btn:hover {
+  background: #0000FF;
+  box-shadow: 0 0 10px #55AAFF;
+}
+
+.ctrl-btn:active {
+  transform: scale(0.95);
+  background: #55AAFF;
+  color: #000080;
+}
+
+.ctrl-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Panneau droit - Texte énigmatique */
+.text-panel {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.text-panel h1 {
+  font-size: 16px;
+  color: #55AAFF;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #55AAFF;
+  padding-bottom: 10px;
+}
+
+.instruction-box {
+  border: 1px dashed #55AAFF;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: rgba(0,0,50,0.5);
+  transition: all 0.3s;
+}
+
+.instruction-box.active {
+  border-color: #FFFF00;
+  background: rgba(50,50,0,0.3);
+  box-shadow: 0 0 20px rgba(255,255,0,0.2);
+}
+
+.instruction-box.completed {
+  border-color: #00FF00;
+  opacity: 0.6;
+}
+
+.step-num {
+  color: #FFAA00;
+  font-weight: bold;
+}
+
+.step-text {
+  color: #FFFFFF;
+  line-height: 1.6;
+}
+
+.step-link {
+  color: #55AAFF;
+  text-decoration: none;
+}
+
+.step-link:hover {
+  color: #AADDFF;
+  text-decoration: underline;
+}
+
+.direction-hint {
+  color: #00FF00;
+  font-style: italic;
+  font-size: 11px;
+}
+
+.glitch-text {
+  animation: glitch 0.5s infinite;
+  color: #FF5555;
+}
+
+.corrupted {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(255,0,0,0.1) 2px,
+    rgba(255,0,0,0.1) 4px
+  );
+  color: #AA5555;
+}
+
+/* Message de victoire */
+.victory-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  flex-direction: column;
+}
+
+.victory-overlay.visible {
+  display: flex;
+}
+
+.victory-text {
+  font-size: 32px;
+  color: #00FF00;
+  text-shadow: 0 0 30px #00FF00;
+  margin-bottom: 20px;
+}
+
+.victory-stats {
+  color: #55AAFF;
+  font-size: 14px;
+  text-align: center;
+  line-height: 2;
+}
+
+.restart-btn {
+  margin-top: 30px;
+  padding: 15px 40px;
+  background: #000080;
+  border: 2px solid #00FF00;
+  color: #00FF00;
+  font-family: "Courier New", monospace;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.restart-btn:hover {
+  background: #00FF00;
+  color: #000080;
+}
+
+/* Mini-map */
+.minimap {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 80px;
+  height: 80px;
+  border: 1px solid #55AAFF;
+  background: rgba(0,0,50,0.8);
+}
+
+.minimap canvas {
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+
+<a href="borne.html" style="text-decoration:none;position:fixed;top:20px;left:20px;z-index:100;border:2px solid #fff;padding:4px 16px;color:#fff;font-family:'Courier New',monospace;"><span style="background:#fff;color:#0000AA;padding:0 4px;font-weight:bold;">:vitalism</span></a>
+
+<div class="container">
+  <!-- Panneau Labyrinthe -->
+  <div class="maze-panel">
+    <div class="step-counter">STEP: <span id="stepCount">0</span></div>
+    <div class="step-counter" style="font-size:10px;opacity:0.6">EXPLORED: <span id="exploredCount">0</span>/<span id="totalPaths">0</span></div>
+    
+    <div class="maze-container">
+      <canvas id="mazeCanvas" class="maze-canvas" width="400" height="400"></canvas>
+      <div class="player" id="player"></div>
+      <div class="exit-marker" id="exitMarker"></div>
+    </div>
+    
+    <div class="position-info">
+      POS: (<span id="posX">0</span>, <span id="posY">0</span>) | 
+      DIR: <span id="direction">→</span>
+    </div>
+    
+    <div class="controls">
+      <div></div>
+      <button class="ctrl-btn" id="btnUp" onclick="move('up')">↑</button>
+      <div></div>
+      <button class="ctrl-btn" id="btnLeft" onclick="move('left')">←</button>
+      <button class="ctrl-btn" onclick="resetMaze()">◈</button>
+      <button class="ctrl-btn" id="btnRight" onclick="move('right')">→</button>
+      <div></div>
+      <button class="ctrl-btn" id="btnDown" onclick="move('down')">↓</button>
+      <div></div>
+    </div>
+    
+    <div class="minimap">
+      <canvas id="minimapCanvas" width="80" height="80"></canvas>
+    </div>
+  </div>
+  
+  <!-- Panneau Texte -->
+  <div class="text-panel">
+    <h1>HOW TO MAKING A PROPER LABYRINTH — in 153 step maybe</h1>
+    
+    <div class="instruction-box active" data-step="1">
+      <span class="step-num">Step 1.</span>
+      <span class="step-text">Start wth a squar... or maybe not sqare? the path kinda bends righ—tward</span>
+      <a href="#lost1" class="step-link">(why square?)</a>
+      <div class="direction-hint">→ Press RIGHT to begin</div>
+    </div>
+    
+    <div class="instruction-box" data-step="2">
+      <span class="step-num">Step 2.</span>
+      <span class="step-text">you think is step 2 but maybe already step 4?? drift slightly left as you doubt</span>
+      <div class="direction-hint">← uncertainty pulls LEFT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="3">
+      <span class="step-num">Step 3.</span>
+      <span class="step-text">draw line... but cut the line in mid—\—— while your hand nudges to the right</span>
+      <a href="#cut" class="step-link">(line cutter tool?)</a>
+      <div class="direction-hint">→ the cut goes RIGHT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="4">
+      <span class="step-num">Step 4½.</span>
+      <span class="step-text">missing half, sorry, continue straight-ish even if floor tilts</span>
+      <div class="direction-hint">↑ proceed FORWARD despite tilt</div>
+    </div>
+    
+    <div class="instruction-box" data-step="5">
+      <span class="step-num">Step 5?</span>
+      <span class="step-text">erase something you think is wrong (is it wrong?) the gesture circles left</span>
+      <a href="#eraser" class="step-link">(eraser lore)</a>
+      <div class="direction-hint">← erasing motion: LEFT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="7">
+      <span class="step-num">Ste 7.</span>
+      <span class="step-text">add wall. or door. or walldoor?? step forward then a shy lean right</span>
+      <a href="#door" class="step-link">(door myth)</a>
+      <div class="direction-hint">↑ then → through the walldoor</div>
+    </div>
+    
+    <div class="instruction-box" data-step="11">
+      <span class="step-num">Stp 11:</span>
+      <span class="step-text">the turning left is not always left, you know, but do a sorta-left-anyway</span>
+      <a href="#leftish" class="step-link">(leftish theory)</a>
+      <div class="direction-hint">← sorta-left means LEFT</div>
+    </div>
+    
+    <div class="instruction-box corrupted" data-step="12">
+      <span class="step-num glitch-text">---- Step 1?2?3?</span>
+      <span class="step-text">lines corrupted — path unknown but seems right-curving ----</span>
+      <div class="direction-hint">→ follow the curve RIGHT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="19">
+      <span class="step-num">Stp 19.</span>
+      <span class="step-text">add tiny passage only ants can use, tilt your walk left to avoid stepping on it</span>
+      <div class="direction-hint">← tilt LEFT for the ants</div>
+    </div>
+    
+    <div class="instruction-box" data-step="24">
+      <span class="step-num">Stp 24:</span>
+      <span class="step-text">If the path go nowhere, that is somewhere too; walk straight until doubt bends you left</span>
+      <a href="#nowhere" class="step-link">(philosophy dept.)</a>
+      <div class="direction-hint">↑ straight into nowhere</div>
+    </div>
+    
+    <div class="instruction-box" data-step="29">
+      <span class="step-num">St—p 29:</span>
+      <span class="step-text">add mystery corner (no one see it) but you turn right around it</span>
+      <a href="#corner" class="step-link">(corner fact)</a>
+      <div class="direction-hint">→ mystery corner: RIGHT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="38">
+      <span class="step-num">S_p 38:</span>
+      <span class="step-text">half-wall half-air, so ppl can maybe pass?? drift forward like wind no left or right</span>
+      <div class="direction-hint">↑ drift FORWARD like wind</div>
+    </div>
+    
+    <div class="instruction-box" data-step="47">
+      <span class="step-num">Stp 47:</span>
+      <span class="step-text">do not finish this step; freeze mid-forward-step</span>
+      <div class="direction-hint">↑ frozen FORWARD</div>
+    </div>
+    
+    <div class="instruction-box" data-step="52">
+      <span class="step-num">Stp 52:</span>
+      <span class="step-text">include hyperlink to nowhere</span>
+      <a href="about:blank" class="step-link">here</a>
+      <span class="step-text">and step straight into nothing</span>
+      <div class="direction-hint">↓ into the void: DOWN</div>
+    </div>
+    
+    <div class="instruction-box" data-step="63">
+      <span class="step-num">Stp 63:</span>
+      <span class="step-text">hear weird echo? note it down while pivoting slightly right</span>
+      <div class="direction-hint">→ pivot RIGHT toward echo</div>
+    </div>
+    
+    <div class="instruction-box" data-step="71">
+      <span class="step-num">Stp 71.</span>
+      <span class="step-text">if you find a loop, pretend you planned it; walk left in a circle</span>
+      <div class="direction-hint">← loop LEFT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="89">
+      <span class="step-num">Stp 89*:</span>
+      <span class="step-text">optional ghost corridor (do not enter), but your feet slide right toward it anyway</span>
+      <div class="direction-hint">→ ghostly pull: RIGHT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="101">
+      <span class="step-num">Stp 101.</span>
+      <span class="step-text">accidentally duplicate wall; step backward-left in confusion</span>
+      <div class="direction-hint">↓ then ← backward-left</div>
+    </div>
+    
+    <div class="instruction-box" data-step="118">
+      <span class="step-num">Stp 118:</span>
+      <span class="step-text">add tiny sign saying "this way?? maybe??" while stepping vaguely straight but not fully</span>
+      <div class="direction-hint">↑ vaguely FORWARD</div>
+    </div>
+    
+    <div class="instruction-box" data-step="130">
+      <span class="step-num">Stp 130:</span>
+      <span class="step-text">forget map orientation and continue bravely in a spiraling left arc</span>
+      <div class="direction-hint">← spiraling LEFT</div>
+    </div>
+    
+    <div class="instruction-box" data-step="146">
+      <span class="step-num">Stp 146.</span>
+      <span class="step-text">add secret trap but forget where; stumble forward-left as precaution</span>
+      <div class="direction-hint">↑ then ← stumble forward-left</div>
+    </div>
+    
+    <div class="instruction-box" data-step="152">
+      <span class="step-num">Step 152:</span>
+      <span class="step-text">check the entrance is not the exit (maybe same??) walk straight toward both</span>
+      <div class="direction-hint">↑ toward entrance-exit</div>
+    </div>
+    
+    <div class="instruction-box" data-step="153">
+      <span class="step-num">Step 153:</span>
+      <span class="step-text">congratulations, the labyrinth is finish? unfinished? both. turn slowly left to end</span>
+      <div class="direction-hint">← final turn LEFT to complete</div>
+    </div>
+    
+    <p style="margin-top:30px; color:#55AAFF; font-size:11px;">
+      Note: some instruct ins gone, sorry. The system blue fail??<br>
+      Use arrow keys or buttons to navigate. Find the green exit.<br>
+      Each step you take reveals more of the path...
+    </p>
+  </div>
+</div>
+
+<!-- Victory Overlay -->
+<div class="victory-overlay" id="victoryOverlay">
+  <div class="victory-text">◈ LABYRINTH COMPLETE ◈</div>
+  <div class="victory-stats">
+    Steps taken: <span id="finalSteps">0</span><br>
+    Time: <span id="finalTime">0:00</span><br>
+    Path efficiency: <span id="efficiency">0%</span><br><br>
+    "The exit was the entrance all along."
+  </div>
+  <button class="restart-btn" onclick="resetMaze()">ENTER AGAIN</button>
+</div>
+
+<script>
+// Maze configuration
+const CELL_SIZE = 20;
+const MAZE_WIDTH = 20;
+const MAZE_HEIGHT = 20;
+const canvas = document.getElementById('mazeCanvas');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimapCanvas');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+let maze = [];
+let playerX = 1;
+let playerY = 1;
+let exitX = MAZE_WIDTH - 2;
+let exitY = MAZE_HEIGHT - 2;
+let stepCount = 0;
+let startTime = Date.now();
+let visited = new Set();
+let currentDirection = '→';
+
+// Generate maze using recursive backtracking
+function generateMaze() {
+  // Initialize with walls
+  maze = Array(MAZE_HEIGHT).fill(null).map(() => Array(MAZE_WIDTH).fill(1));
+  
+  function carve(x, y) {
+    maze[y][x] = 0;
+    
+    const directions = [
+      [0, -2], [0, 2], [-2, 0], [2, 0]
+    ].sort(() => Math.random() - 0.5);
+    
+    for (const [dx, dy] of directions) {
+      const nx = x + dx;
+      const ny = y + dy;
+      
+      if (nx > 0 && nx < MAZE_WIDTH - 1 && ny > 0 && ny < MAZE_HEIGHT - 1 && maze[ny][nx] === 1) {
+        maze[y + dy/2][x + dx/2] = 0;
+        carve(nx, ny);
+      }
+    }
+  }
+  
+  carve(1, 1);
+  
+  // Ensure exit is accessible
+  maze[exitY][exitX] = 0;
+  maze[exitY][exitX - 1] = 0;
+  maze[exitY - 1][exitX] = 0;
+  
+  // Add some random passages for more paths
+  for (let i = 0; i < 15; i++) {
+    const x = Math.floor(Math.random() * (MAZE_WIDTH - 2)) + 1;
+    const y = Math.floor(Math.random() * (MAZE_HEIGHT - 2)) + 1;
+    if (maze[y][x] === 1) {
+      // Check if opening this creates a path
+      let neighbors = 0;
+      if (y > 0 && maze[y-1][x] === 0) neighbors++;
+      if (y < MAZE_HEIGHT-1 && maze[y+1][x] === 0) neighbors++;
+      if (x > 0 && maze[y][x-1] === 0) neighbors++;
+      if (x < MAZE_WIDTH-1 && maze[y][x+1] === 0) neighbors++;
+      if (neighbors >= 2) maze[y][x] = 0;
+    }
+  }
+}
+
+function drawMaze() {
+  ctx.fillStyle = '#000033';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      const px = x * CELL_SIZE;
+      const py = y * CELL_SIZE;
+      
+      if (maze[y][x] === 1) {
+        // Wall
+        ctx.fillStyle = '#000080';
+        ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
+        ctx.strokeStyle = '#55AAFF';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px + 1, py + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+      } else {
+        // Path
+        const key = `${x},${y}`;
+        if (visited.has(key)) {
+          ctx.fillStyle = 'rgba(85, 170, 255, 0.1)';
+          ctx.fillRect(px, py, CELL_SIZE, CELL_SIZE);
+        }
+      }
+    }
+  }
+  
+  // Draw grid overlay
+  ctx.strokeStyle = 'rgba(85, 170, 255, 0.1)';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= MAZE_WIDTH; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * CELL_SIZE, 0);
+    ctx.lineTo(i * CELL_SIZE, canvas.height);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= MAZE_HEIGHT; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, i * CELL_SIZE);
+    ctx.lineTo(canvas.width, i * CELL_SIZE);
+    ctx.stroke();
+  }
+}
+
+function drawMinimap() {
+  const scale = 80 / Math.max(MAZE_WIDTH, MAZE_HEIGHT);
+  
+  minimapCtx.fillStyle = '#000033';
+  minimapCtx.fillRect(0, 0, 80, 80);
+  
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      if (maze[y][x] === 1) {
+        minimapCtx.fillStyle = '#000080';
+        minimapCtx.fillRect(x * scale, y * scale, scale, scale);
+      }
+    }
+  }
+  
+  // Player position
+  minimapCtx.fillStyle = '#FFFF00';
+  minimapCtx.fillRect(playerX * scale - 1, playerY * scale - 1, 3, 3);
+  
+  // Exit
+  minimapCtx.fillStyle = '#00FF00';
+  minimapCtx.fillRect(exitX * scale - 1, exitY * scale - 1, 3, 3);
+}
+
+function updatePlayer() {
+  const player = document.getElementById('player');
+  player.style.left = (playerX * CELL_SIZE + CELL_SIZE / 2) + 'px';
+  player.style.top = (playerY * CELL_SIZE + CELL_SIZE / 2) + 'px';
+  
+  const exit = document.getElementById('exitMarker');
+  exit.style.left = (exitX * CELL_SIZE + CELL_SIZE / 2) + 'px';
+  exit.style.top = (exitY * CELL_SIZE + CELL_SIZE / 2) + 'px';
+  
+  document.getElementById('posX').textContent = playerX;
+  document.getElementById('posY').textContent = playerY;
+  document.getElementById('stepCount').textContent = stepCount;
+  document.getElementById('direction').textContent = currentDirection;
+  
+  // Mark as visited
+  visited.add(`${playerX},${playerY}`);
+  
+  // Update instruction boxes
+  updateInstructions();
+}
+
+function updateInstructions() {
+  const boxes = document.querySelectorAll('.instruction-box');
+  const activeIndex = Math.min(Math.floor(stepCount / 8), boxes.length - 1);
+  
+  boxes.forEach((box, idx) => {
+    box.classList.remove('active', 'completed');
+    if (idx < activeIndex) {
+      box.classList.add('completed');
+    } else if (idx === activeIndex) {
+      box.classList.add('active');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+}
+
+function updateControls() {
+  const canUp = playerY > 0 && maze[playerY - 1][playerX] === 0;
+  const canDown = playerY < MAZE_HEIGHT - 1 && maze[playerY + 1][playerX] === 0;
+  const canLeft = playerX > 0 && maze[playerY][playerX - 1] === 0;
+  const canRight = playerX < MAZE_WIDTH - 1 && maze[playerY][playerX + 1] === 0;
+  
+  document.getElementById('btnUp').classList.toggle('disabled', !canUp);
+  document.getElementById('btnDown').classList.toggle('disabled', !canDown);
+  document.getElementById('btnLeft').classList.toggle('disabled', !canLeft);
+  document.getElementById('btnRight').classList.toggle('disabled', !canRight);
+}
+
+function move(direction) {
+  let newX = playerX;
+  let newY = playerY;
+  
+  switch(direction) {
+    case 'up': newY--; currentDirection = '↑'; break;
+    case 'down': newY++; currentDirection = '↓'; break;
+    case 'left': newX--; currentDirection = '←'; break;
+    case 'right': newX++; currentDirection = '→'; break;
+  }
+  
+  if (newX >= 0 && newX < MAZE_WIDTH && newY >= 0 && newY < MAZE_HEIGHT && maze[newY][newX] === 0) {
+    playerX = newX;
+    playerY = newY;
+    stepCount++;
+    lastMoveTime = Date.now();
+    
+    const player = document.getElementById('player');
+    player.classList.add('walking');
+    setTimeout(() => player.classList.remove('walking'), 200);
+    
+    updatePlayer();
+    drawMaze();
+    drawMinimap();
+    updateControls();
+    
+    // Vérifier si toutes les cases sont visitées (sauf sortie)
+    checkAllVisited();
+  }
+}
+
+// Compter toutes les cases traversables
+function countAllPaths() {
+  let count = 0;
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      if (maze[y][x] === 0 && !(x === exitX && y === exitY)) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+let allPathsCount = 0;
+let secretTriggered = false;
+let stepsEmballement = false;
+
+function checkAllVisited() {
+  if (secretTriggered) return;
+  
+  // Compter les cases visitées (sauf sortie)
+  let visitedPaths = 0;
+  for (let y = 0; y < MAZE_HEIGHT; y++) {
+    for (let x = 0; x < MAZE_WIDTH; x++) {
+      if (maze[y][x] === 0 && !(x === exitX && y === exitY)) {
+        if (visited.has(`${x},${y}`)) visitedPaths++;
+      }
+    }
+  }
+  
+  // Mettre à jour l'affichage
+  document.getElementById('exploredCount').textContent = visitedPaths;
+  document.getElementById('totalPaths').textContent = allPathsCount;
+  
+  // Si tout est visité et on n'est PAS sur la sortie
+  if (visitedPaths >= allPathsCount && !(playerX === exitX && playerY === exitY)) {
+    triggerSecretCountdown();
+  }
+}
+
+function triggerSecretCountdown() {
+  if (secretTriggered) return;
+  
+  // Attendre 5 secondes d'immobilité
+  setTimeout(() => {
+    if (Date.now() - lastMoveTime >= 4900) {
+      secretTriggered = true;
+      startStepsEmballement();
+    }
+  }, 5000);
+}
+
+function startStepsEmballement() {
+  stepsEmballement = true;
+  const stepsEl = document.getElementById('stepCount');
+  let fakeSteps = stepCount;
+  
+  // Les steps s'emballent !
+  const emballementInterval = setInterval(() => {
+    fakeSteps += Math.floor(Math.random() * 50) + 10;
+    stepsEl.textContent = fakeSteps;
+    stepsEl.style.color = `hsl(${Math.random()*60}, 100%, 50%)`;
+    
+    if (fakeSteps > stepCount + 500) {
+      clearInterval(emballementInterval);
+      setTimeout(() => {
+        showRegardVideo();
+      }, 1000);
+    }
+  }, 50);
+}
+
+function showVictory() {
+  hasWon = true;
+  lastMoveTime = Date.now();
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+  
+  // Calculate optimal path (rough estimate)
+  const optimalPath = Math.abs(exitX - 1) + Math.abs(exitY - 1);
+  const efficiency = Math.min(100, Math.round((optimalPath / stepCount) * 100));
+  
+  document.getElementById('finalSteps').textContent = stepCount;
+  document.getElementById('finalTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  document.getElementById('efficiency').textContent = efficiency + '%';
+  
+  document.getElementById('victoryOverlay').classList.add('visible');
+}
+
+function resetMaze() {
+  document.getElementById('victoryOverlay').classList.remove('visible');
+  playerX = 1;
+  playerY = 1;
+  stepCount = 0;
+  startTime = Date.now();
+  visited = new Set();
+  currentDirection = '→';
+  
+  generateMaze();
+  drawMaze();
+  drawMinimap();
+  updatePlayer();
+  updateControls();
+  
+  // Reset instructions
+  document.querySelectorAll('.instruction-box').forEach((box, idx) => {
+    box.classList.remove('active', 'completed');
+    if (idx === 0) box.classList.add('active');
+  });
+}
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+  switch(e.key) {
+    case 'ArrowUp': case 'w': case 'z': move('up'); e.preventDefault(); break;
+    case 'ArrowDown': case 's': move('down'); e.preventDefault(); break;
+    case 'ArrowLeft': case 'a': case 'q': move('left'); e.preventDefault(); break;
+    case 'ArrowRight': case 'd': move('right'); e.preventDefault(); break;
+    case 'r': resetMaze(); break;
+  }
+});
+
+// Initialize
+generateMaze();
+allPathsCount = countAllPaths();
+drawMaze();
+drawMinimap();
+updatePlayer();
+updateControls();
+
+// Secret: regard.mp4 - explorer tout le labyrinthe sans aller à la sortie
+let lastMoveTime = Date.now();
+let regardShown = false;
+let hasWon = false;
+
+function showRegardVideo() {
+  if (regardShown) return;
+  regardShown = true;
+  const popup = document.createElement('div');
+  popup.id = 'regardPopup';
+  popup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;border:2px solid #AA0000;z-index:2000;box-shadow:0 0 50px rgba(170,0,0,0.5);';
+  popup.innerHTML = `
+    <div style="background:#AA0000;color:#fff;padding:5px 10px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span>👁️ ???</span>
+      <span style="cursor:pointer;font-size:16px;" onclick="closeRegard()">×</span>
+    </div>
+    <video id="regardVideo" controls autoplay style="width:450px;display:block;"><source src="regard.mp4" type="video/mp4"></video>
+  `;
+  document.body.appendChild(popup);
+}
+
+window.closeRegard = function() {
+  const popup = document.getElementById('regardPopup');
+  if (popup) {
+    const video = popup.querySelector('video');
+    if (video) video.pause();
+    popup.remove();
+  }
+};
+
+// Override move to track stillness
+const originalMove = move;
+move = function(direction) {
+  lastMoveTime = Date.now();
+  originalMove(direction);
+};
+
+setInterval(checkRegardSecret, 1000);
+
+// SECRET: sous.mp4 - mot "underneath" caché en bas à droite
+const secretUnder=document.createElement('div');
+secretUnder.textContent='underneath';
+secretUnder.style.cssText='position:fixed;bottom:5px;right:5px;font-size:8px;opacity:0.15;cursor:pointer;color:#666;font-family:monospace';
+secretUnder.onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="sous.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+document.body.appendChild(secretUnder);
+</script>
+</body>
+</html>

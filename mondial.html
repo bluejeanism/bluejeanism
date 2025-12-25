@@ -1,136 +1,160 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M0ND_IX3</title>
+<title>RADAR_MONDIAL.SYS</title>
 <style>
-body {
-  margin:0;
-  padding:0;
-  background:#000033;
-  font-family:"Courier New", monospace;
-  color:#0FF;
-  overflow:hidden;
-}
-#container{
-  position:relative;
-  width:100vw;
-  height:100vh;
-}
-svg{
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-}
-canvas{
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-}
-.title-bar{
-  position:absolute;top:10px;left:50%;transform:translateX(-50%);
-  width:900px;height:30px;background:#000080;color:#0FF;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:0 10px;box-sizing:border-box;border:2px solid #0FF;
-  font-weight:bold;z-index:1000;
-}
-.title-bar .buttons span{
-  width:20px;height:18px;background:#000080;color:#0FF;
-  border:1px solid #0FF;text-align:center;cursor:pointer;margin-left:4px;
-}
-.title-bar .buttons span:hover{background:#FF0000;color:white;}
+@keyframes sweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes ping{0%{transform:scale(1);opacity:1}100%{transform:scale(2.5);opacity:0}}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@keyframes scanV{0%{top:-2px}100%{top:100%}}
+@keyframes glow{0%,100%{opacity:0.6}50%{opacity:1}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:none}
+body{background:#020a02;font-family:"Courier New",monospace;overflow:hidden;height:100vh}
+body::before{content:'';position:fixed;left:0;width:100%;height:2px;background:#0f0;opacity:0.3;animation:scanV 4s linear infinite;pointer-events:none;z-index:1000}
+
+.radar-container{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+
+.radar-screen{position:relative;width:min(85vw,85vh);height:min(85vw,85vh);border-radius:50%;background:radial-gradient(circle,#001a00 0%,#000a00 50%,#000 100%);border:3px solid #0a0;box-shadow:0 0 60px rgba(0,255,0,0.15),inset 0 0 80px rgba(0,255,0,0.05);overflow:hidden}
+
+.radar-grid{position:absolute;top:0;left:0;width:100%;height:100%}
+.radar-grid circle{fill:none;stroke:#0a0;stroke-width:1;opacity:0.25}
+.radar-grid line{stroke:#0a0;stroke-width:1;opacity:0.15}
+
+.radar-sweep{position:absolute;top:0;left:50%;width:50%;height:50%;transform-origin:bottom left;background:linear-gradient(90deg,rgba(0,255,0,0.35) 0%,transparent 100%);animation:sweep 4s linear infinite}
+
+.blip{position:absolute;width:6px;height:6px;background:#0f0;border-radius:50%;transform:translate(-50%,-50%);animation:glow 2s infinite}
+.blip::after{content:'';position:absolute;top:50%;left:50%;width:100%;height:100%;background:#0f0;border-radius:50%;transform:translate(-50%,-50%);animation:ping 2s infinite}
+.blip:hover{background:#ff0;cursor:pointer}
+.blip:hover::after{background:#ff0}
+
+.blip-france{top:36%;left:47%;width:10px;height:10px;background:#0ff;z-index:10;cursor:pointer}
+.blip-france::after{background:#0ff;animation:ping 1.5s infinite}
+.blip-france:hover{background:#fff}
+
+.blip-label{position:absolute;font-size:8px;color:#0a0;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 0.2s}
+.blip:hover .blip-label{opacity:1;color:#0f0}
+
+.hud-top{position:fixed;top:15px;left:50%;transform:translateX(-50%);color:#0f0;font-size:12px;letter-spacing:3px;text-shadow:0 0 10px #0f0}
+.hud-corner{position:fixed;color:#060;font-size:9px;padding:12px}
+.hud-tl{top:0;left:0}
+.hud-tr{top:0;right:0;text-align:right}
+.hud-bl{bottom:0;left:0}
+.hud-br{bottom:0;right:0;text-align:right}
+.hud-value{color:#0f0}
+
+.coord-display{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);color:#0a0;font-size:10px}
+
+.cursor{position:fixed;width:16px;height:16px;border:1px solid #0f0;border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%)}
+.cursor::before,.cursor::after{content:'';position:absolute;background:#0f0}
+.cursor::before{width:8px;height:1px;top:7px;left:4px}
+.cursor::after{width:1px;height:8px;top:4px;left:7px}
+
+.video-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);z-index:2000;display:none;align-items:center;justify-content:center}
+.video-modal.visible{display:flex}
+.video-modal video{max-width:80vw;max-height:70vh;border:2px solid #0f0}
+.video-modal .close{position:absolute;top:25px;right:25px;color:#0f0;font-size:24px;cursor:pointer;border:1px solid #0f0;width:35px;height:35px;display:flex;align-items:center;justify-content:center}
+.video-modal .close:hover{background:#0f0;color:#000}
+
+.logo{position:fixed;top:12px;left:12px;border:2px solid #fff;padding:4px 12px;text-decoration:none;color:#fff;font-size:11px;z-index:100;background:transparent}
+.logo:hover{background:#fff}
+.logo:hover span{color:#000}
+.logo span{background:#fff;color:#00a;padding:0 3px;font-weight:bold}
 </style>
 </head>
 <body>
-<div class="title-bar">run:vitalism//Global Radar<div class="buttons"><span onclick="closeWindow()">X</span></div></div>
+<a href="borne.html" class="logo"><span>:vitalism</span></a>
+<div class="cursor" id="cursor"></div>
 
-<div id="container">
-  <!-- SVG du planisphère simplifié -->
-  <svg id="mapSVG" viewBox="0 0 1000 500">
-    <rect x="0" y="0" width="1000" height="500" fill="#000033"/>
-    <!-- Continents très simplifiés -->
-    <path d="M50,100 L150,80 L200,150 L100,200 Z" fill="#003366" stroke="#0FF" stroke-width="2"/>
-    <path d="M300,150 L400,120 L450,200 L350,250 Z" fill="#003366" stroke="#0FF" stroke-width="2"/>
-    <path d="M600,80 L700,60 L750,150 L650,180 Z" fill="#003366" stroke="#0FF" stroke-width="2"/>
-    <path d="M200,300 L300,280 L350,350 L250,400 Z" fill="#003366" stroke="#0FF" stroke-width="2"/>
-    <path d="M700,300 L800,280 L850,350 L750,400 Z" fill="#003366" stroke="#0FF" stroke-width="2"/>
-  </svg>
+<div class="hud-top">◢ RADAR MONDIAL v2.4 ◣</div>
+<div class="hud-corner hud-tl">SYS <span class="hud-value">ACTIVE</span><br>FREQ <span class="hud-value">47.3MHz</span></div>
+<div class="hud-corner hud-tr"><span id="clock">00:00:00</span><br>SWEEP <span class="hud-value" id="sweepAngle">0°</span></div>
+<div class="hud-corner hud-bl">SIGNALS <span class="hud-value">24</span><br>ZONES <span class="hud-value">12</span></div>
+<div class="hud-corner hud-br">GAIN <span class="hud-value">+12dB</span><br>STATUS <span class="hud-value">OK</span></div>
 
-  <!-- Canvas pour les blips et radars -->
-  <canvas id="canvas"></canvas>
+<div class="coord-display">LAT: <span id="lat">--</span> | LON: <span id="lon">--</span></div>
+
+<div class="radar-container">
+  <div class="radar-screen" id="radarScreen">
+    <svg class="radar-grid" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="10"/><circle cx="50" cy="50" r="20"/><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="40"/><circle cx="50" cy="50" r="48"/>
+      <line x1="50" y1="2" x2="50" y2="98"/><line x1="2" y1="50" x2="98" y2="50"/>
+      <line x1="15" y1="15" x2="85" y2="85"/><line x1="85" y1="15" x2="15" y2="85"/>
+    </svg>
+    
+    <div class="radar-sweep"></div>
+    
+    <!-- Capitales mondiales -->
+    <div class="blip" style="top:35%;left:20%"><span class="blip-label" style="left:12px">WASHINGTON</span></div>
+    <div class="blip" style="top:32%;left:18%"><span class="blip-label" style="left:12px">OTTAWA</span></div>
+    <div class="blip" style="top:52%;left:25%"><span class="blip-label" style="left:12px">BRASILIA</span></div>
+    <div class="blip" style="top:60%;left:22%"><span class="blip-label" style="left:12px">BUENOS AIRES</span></div>
+    <div class="blip" style="top:33%;left:46%"><span class="blip-label" style="left:12px">LONDON</span></div>
+    <div class="blip" style="top:35%;left:48%"><span class="blip-label" style="left:12px">BRUSSELS</span></div>
+    <div class="blip" style="top:34%;left:49%"><span class="blip-label" style="left:12px">BERLIN</span></div>
+    <div class="blip" style="top:38%;left:50%"><span class="blip-label" style="left:12px">ROME</span></div>
+    <div class="blip" style="top:40%;left:46%"><span class="blip-label" style="left:12px">MADRID</span></div>
+    <div class="blip" style="top:30%;left:48%"><span class="blip-label" style="left:12px">STOCKHOLM</span></div>
+    <div class="blip" style="top:32%;left:52%"><span class="blip-label" style="left:12px">MOSCOW</span></div>
+    <div class="blip" style="top:36%;left:55%"><span class="blip-label" style="left:12px">ANKARA</span></div>
+    <div class="blip" style="top:38%;left:58%"><span class="blip-label" style="left:12px">TEHRAN</span></div>
+    <div class="blip" style="top:40%;left:65%"><span class="blip-label" style="left:12px">NEW DELHI</span></div>
+    <div class="blip" style="top:38%;left:75%"><span class="blip-label" style="left:12px">BEIJING</span></div>
+    <div class="blip" style="top:36%;left:80%"><span class="blip-label" style="left:12px">TOKYO</span></div>
+    <div class="blip" style="top:50%;left:50%"><span class="blip-label" style="left:12px">CAIRO</span></div>
+    <div class="blip" style="top:55%;left:48%"><span class="blip-label" style="left:12px">NAIROBI</span></div>
+    <div class="blip" style="top:65%;left:52%"><span class="blip-label" style="left:12px">PRETORIA</span></div>
+    <div class="blip" style="top:68%;left:78%"><span class="blip-label" style="left:12px">CANBERRA</span></div>
+    
+    <!-- PARIS - Secret -->
+    <div class="blip blip-france" id="franceBlip"><span class="blip-label" style="left:14px;color:#0ff">PARIS</span></div>
+  </div>
+</div>
+
+<div class="video-modal" id="videoModal">
+  <div class="close" onclick="closeVideo()">×</div>
+  <video id="secretVideo" controls><source src="giscard.mp4" type="video/mp4"></video>
 </div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-let W = canvas.width = window.innerWidth;
-let H = canvas.height = window.innerHeight;
+const cursor=document.getElementById('cursor');
+const radarScreen=document.getElementById('radarScreen');
 
-window.addEventListener('resize',()=>{
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX+'px';
+  cursor.style.top=e.clientY+'px';
+  const rect=radarScreen.getBoundingClientRect();
+  const rx=(e.clientX-rect.left)/rect.width;
+  const ry=(e.clientY-rect.top)/rect.height;
+  if(rx>=0&&rx<=1&&ry>=0&&ry<=1){
+    document.getElementById('lat').textContent=(45-ry*90).toFixed(1)+'°';
+    document.getElementById('lon').textContent=(-180+rx*360).toFixed(1)+'°';
+  }
 });
 
-// Radar arcs
-class Radar {
-  constructor(x,y,radius){
-    this.x=x; this.y=y; this.radius=radius;
-    this.angle=0;
-  }
-  draw(){
-    ctx.strokeStyle="#0FF";
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.radius,0,this.angle);
-    ctx.stroke();
-    this.angle+=0.02;
-    if(this.angle>2*Math.PI) this.angle=0;
-  }
+function updateClock(){
+  document.getElementById('clock').textContent=new Date().toTimeString().split(' ')[0];
+}
+setInterval(updateClock,1000);
+updateClock();
+
+let angle=0;
+setInterval(()=>{angle=(angle+2)%360;document.getElementById('sweepAngle').textContent=angle+'°'},44);
+
+document.getElementById('franceBlip').addEventListener('click',()=>{
+  document.getElementById('videoModal').classList.add('visible');
+  document.getElementById('secretVideo').play();
+});
+
+function closeVideo(){
+  document.getElementById('videoModal').classList.remove('visible');
+  document.getElementById('secretVideo').pause();
 }
 
-// Blips aléatoires
-class Blip {
-  constructor(){
-    this.x=Math.random()*W;
-    this.y=Math.random()*H;
-    this.alpha=Math.random();
-    this.size=2+Math.random()*3;
-  }
-  draw(){
-    ctx.fillStyle=`rgba(0,255,255,${this.alpha})`;
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-    ctx.fill();
-    this.alpha+=Math.random()*0.02-0.01;
-    if(this.alpha>1) this.alpha=1;
-    if(this.alpha<0) this.alpha=0;
-  }
-}
-
-const radars=[
-  new Radar(W*0.25,H*0.3,50),
-  new Radar(W*0.7,H*0.4,80),
-  new Radar(W*0.5,H*0.7,60)
-];
-
-const blips=[];
-for(let i=0;i<100;i++) blips.push(new Blip());
-
-function animate(){
-  ctx.clearRect(0,0,W,H);
-
-  radars.forEach(r=>r.draw());
-  blips.forEach(b=>b.draw());
-
-  requestAnimationFrame(animate);
-}
-
-animate();
-
-function closeWindow(){
-  document.querySelector('.title-bar .buttons span').parentElement.parentElement.style.display='none';
-}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeVideo()});
 </script>
 </body>
 </html>

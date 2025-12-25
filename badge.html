@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B@DGΣ_SYS</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
+<style>
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+@keyframes shine { 0%,100%{transform:translateX(-100%);}50%{transform:translateX(200%);} }
+@keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
+
+* { cursor: none !important; box-sizing: border-box; }
+
+body {
+  background-color: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  font-size:16px;
+  margin:0;
+  padding:40px 20px;
+  min-height:100vh;
+  animation: flicker 0.15s infinite;
+  text-shadow:0 0 2px rgba(255,255,255,0.5);
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position:fixed;
+  top:0; left:0; width:100%; height:2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events:none; z-index:1000;
+}
+
+body::after {
+  content:'';
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events:none; z-index:999;
+}
+
+.content { 
+  position: relative; 
+  z-index:1; 
+  max-width:1200px; 
+  margin:0 auto; 
+}
+
+.logo {
+  border: 2px solid #FFFFFF;
+  display: inline-block;
+  padding: 4px 16px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logo:hover { background: #FFFFFF; }
+.logo:hover span { color: #0000AA; }
+
+.logo span {
+  background-color: #FFFFFF;
+  color: #0000AA;
+  padding: 0 4px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 3px solid #FFFFFF;
+  padding-bottom: 20px;
+}
+
+.system-info {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 30px;
+  padding: 10px;
+  border: 2px solid #FFFFFF;
+  background-color: rgba(0, 0, 100, 0.5);
+}
+
+.badge-category {
+  background: #C0C0C0;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.category-header {
+  color: #000000;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #000000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.badge-card {
+  background: #FFFFFF;
+  border: 3px solid #000000;
+  padding: 15px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.badge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: shine 3s infinite;
+}
+
+.badge-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  animation: float 2s infinite;
+}
+
+.badge-card.gold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border-color: #FF8C00;
+}
+
+.badge-card.silver {
+  background: linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%);
+  border-color: #A9A9A9;
+}
+
+.badge-card.bronze {
+  background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+  border-color: #654321;
+  color: #FFFFFF;
+}
+
+.badge-card.special {
+  background: linear-gradient(135deg, #FF1493 0%, #8B008B 100%);
+  border-color: #4B0082;
+  color: #FFFFFF;
+}
+
+.badge-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+.badge-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #000000;
+}
+
+.badge-card.bronze .badge-name,
+.badge-card.special .badge-name {
+  color: #FFFFFF;
+}
+
+.badge-desc {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #333;
+}
+
+.badge-card.bronze .badge-desc,
+.badge-card.special .badge-desc {
+  color: #E0E0E0;
+}
+
+.badge-requirement {
+  margin-top: 8px;
+  padding: 5px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.locked-badge {
+  opacity: 0.4;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+}
+
+.locked-badge:hover {
+  transform: none;
+  animation: none;
+}
+
+.lock-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+}
+
+.fake-cursor { 
+  position: fixed; 
+  width: 16px; 
+  height: 16px; 
+  background-color: #FFFFFF; 
+  pointer-events: none; 
+  z-index: 10000; 
+  mix-blend-mode: difference; 
+  display: none; 
+}
+
+body:hover .fake-cursor { display: block; }
+
+.blink-cursor { 
+  display: inline-block; 
+  width: 10px; 
+  height: 16px; 
+  background-color: #FFFFFF; 
+  animation: blink 1s infinite; 
+  margin-left: 5px; 
+}
+
+@media (max-width: 768px) {
+  .badge-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="fake-cursor" id="cursor"></div>
+
+<div class="content">
+  <a href="borne.html" style="text-decoration:none;">
+    <div class="logo"><span>:vitalism</span></div>
+  </a>
+
+  <div class="header">
+    *** B@DGΣ_SYS - ACHIEVEMENTS REGISTRY ***<span class="blink-cursor"></span>
+  </div>
+
+  <div class="system-info">
+    System: BADGE_TRACKER v2.1 | Total Badges: 24 | Status: ACTIVE<br>
+    Unlock badges by reaching milestones and participating in events
+  </div>
+
+  <!-- PRODUCTION BADGES -->
+  <div class="badge-category">
+    <div class="category-header">
+      <span>📚</span>
+      <span>PRODUCTION BADGES</span>
+    </div>
+    <div class="badge-grid">
+      
+      <div class="badge-card gold">
+        <div class="badge-icon">🥇</div>
+        <div class="badge-name">TOP 1</div>
+        <div class="badge-desc">Classé premier au classement général</div>
+        <div class="badge-requirement">Rang #1</div>
+      </div>
+
+      <div class="badge-card silver">
+        <div class="badge-icon">🥈</div>
+        <div class="badge-name">TOP 2</div>
+        <div class="badge-desc">Classé deuxième au classement général</div>
+        <div class="badge-requirement">Rang #2</div>
+      </div>
+
+      <div class="badge-card bronze">
+        <div class="badge-icon">🥉</div>
+        <div class="badge-name">TOP 3</div>
+        <div class="badge-desc">Classé troisième au classement général</div>
+        <div class="badge-requirement">Rang #3</div>
+      </div>
+
+      <div class="badge-card gold">
+        <div class="badge-icon">📚</div>
+        <div class="badge-name">BOOK MASTER</div>
+        <div class="badge-desc">Auteur prolifique avec plusieurs livres publiés</div>
+        <div class="badge-requirement">5+ livres</div>
+      </div>
+
+      <div class="badge-card silver">
+        <div class="badge-icon">✍️</div>
+        <div class="badge-name">WRITER</div>
+        <div class="badge-desc">Écrivain régulier d'articles et d'essais</div>
+        <div class="badge-requirement">50+ articles</div>
+      </div>
+
+      <div class="badge-card gold">
+        <div class="badge-icon">🎥</div>
+        <div class="badge-name">CREATOR</div>
+        <div class="badge-desc">Créateur de contenu vidéo prolifique</div>
+        <div class="badge-requirement">20+ vidéos</div>
+      </div>
+
+      <div class="badge-card gold">
+        <div class="badge-icon">⚡</div>
+        <div class="badge-name">HIGH SCORE</div>
+        <div class="badge-desc">Score total exceptionnel</div>
+        <div class="badge-requirement">500+ points</div>
+      </div>
+
+      <div class="badge-card silver">
+        <div class="badge-icon">🔥</div>
+        <div class="badge-name">ON FIRE</div>
+        <div class="badge-desc">Productivité hebdomadaire intense</div>
+        <div class="badge-requirement">100+ pts/semaine</div>
+      </div>
+
+      <div class="badge-card bronze">
+        <div class="badge-icon">📈</div>
+        <div class="badge-name">RISING STAR</div>
+        <div class="badge-desc">Progression rapide au classement</div>
+        <div class="badge-requirement">+5 rangs/mois</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ENGAGEMENT BADGES -->
+  <div class="badge-category">
+    <div class="category-header">
+      <span>💬</span>
+      <span>ENGAGEMENT BADGES</span>
+    </div>
+    <div class="badge-grid">
+      
+      <div class="badge-card gold">
+        <div class="badge-icon">🌟</div>
+        <div class="badge-name">INFLUENCER</div>
+        <div class="badge-desc">Impact social majeur sur les réseaux</div>
+        <div class="badge-requirement">1000+ likes</div>
+      </div>
+
+      <div class="badge-card silver">
+        <div class="badge-icon">🔄</div>
+        <div class="badge-name">VIRAL</div>
+        <div class="badge-desc">Contenu largement partagé</div>
+        <div class="badge-requirement">200+ retweets</div>
+      </div>
+
+      <div class="badge-card bronze">
+        <div class="badge-icon">💚</div>
+        <div class="badge-name">POPULAR</div>
+        <div class="badge-desc">Appréciation constante du public</div>
+        <div class="badge-requirement">500+ likes</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SPECIAL EVENT BADGES -->
+  <div class="badge-category">
+    <div class="category-header">
+      <span>🎪</span>
+      <span>EVENT BADGES</span>
+    </div>
+    <div class="badge-grid">
+      
+      <div class="badge-card special">
+        <div class="badge-icon">🎉</div>
+        <div class="badge-name">FOUNDER</div>
+        <div class="badge-desc">Membre fondateur du réseau Vitalism</div>
+        <div class="badge-requirement">2018-2019</div>
+      </div>
+
+      <div class="badge-card special">
+        <div class="badge-icon">🏆</div>
+        <div class="badge-name">CHAMPION 2024</div>
+        <div class="badge-desc">Meilleur contributeur de l'année 2024</div>
+        <div class="badge-requirement">Top 1 en 2024</div>
+      </div>
+
+      <div class="badge-card special locked-badge">
+        <div class="lock-icon">🔒</div>
+        <div class="badge-icon">🎯</div>
+        <div class="badge-name">MARATHON 2025</div>
+        <div class="badge-desc">Participation au Marathon d'Écriture 2025</div>
+        <div class="badge-requirement">Event à venir</div>
+      </div>
+
+      <div class="badge-card special locked-badge">
+        <div class="lock-icon">🔒</div>
+        <div class="badge-icon">🌙</div>
+        <div class="badge-name">NIGHT OWL</div>
+        <div class="badge-desc">Publication nocturne intensive</div>
+        <div class="badge-requirement">Event spécial</div>
+      </div>
+
+      <div class="badge-card special locked-badge">
+        <div class="lock-icon">🔒</div>
+        <div class="badge-icon">🎨</div>
+        <div class="badge-name">RENAISSANCE</div>
+        <div class="badge-desc">Polyvalence exceptionnelle</div>
+        <div class="badge-requirement">5+ catégories</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MILESTONE BADGES -->
+  <div class="badge-category">
+    <div class="category-header">
+      <span>🎯</span>
+      <span>MILESTONE BADGES</span>
+    </div>
+    <div class="badge-grid">
+      
+      <div class="badge-card gold">
+        <div class="badge-icon">💯</div>
+        <div class="badge-name">CENTURY</div>
+        <div class="badge-desc">100 contributions au total</div>
+        <div class="badge-requirement">100 contenus</div>
+      </div>
+
+      <div class="badge-card silver">
+        <div class="badge-icon">🔟</div>
+        <div class="badge-name">DECADE</div>
+        <div class="badge-desc">10 livres publiés</div>
+        <div class="badge-requirement">10 livres</div>
+      </div>
+
+      <div class="badge-card bronze">
+        <div class="badge-icon">⏰</div>
+        <div class="badge-name">VETERAN</div>
+        <div class="badge-desc">5 ans d'activité continue</div>
+        <div class="badge-requirement">5 années</div>
+      </div>
+
+      <div class="badge-card gold">
+        <div class="badge-icon">👑</div>
+        <div class="badge-name">LEGEND</div>
+        <div class="badge-desc">Statut légendaire atteint</div>
+        <div class="badge-requirement">1000+ points</div>
+      </div>
+
+      <div class="badge-card special">
+        <div class="badge-icon">💎</div>
+        <div class="badge-name">DIAMOND</div>
+        <div class="badge-desc">Excellence absolue</div>
+        <div class="badge-requirement">Top 1 pendant 6 mois</div>
+      </div>
+
+      <div class="badge-card special locked-badge">
+        <div class="lock-icon">🔒</div>
+        <div class="badge-icon">🌌</div>
+        <div class="badge-name">COSMIC</div>
+        <div class="badge-desc">Badge mystérieux...</div>
+        <div class="badge-requirement">???</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 40px; padding: 20px; border-top: 2px solid #FFFFFF;">
+    <p style="font-size: 14px; color: #AAAAAA;">
+      *** Nouveaux badges ajoutés régulièrement ***<br>
+      Consultez evenements.html pour les prochains challenges
+    </p>
+  </div>
+</div>
+
+<script>
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', (e) => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+
+// Animation au clic sur les badges
+document.querySelectorAll('.badge-card:not(.locked-badge)').forEach(card => {
+  card.addEventListener('click', function() {
+    this.style.animation = 'none';
+    setTimeout(() => {
+      this.style.animation = '';
+    }, 10);
+    
+    // Effet de confettis (optionnel)
+    const rect = this.getBoundingClientRect();
+    for(let i = 0; i < 10; i++) {
+      createConfetti(rect.left + rect.width/2, rect.top + rect.height/2);
+    }
+  });
+});
+
+function createConfetti(x, y) {
+  const confetti = document.createElement('div');
+  confetti.style.position = 'fixed';
+  confetti.style.left = x + 'px';
+  confetti.style.top = y + 'px';
+  confetti.style.width = '10px';
+  confetti.style.height = '10px';
+  confetti.style.background = ['#FFD700', '#FF69B4', '#00BFFF', '#00FF00'][Math.floor(Math.random()*4)];
+  confetti.style.pointerEvents = 'none';
+  confetti.style.zIndex = '10001';
+  document.body.appendChild(confetti);
+  
+  const angle = Math.random() * Math.PI * 2;
+  const velocity = Math.random() * 5 + 2;
+  let vx = Math.cos(angle) * velocity;
+  let vy = Math.sin(angle) * velocity;
+  let posX = x;
+  let posY = y;
+  
+  const animation = setInterval(() => {
+    vy += 0.2;
+    posX += vx;
+    posY += vy;
+    confetti.style.left = posX + 'px';
+    confetti.style.top = posY + 'px';
+    confetti.style.opacity = parseFloat(confetti.style.opacity || 1) - 0.02;
+    
+    if(posY > window.innerHeight || parseFloat(confetti.style.opacity) <= 0) {
+      clearInterval(animation);
+      confetti.remove();
+    }
+  }, 20);
+}
+</script>
+
+</body>
+</html>

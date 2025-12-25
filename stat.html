@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STAT.SYS - Central Database</title>
+<style>
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+
+* { cursor: none !important; box-sizing: border-box; }
+
+.custom-cursor {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background: #FFFF00;
+  pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: difference;
+}
+
+.login-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: #0000AA;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: flicker 0.15s infinite;
+}
+
+.login-screen::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 10001;
+}
+
+.login-screen::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+  z-index: 10001;
+}
+
+.login-box {
+  background: #C0C0C0;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 30px;
+  box-shadow: 8px 8px 0 #000000;
+  z-index: 10002;
+  position: relative;
+  max-width: 400px;
+  width: 90%;
+}
+
+.login-header {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #FFFFFF;
+  padding: 6px;
+  margin: -30px -30px 20px -30px;
+  font-weight: bold;
+  font-size: 13px;
+  text-align: center;
+  font-family: "Courier New", monospace;
+}
+
+.login-content { text-align: center; }
+
+.login-content h2 {
+  color: #000000;
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.login-input {
+  width: 100%;
+  padding: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  border: 2px solid;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  margin-bottom: 15px;
+  background: #FFFFFF;
+  color: #000000;
+}
+
+.login-button {
+  padding: 10px 30px;
+  background: #C0C0C0;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  font-weight: bold;
+  font-size: 13px;
+  font-family: "Courier New", monospace;
+  cursor: pointer;
+  color: #000000;
+}
+
+.login-button:hover { background: #DFDFDF; }
+.login-button:active { border-color: #000000 #FFFFFF #FFFFFF #000000; }
+
+.login-error {
+  color: #FF0000;
+  font-weight: bold;
+  margin-top: 15px;
+  display: none;
+  font-size: 12px;
+}
+
+.main-content { display: none; }
+
+body {
+  background-color: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  margin: 0;
+  padding: 40px 20px;
+  min-height: 100vh;
+  animation: flicker 0.15s infinite;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5);
+  position: relative;
+  overflow-y: auto;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.content { position: relative; z-index: 1; max-width: 1800px; margin: 0 auto; }
+
+.logo {
+  border: 2px solid #FFFFFF;
+  display: inline-block;
+  padding: 4px 16px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #fff;
+}
+
+.logo:hover { background: #FFFFFF; }
+.logo:hover span { color: #0000AA; }
+
+.logo span {
+  background-color: #FFFFFF;
+  color: #0000AA;
+  padding: 0 4px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  border-bottom: 3px solid #FFFFFF;
+  padding-bottom: 20px;
+}
+
+.controls {
+  background: #C0C0C0;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  box-shadow: 4px 4px 0 #000000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.control-group { display: flex; flex-direction: column; gap: 5px; }
+.control-label { color: #000000; font-weight: bold; font-size: 12px; }
+
+select, input, button {
+  padding: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  border: 2px solid;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  background: #FFFFFF;
+  color: #000000;
+}
+
+button {
+  background: #C0C0C0;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+button:hover { background: #DFDFDF; }
+button:active { border-color: #000000 #FFFFFF #FFFFFF #000000; }
+button.danger { background: #FF6666; }
+button.success { background: #66FF66; }
+
+.stats-table {
+  background: #C0C0C0;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  box-shadow: 4px 4px 0 #000000;
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+table { width: 100%; border-collapse: collapse; background: #FFFFFF; }
+
+th, td {
+  border: 1px solid #808080;
+  padding: 8px 6px;
+  text-align: center;
+  color: #000000;
+  font-size: 12px;
+}
+
+th {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #FFFFFF;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+th.sortable { cursor: pointer; }
+th.sortable:hover { background: #4040FF; }
+
+td input {
+  width: 60px;
+  padding: 4px;
+  font-size: 12px;
+  text-align: center;
+}
+
+td.name-cell { text-align: left; font-weight: bold; white-space: nowrap; }
+
+.score-cell { background: #FFD700 !important; font-weight: bold; }
+
+#status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  background: #00FF00;
+  color: #000;
+  font-weight: bold;
+  display: none;
+  z-index: 2000;
+  border: 2px solid #000;
+}
+
+#jsonOutput {
+  background: #000;
+  color: #0f0;
+  padding: 15px;
+  font-size: 11px;
+  max-height: 300px;
+  overflow: auto;
+  display: none;
+  white-space: pre-wrap;
+  margin-top: 20px;
+}
+
+.period-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
+.period-buttons button { padding: 8px 12px; font-size: 11px; }
+.period-buttons button.active { background: #000080; color: #fff; }
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #FFFF00;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-box input { width: 200px; }
+</style>
+</head>
+<body>
+<div class="custom-cursor" id="cursor"></div>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-header">🔒 STAT.SYS - ACCÈS RESTREINT</div>
+    <div class="login-content">
+      <h2>IDENTIFICATION REQUISE</h2>
+      <input type="password" class="login-input" id="passwordInput" placeholder="Mot de passe..." onkeypress="if(event.key==='Enter')checkPassword()">
+      <br>
+      <button class="login-button" onclick="checkPassword()">CONNEXION</button>
+      <div class="login-error" id="loginError">❌ MOT DE PASSE INCORRECT</div>
+    </div>
+  </div>
+  <div id="brumeLink" style="margin-top:10px;color:#ffb6c1;font-size:9px;cursor:pointer;opacity:0.5">brume</div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <div class="content">
+    <a href="borne.html" class="logo"><span>:vitalism</span></a>
+    
+    <div class="header">
+      📊 STAT.SYS - BASE DE DONNÉES CENTRALE<br>
+      <span style="font-size:12px;opacity:0.7">68 contributeurs | Dernière MAJ: <span id="lastUpdate">--</span></span>
+    </div>
+    
+    <div id="status"></div>
+    
+    <div class="controls">
+      <div class="control-group">
+        <span class="control-label">PÉRIODE:</span>
+        <div class="period-buttons" id="periodButtons">
+          <button onclick="setPeriod('y2018')">2018</button>
+          <button onclick="setPeriod('y2019')">2019</button>
+          <button onclick="setPeriod('y2020')">2020</button>
+          <button onclick="setPeriod('y2021')">2021</button>
+          <button onclick="setPeriod('y2022')">2022</button>
+          <button onclick="setPeriod('y2023')">2023</button>
+          <button onclick="setPeriod('y2024')">2024</button>
+          <button onclick="setPeriod('y2025')" class="active">2025</button>
+        </div>
+      </div>
+      
+      <div class="control-group search-box">
+        <span class="control-label">RECHERCHE:</span>
+        <input type="text" id="searchInput" placeholder="Nom..." oninput="filterTable()">
+      </div>
+      
+      <div class="control-group">
+        <span class="control-label">CONTRIBUTEUR:</span>
+        <select id="contributorSelect" onchange="scrollToContributor()">
+          <option value="">-- Sélectionner --</option>
+        </select>
+      </div>
+      
+      <button onclick="saveData()" class="success">💾 SAUVEGARDER</button>
+      <button onclick="exportJSON()">📤 EXPORTER JSON</button>
+      <button onclick="loadFromJSON()">📥 RECHARGER JSON</button>
+    </div>
+    
+    <div class="stats-table">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortTable('name')">NOM ▼</th>
+            <th class="sortable" onclick="sortTable('books')">📚 LIVRES</th>
+            <th class="sortable" onclick="sortTable('articles')">📝 ARTICLES</th>
+            <th class="sortable" onclick="sortTable('video_minutes')">🎬 VIDÉO (min)</th>
+            <th class="sortable" onclick="sortTable('audio_minutes')">🎙️ AUDIO (min)</th>
+            <th class="sortable" onclick="sortTable('retweets')">🔄 RTs</th>
+            <th class="sortable" onclick="sortTable('likes')">❤️ LIKES</th>
+            <th class="sortable" onclick="sortTable('score')">⭐ SCORE</th>
+          </tr>
+        </thead>
+        <tbody id="statsTableBody">
+          <tr><td colspan="8" class="loading">Chargement des données...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <pre id="jsonOutput"></pre>
+  </div>
+</div>
+
+<script>
+// SECRET: brume.mp4
+document.getElementById('brumeLink').onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="brume.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+
+// Cursor
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+
+// Password check (SHA-256 hash of password)
+const PASSWORD_HASH = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'; // 'test'
+
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPassword() {
+  const input = document.getElementById('passwordInput').value;
+  const hash = await sha256(input);
+  
+  if (hash === PASSWORD_HASH) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    loadFromJSON();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+  }
+}
+
+// Data
+let contributors = [];
+let currentPeriod = 'y2025';
+let sortColumn = 'name';
+let sortAsc = true;
+
+// Load from data.json
+async function loadFromJSON() {
+  try {
+    const response = await fetch('data.json');
+    const data = await response.json();
+    contributors = data.contributors;
+    document.getElementById('lastUpdate').textContent = data.lastUpdate || 'N/A';
+    initContributorSelect();
+    renderTable();
+    showStatus('✅ Données chargées depuis data.json', 'success');
+  } catch (e) {
+    showStatus('❌ Erreur de chargement: ' + e.message, 'error');
+  }
+}
+
+// Calculate score
+function calculateScore(data) {
+  const books = data.books || 0;
+  const articles = data.articles || 0;
+  const video = data.video_minutes || 0;
+  const audio = data.audio_minutes || 0;
+  const rts = data.retweets || 0;
+  const likes = data.likes || 0;
+  
+  return (books * 50) + (articles * 5) + (video * 0.5) + (audio * 0.3) + (rts * 0.5) + (likes * 0.1);
+}
+
+// Init contributor select
+function initContributorSelect() {
+  const select = document.getElementById('contributorSelect');
+  select.innerHTML = '<option value="">-- Sélectionner --</option>';
+  contributors.forEach((c, idx) => {
+    const option = document.createElement('option');
+    option.value = idx;
+    option.textContent = c.name;
+    select.appendChild(option);
+  });
+}
+
+// Set period
+function setPeriod(period) {
+  currentPeriod = period;
+  document.querySelectorAll('.period-buttons button').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === period.replace('y', ''));
+  });
+  renderTable();
+}
+
+// Render table
+function renderTable() {
+  const tbody = document.getElementById('statsTableBody');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  
+  // Sort contributors
+  let sorted = [...contributors];
+  sorted.sort((a, b) => {
+    let valA, valB;
+    if (sortColumn === 'name') {
+      valA = a.name.toLowerCase();
+      valB = b.name.toLowerCase();
+    } else if (sortColumn === 'score') {
+      valA = calculateScore(a[currentPeriod] || {});
+      valB = calculateScore(b[currentPeriod] || {});
+    } else {
+      valA = (a[currentPeriod] || {})[sortColumn] || 0;
+      valB = (b[currentPeriod] || {})[sortColumn] || 0;
+    }
+    if (sortAsc) return valA > valB ? 1 : -1;
+    return valA < valB ? 1 : -1;
+  });
+  
+  // Filter by search
+  if (search) {
+    sorted = sorted.filter(c => c.name.toLowerCase().includes(search));
+  }
+  
+  tbody.innerHTML = '';
+  
+  sorted.forEach((c, idx) => {
+    const originalIdx = contributors.indexOf(c);
+    const data = c[currentPeriod] || {};
+    const score = calculateScore(data);
+    
+    const tr = document.createElement('tr');
+    tr.dataset.idx = originalIdx;
+    tr.innerHTML = `
+      <td class="name-cell">${c.name}</td>
+      <td><input type="number" min="0" value="${data.books || 0}" onchange="updateStat(${originalIdx}, 'books', this.value)"></td>
+      <td><input type="number" min="0" value="${data.articles || 0}" onchange="updateStat(${originalIdx}, 'articles', this.value)"></td>
+      <td><input type="number" min="0" value="${data.video_minutes || 0}" onchange="updateStat(${originalIdx}, 'video_minutes', this.value)"></td>
+      <td><input type="number" min="0" value="${data.audio_minutes || 0}" onchange="updateStat(${originalIdx}, 'audio_minutes', this.value)"></td>
+      <td><input type="number" min="0" value="${data.retweets || 0}" onchange="updateStat(${originalIdx}, 'retweets', this.value)"></td>
+      <td><input type="number" min="0" value="${data.likes || 0}" onchange="updateStat(${originalIdx}, 'likes', this.value)"></td>
+      <td class="score-cell">${score.toFixed(1)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Update stat
+function updateStat(contributorIdx, field, value) {
+  if (!contributors[contributorIdx][currentPeriod]) {
+    contributors[contributorIdx][currentPeriod] = {};
+  }
+  contributors[contributorIdx][currentPeriod][field] = parseInt(value) || 0;
+  renderTable();
+}
+
+// Sort table
+function sortTable(column) {
+  if (sortColumn === column) {
+    sortAsc = !sortAsc;
+  } else {
+    sortColumn = column;
+    sortAsc = true;
+  }
+  renderTable();
+}
+
+// Filter table
+function filterTable() {
+  renderTable();
+}
+
+// Scroll to contributor
+function scrollToContributor() {
+  const idx = document.getElementById('contributorSelect').value;
+  if (idx !== '') {
+    const row = document.querySelector(`tr[data-idx="${idx}"]`);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.background = '#FFFF00';
+      setTimeout(() => row.style.background = '', 2000);
+    }
+  }
+}
+
+// Save data (generates JSON to copy)
+function saveData() {
+  const output = {
+    lastUpdate: new Date().toISOString(),
+    contributors: contributors
+  };
+  
+  const json = JSON.stringify(output, null, 2);
+  const el = document.getElementById('jsonOutput');
+  el.textContent = json;
+  el.style.display = 'block';
+  
+  navigator.clipboard.writeText(json).then(() => {
+    showStatus('📋 JSON copié! Collez-le dans data.json', 'success');
+  }).catch(() => {
+    showStatus('💾 JSON généré ci-dessous', 'success');
+  });
+}
+
+// Export JSON
+function exportJSON() {
+  const output = {
+    lastUpdate: new Date().toISOString(),
+    contributors: contributors
+  };
+  
+  const json = JSON.stringify(output, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showStatus('📥 Fichier téléchargé!', 'success');
+}
+
+// Show status message
+function showStatus(message, type) {
+  const status = document.getElementById('status');
+  status.textContent = message;
+  status.style.display = 'block';
+  status.style.background = type === 'success' ? '#00FF00' : type === 'warning' ? '#FFD700' : '#FF6666';
+  setTimeout(() => status.style.display = 'none', 3000);
+}
+</script>
+</body>
+</html>

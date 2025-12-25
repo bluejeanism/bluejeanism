@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HUMAN SORTING PROTOCOL — ULTIMATE EDITION</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap');
+
+    :root {
+      --bg: #0a0a0a;
+      --accent: #ff1a1a;
+      --accent-dark: #aa0000;
+      --good: #10b981;
+      --bad: #ef4444;
+      --warning: #f59e0b;
+      --text: #e0e0e0;
+      --muted: #666;
+      --card-bg: rgba(15, 5, 5, 0.85);
+      --cognitive: #8b5cf6;
+      --moral: #ec4899;
+      --emotional: #06b6d4;
+      --social: #f59e0b;
+      --physical: #22c55e;
+      --existential: #a855f7;
+      --behavioral: #f97316;
+      --professional: #0ea5e9;
+      --creative: #d946ef;
+      --temporal: #64748b;
+      --genetic: #14b8a6;
+      --impact: #eab308;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: linear-gradient(180deg, #1a0505 0%, #0a0000 50%, #000 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    /* LOADING */
+    #loading { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s; }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    .ld-icon { font-size: 50px; margin-bottom: 25px; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .ld-title { font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--accent); letter-spacing: 3px; margin-bottom: 25px; }
+    .ld-bar { width: 280px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
+    .ld-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.1s; }
+    .ld-text { margin-top: 15px; font-size: 10px; color: #555; letter-spacing: 2px; }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(180deg, rgba(20, 5, 5, 0.98), rgba(10, 0, 0, 0.95));
+      border-bottom: 1px solid #330000;
+      padding: 12px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { font-size: 22px; }
+    .logo h1 { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--accent); letter-spacing: 2px; }
+    .logo-sub { font-size: 8px; color: #555; letter-spacing: 1px; }
+    .header-stats { display: flex; gap: 20px; font-size: 10px; color: #666; }
+    .header-stat span { color: var(--accent); font-weight: 600; }
+
+    /* LAYOUT */
+    .wrapper { display: flex; min-height: calc(100vh - 50px); }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      background: rgba(5, 0, 0, 0.95);
+      border-right: 1px solid #220000;
+      overflow-y: auto;
+      max-height: calc(100vh - 50px);
+      position: sticky;
+      top: 50px;
+      flex-shrink: 0;
+    }
+    .sb-title { font-size: 9px; color: #555; letter-spacing: 2px; padding: 12px 12px 8px; border-bottom: 1px solid #1a0000; }
+    .archive {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,26,26,0.06);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .archive:hover { background: rgba(255,26,26,0.04); }
+    .archive.active { background: rgba(255,26,26,0.08); border-left: 2px solid var(--accent); }
+    .archive-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .archive-id { font-size: 10px; font-weight: 600; }
+    .archive-tier { font-size: 11px; font-weight: 700; padding: 1px 5px; border-radius: 2px; }
+    .t-s { background: rgba(255,215,0,0.2); color: #ffd700; }
+    .t-a { background: rgba(16,185,129,0.2); color: var(--good); }
+    .t-b { background: rgba(59,130,246,0.2); color: #3b82f6; }
+    .t-c { background: rgba(150,150,150,0.2); color: #999; }
+    .t-d { background: rgba(245,158,11,0.2); color: var(--warning); }
+    .t-f { background: rgba(239,68,68,0.2); color: var(--bad); }
+    .t-x { background: rgba(255,0,0,0.3); color: #ff0000; }
+    .archive-name { font-size: 9px; color: #777; }
+    .archive-status { font-size: 8px; letter-spacing: 1px; margin-top: 2px; }
+    .st-approved { color: var(--good); }
+    .st-rejected { color: var(--bad); }
+    .st-quarantine { color: var(--warning); }
+    .st-terminated { color: #ff0000; }
+
+    .btn-new {
+      margin: 12px;
+      padding: 10px;
+      background: linear-gradient(135deg, var(--accent-dark), #550000);
+      border: 1px solid var(--accent);
+      color: #fff;
+      font-size: 9px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-new:hover { background: var(--accent); }
+
+    /* MAIN */
+    .main { flex: 1; padding: 20px 25px; overflow-x: hidden; }
+
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid #2a0000;
+      border-radius: 5px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .card-title {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #2a0000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .count { color: #666; font-weight: 400; margin-left: auto; }
+
+    /* PROFILE */
+    .profile-top { display: flex; gap: 18px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #2a0000; }
+    .photo-box {
+      width: 100px;
+      height: 125px;
+      background: #0a0a0a;
+      border: 2px solid #333;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .photo-box:hover { border-color: var(--accent); }
+    .photo-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .photo-ph { font-size: 35px; opacity: 0.25; }
+    .profile-info { flex: 1; }
+    .profile-id { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .profile-meta { font-size: 10px; color: #666; margin-bottom: 8px; }
+    .age-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background: rgba(255,26,26,0.1);
+      border: 1px solid var(--accent);
+      border-radius: 2px;
+      font-size: 9px;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+
+    /* FORM GRID */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .fg { display: flex; flex-direction: column; gap: 4px; }
+    .fg-label { font-size: 8px; color: #555; letter-spacing: 1px; text-transform: uppercase; }
+    .fg-input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #2a2a2a;
+      padding: 8px 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 11px;
+      border-radius: 2px;
+    }
+    .fg-input:focus { outline: none; border-color: var(--accent); }
+    .fg-input::placeholder { color: #3a3a3a; }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 18px; flex-wrap: wrap; }
+    .tab {
+      padding: 7px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid #2a2a2a;
+      color: #777;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      border-radius: 2px;
+    }
+    .tab:hover { border-color: #444; color: #aaa; }
+    .tab.active { border-color: var(--accent); color: var(--accent); background: rgba(255,26,26,0.08); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* TRAITS */
+    .cat-block { margin-bottom: 18px; }
+    .cat-head {
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-head.cognitive { background: rgba(139,92,246,0.12); color: var(--cognitive); }
+    .cat-head.moral { background: rgba(236,72,153,0.12); color: var(--moral); }
+    .cat-head.emotional { background: rgba(6,182,212,0.12); color: var(--emotional); }
+    .cat-head.social { background: rgba(245,158,11,0.12); color: var(--social); }
+    .cat-head.physical { background: rgba(34,197,94,0.12); color: var(--physical); }
+    .cat-head.existential { background: rgba(168,85,247,0.12); color: var(--existential); }
+    .cat-head.behavioral { background: rgba(249,115,22,0.12); color: var(--behavioral); }
+    .cat-head.professional { background: rgba(14,165,233,0.12); color: var(--professional); }
+    .cat-head.creative { background: rgba(217,70,239,0.12); color: var(--creative); }
+    .cat-head.temporal { background: rgba(100,116,139,0.12); color: var(--temporal); }
+    .cat-head.genetic { background: rgba(20,184,166,0.12); color: var(--genetic); }
+    .cat-head.impact { background: rgba(234,179,8,0.12); color: var(--impact); }
+    .cat-head.neg { background: rgba(239,68,68,0.1); color: var(--bad); }
+
+    .traits {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 5px;
+    }
+    .trait {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid transparent;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.12s;
+      font-size: 10px;
+    }
+    .trait:hover { background: rgba(255,255,255,0.02); border-color: #333; }
+    .trait.sel { border-color: var(--accent); background: rgba(255,26,26,0.08); }
+    .trait.pos.sel { border-color: var(--good); background: rgba(16,185,129,0.08); }
+    .trait input { accent-color: var(--accent); cursor: pointer; width: 12px; height: 12px; }
+    .trait.pos input { accent-color: var(--good); }
+    .trait-name { flex: 1; color: #aaa; }
+    .trait-w { font-size: 8px; color: #444; font-weight: 600; }
+    .trait-w.pos { color: var(--good); }
+    .trait-w.neg { color: var(--bad); }
+
+    /* RESULTS */
+    .results-grid { display: grid; grid-template-columns: 180px 1fr; gap: 20px; }
+    .tier-box { text-align: center; }
+    .tier-badge { font-family: 'Orbitron', sans-serif; font-size: 90px; font-weight: 900; line-height: 1; }
+    .tier-name { font-size: 11px; color: #777; letter-spacing: 2px; margin-top: 8px; }
+
+    .scores-box { display: flex; flex-direction: column; gap: 12px; }
+    .score-row { display: flex; gap: 12px; }
+    .score-item { flex: 1; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 3px; text-align: center; }
+    .score-val { font-size: 22px; font-weight: 700; }
+    .score-lbl { font-size: 8px; color: #555; letter-spacing: 1px; margin-top: 4px; }
+
+    .result-bar { height: 5px; background: #1a1a1a; border-radius: 3px; overflow: hidden; margin: 12px 0; }
+    .result-fill { height: 100%; background: linear-gradient(90deg, var(--bad), var(--warning), var(--good)); transition: width 0.4s; }
+
+    .status-box { padding: 10px 18px; border-radius: 3px; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-align: center; }
+    .status-box.approved { background: rgba(16,185,129,0.12); border: 1px solid var(--good); color: var(--good); }
+    .status-box.rejected { background: rgba(239,68,68,0.12); border: 1px solid var(--bad); color: var(--bad); }
+    .status-box.review { background: rgba(245,158,11,0.12); border: 1px solid var(--warning); color: var(--warning); }
+    .status-box.pending { background: rgba(100,100,100,0.12); border: 1px solid #555; color: #777; }
+
+    .cat-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .cb-item { background: rgba(0,0,0,0.25); padding: 10px; border-radius: 3px; border-left: 3px solid; }
+    .cb-item.cognitive { border-color: var(--cognitive); }
+    .cb-item.moral { border-color: var(--moral); }
+    .cb-item.emotional { border-color: var(--emotional); }
+    .cb-item.social { border-color: var(--social); }
+    .cb-item.physical { border-color: var(--physical); }
+    .cb-item.existential { border-color: var(--existential); }
+    .cb-item.behavioral { border-color: var(--behavioral); }
+    .cb-item.professional { border-color: var(--professional); }
+    .cb-item.creative { border-color: var(--creative); }
+    .cb-item.temporal { border-color: var(--temporal); }
+    .cb-item.genetic { border-color: var(--genetic); }
+    .cb-item.impact { border-color: var(--impact); }
+    .cb-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .cb-name { font-size: 8px; color: #666; letter-spacing: 1px; }
+    .cb-val { font-size: 11px; font-weight: 700; }
+    .cb-bar { height: 3px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+    .cb-fill { height: 100%; transition: width 0.3s; }
+    .cb-item.cognitive .cb-fill { background: var(--cognitive); }
+    .cb-item.moral .cb-fill { background: var(--moral); }
+    .cb-item.emotional .cb-fill { background: var(--emotional); }
+    .cb-item.social .cb-fill { background: var(--social); }
+    .cb-item.physical .cb-fill { background: var(--physical); }
+    .cb-item.existential .cb-fill { background: var(--existential); }
+    .cb-item.behavioral .cb-fill { background: var(--behavioral); }
+    .cb-item.professional .cb-fill { background: var(--professional); }
+    .cb-item.creative .cb-fill { background: var(--creative); }
+    .cb-item.temporal .cb-fill { background: var(--temporal); }
+    .cb-item.genetic .cb-fill { background: var(--genetic); }
+    .cb-item.impact .cb-fill { background: var(--impact); }
+
+    /* ACTIONS */
+    .actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+    .act-btn {
+      padding: 9px 22px;
+      font-size: 10px;
+      font-family: inherit;
+      letter-spacing: 1px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-save { background: var(--accent); border: none; color: #fff; }
+    .btn-save:hover { background: #ff3333; }
+    .btn-reset { background: transparent; border: 1px solid #3a3a3a; color: #777; }
+    .btn-reset:hover { border-color: #555; color: #aaa; }
+    .btn-export { background: transparent; border: 1px solid #3a3a3a; color: #777; }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* RESPONSIVE */
+    @media (max-width: 1100px) {
+      .cat-bars { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .wrapper { flex-direction: column; }
+      .sidebar { width: 100%; max-height: none; position: relative; top: 0; display: flex; flex-wrap: wrap; padding: 8px; gap: 6px; }
+      .sb-title { width: 100%; }
+      .archive { flex: 1; min-width: 150px; border: 1px solid #1a0000; border-radius: 3px; }
+      .btn-new { flex: 1; min-width: 150px; margin: 0; }
+      .results-grid { grid-template-columns: 1fr; }
+      .cat-bars { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .traits { grid-template-columns: 1fr; }
+      .cat-bars { grid-template-columns: 1fr; }
+      .score-row { flex-direction: column; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="ld-icon">⚖️</div>
+  <div class="ld-title">HUMAN SORTING PROTOCOL</div>
+  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-text" id="ld-text">INITIALIZING...</div>
+</div>
+<script>
+(function(){
+  const b=document.getElementById('ld-fill'),t=document.getElementById('ld-text'),s=document.getElementById('loading');
+  const m=['INITIALIZING...','LOADING DATABASE...','CALIBRATING...','READY'];
+  let p=0;
+  const i=setInterval(()=>{
+    p+=Math.random()*25+10;if(p>100)p=100;
+    b.style.width=p+'%';
+    t.textContent=m[Math.min(Math.floor(p/28),m.length-1)];
+    if(p>=100){clearInterval(i);setTimeout(()=>s.classList.add('hidden'),250);}
+  },80);
+})();
+</script>
+
+<header>
+  <div class="logo">
+    <span class="logo-icon">⚖️</span>
+    <div>
+      <h1>HUMAN SORTING PROTOCOL</h1>
+      <div class="logo-sub">ULTIMATE SPECIMEN EVALUATION — 300+ TRAITS</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div>TRAITS SÉLECTIONNÉS: <span id="h-count">0</span></div>
+    <div>SCORE: <span id="h-score">0.0</span></div>
+  </div>
+</header>
+
+<div class="wrapper">
+  <aside class="sidebar">
+    <div class="sb-title">📁 ARCHIVES</div>
+    <div class="archive" data-id="001"><div class="archive-top"><span class="archive-id">HSP-001</span><span class="archive-tier t-a">A</span></div><div class="archive-name">Dr. Elena Vasquez, 42F</div><div class="archive-status st-approved">✓ APPROVED</div></div>
+    <div class="archive" data-id="002"><div class="archive-top"><span class="archive-id">HSP-002</span><span class="archive-tier t-c">C</span></div><div class="archive-name">Marcus Chen, 28M</div><div class="archive-status st-approved">✓ APPROVED</div></div>
+    <div class="archive" data-id="003"><div class="archive-top"><span class="archive-id">HSP-003</span><span class="archive-tier t-f">F</span></div><div class="archive-name">Viktor Kozlov, 51M</div><div class="archive-status st-rejected">✗ REJECTED</div></div>
+    <div class="archive" data-id="004"><div class="archive-top"><span class="archive-id">HSP-004</span><span class="archive-tier t-s">S</span></div><div class="archive-name">Amara Okonkwo, 35F</div><div class="archive-status st-approved">✓ APPROVED</div></div>
+    <div class="archive" data-id="005"><div class="archive-top"><span class="archive-id">HSP-005</span><span class="archive-tier t-x">X</span></div><div class="archive-name">[REDACTED]</div><div class="archive-status st-terminated">☠ TERMINATED</div></div>
+    <div class="archive" data-id="006"><div class="archive-top"><span class="archive-id">HSP-006</span><span class="archive-tier t-b">B</span></div><div class="archive-name">Yuki Tanaka, 24NB</div><div class="archive-status st-approved">✓ APPROVED</div></div>
+    <div class="archive" data-id="007"><div class="archive-top"><span class="archive-id">HSP-007</span><span class="archive-tier t-d">D</span></div><div class="archive-name">Jean-Pierre Moreau, 45M</div><div class="archive-status st-quarantine">⚠ QUARANTINE</div></div>
+    <button class="btn-new" id="btn-new">+ NOUVELLE ÉVALUATION</button>
+  </aside>
+
+  <main class="main">
+    <!-- PROFILE -->
+    <div class="card">
+      <div class="card-title">👤 PROFIL DU SPÉCIMEN</div>
+      <div class="profile-top">
+        <div class="photo-box" id="photo-box"><span class="photo-ph">👤</span><img id="photo-img"></div>
+        <input type="file" id="photo-input" accept="image/*" style="display:none">
+        <div class="profile-info">
+          <div class="profile-id" id="disp-id">HSP-008</div>
+          <div class="profile-meta" id="disp-meta">Nouveau dossier • En attente</div>
+          <div class="age-badge" id="disp-age">CATÉGORIE: —</div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fg"><label class="fg-label">Désignation</label><input class="fg-input" id="f-name" placeholder="Nom complet..."></div>
+        <div class="fg"><label class="fg-label">Âge</label><input type="number" class="fg-input" id="f-age" placeholder="—" min="0" max="150"></div>
+        <div class="fg"><label class="fg-label">Sexe biologique</label><select class="fg-input" id="f-sex"><option value="">—</option><option value="M">Masculin</option><option value="F">Féminin</option><option value="I">Intersexe</option></select></div>
+        <div class="fg"><label class="fg-label">Genre</label><select class="fg-input" id="f-gender"><option value="">—</option><option value="H">Homme</option><option value="F">Femme</option><option value="NB">Non-binaire</option><option value="GF">Genderfluid</option><option value="A">Agenre</option><option value="TM">Trans (FtM)</option><option value="TF">Trans (MtF)</option><option value="O">Autre</option></select></div>
+        <div class="fg"><label class="fg-label">Orientation</label><select class="fg-input" id="f-orient"><option value="">—</option><option value="HET">Hétérosexuel</option><option value="HOM">Homosexuel</option><option value="BI">Bisexuel</option><option value="PAN">Pansexuel</option><option value="ACE">Asexuel</option><option value="DEM">Demisexuel</option><option value="Q">Queer</option><option value="O">Autre</option></select></div>
+        <div class="fg"><label class="fg-label">Ethnicité</label><input class="fg-input" id="f-eth" placeholder="Origine ethnique..."></div>
+        <div class="fg"><label class="fg-label">Nationalité</label><input class="fg-input" id="f-nat" placeholder="Pays..."></div>
+        <div class="fg"><label class="fg-label">Statut relationnel</label><select class="fg-input" id="f-rel"><option value="">—</option><option value="single">Célibataire</option><option value="relation">En couple</option><option value="married">Marié(e)</option><option value="divorced">Divorcé(e)</option><option value="widowed">Veuf/Veuve</option><option value="poly">Polyamoureux</option><option value="other">Autre</option></select></div>
+        <div class="fg"><label class="fg-label">Éducation</label><select class="fg-input" id="f-edu"><option value="">—</option><option value="none">Aucune</option><option value="primary">Primaire</option><option value="secondary">Secondaire</option><option value="bac">Baccalauréat</option><option value="bachelor">Licence</option><option value="master">Master</option><option value="phd">Doctorat</option><option value="auto">Autodidacte</option></select></div>
+        <div class="fg"><label class="fg-label">Profession</label><input class="fg-input" id="f-job" placeholder="Métier..."></div>
+        <div class="fg"><label class="fg-label">Classe sociale</label><select class="fg-input" id="f-class"><option value="">—</option><option value="poverty">Pauvreté</option><option value="working">Ouvrière</option><option value="lower-mid">Moy. inférieure</option><option value="middle">Moyenne</option><option value="upper-mid">Moy. supérieure</option><option value="upper">Aisée</option><option value="elite">Élite</option></select></div>
+        <div class="fg"><label class="fg-label">Religion</label><select class="fg-input" id="f-relig"><option value="">—</option><option value="none">Athée</option><option value="agnostic">Agnostique</option><option value="christian">Christianisme</option><option value="catholic">Catholicisme</option><option value="protestant">Protestantisme</option><option value="orthodox">Orthodoxe</option><option value="islam">Islam</option><option value="judaism">Judaïsme</option><option value="buddhism">Bouddhisme</option><option value="hinduism">Hindouisme</option><option value="shinto">Shintoïsme</option><option value="spiritual">Spirituel</option><option value="other">Autre</option></select></div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="pos">✓ POSITIFS</button>
+      <button class="tab" data-tab="neg">✗ NÉGATIFS</button>
+      <button class="tab" data-tab="results">📊 RÉSULTATS</button>
+    </div>
+
+    <!-- POSITIVE TRAITS -->
+    <div class="tab-panel active" id="tab-pos">
+      <div class="card">
+        <div class="card-title">✓ ATTRIBUTS POSITIFS <span class="count" id="pos-count">0 sélectionnés</span></div>
+        <div id="pos-traits"></div>
+      </div>
+    </div>
+
+    <!-- NEGATIVE TRAITS -->
+    <div class="tab-panel" id="tab-neg">
+      <div class="card">
+        <div class="card-title">✗ ATTRIBUTS NÉGATIFS <span class="count" id="neg-count">0 sélectionnés</span></div>
+        <div id="neg-traits"></div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="tab-panel" id="tab-results">
+      <div class="card">
+        <div class="card-title">📊 ÉVALUATION FINALE</div>
+        <div class="results-grid">
+          <div class="tier-box">
+            <div class="tier-badge t-c" id="r-tier">C</div>
+            <div class="tier-name" id="r-tier-name">STANDARD</div>
+          </div>
+          <div class="scores-box">
+            <div class="score-row">
+              <div class="score-item"><div class="score-val" id="r-pos" style="color:var(--good)">0</div><div class="score-lbl">POSITIFS</div></div>
+              <div class="score-item"><div class="score-val" id="r-neg" style="color:var(--bad)">0</div><div class="score-lbl">NÉGATIFS</div></div>
+              <div class="score-item"><div class="score-val" id="r-total">0.0</div><div class="score-lbl">SCORE</div></div>
+              <div class="score-item"><div class="score-val" id="r-pct">50<sup>e</sup></div><div class="score-lbl">PERCENTILE</div></div>
+            </div>
+            <div class="result-bar"><div class="result-fill" id="r-bar" style="width:50%"></div></div>
+            <div class="status-box pending" id="r-status">⏳ EN ATTENTE</div>
+            <div class="cat-bars" id="cat-bars"></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="act-btn btn-reset" id="btn-reset">RÉINITIALISER</button>
+          <button class="act-btn btn-save" id="btn-save">💾 SAUVEGARDER</button>
+          <button class="act-btn btn-export" id="btn-export">📤 EXPORTER</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ============ MASSIVE TRAITS DATABASE ============
+const TRAITS = {
+  positive: {
+    cognitive: [
+      {n:'Bon sens',w:1},{n:'Mémoire',w:1},{n:'Concentration',w:1.5},{n:'Organisation',w:1.5},{n:'Curiosité',w:1.5},
+      {n:'Logique',w:2},{n:'Créativité',w:2},{n:'Esprit critique',w:2},{n:'Résolution de problèmes',w:2},
+      {n:'Pensée abstraite',w:2.5},{n:'Innovation',w:2.5},{n:'Esprit stratégique',w:2.5},{n:'Polyvalence',w:2},
+      {n:'Adaptabilité mentale',w:2},{n:'Sagesse',w:3},{n:'Vision',w:3},{n:'Génie',w:4},
+      {n:'Apprentissage rapide',w:2},{n:'Autodidacte',w:2},{n:'Intelligence linguistique',w:1.5},
+      {n:'Intelligence mathématique',w:1.5},{n:'Intelligence spatiale',w:1.5},{n:'Intelligence musicale',w:1.5},
+      {n:'Intelligence kinesthésique',w:1.5},{n:'Intelligence naturaliste',w:1.5},{n:'Pensée systémique',w:2.5},
+      {n:'Pensée latérale',w:2},{n:'Intuition',w:2}
+    ],
+    moral: [
+      {n:'Politesse',w:0.5},{n:'Ponctualité',w:0.5},{n:'Propreté',w:0.5},{n:'Honnêteté',w:2},{n:'Sincérité',w:2},
+      {n:'Équité',w:2},{n:'Transparence',w:2},{n:'Responsabilité',w:2.5},{n:'Fiabilité',w:2.5},{n:'Intégrité',w:3},
+      {n:'Justice',w:3},{n:'Éthique',w:3},{n:'Conscience morale',w:2.5},{n:'Authenticité',w:2},{n:'Discipline',w:2},
+      {n:'Honneur',w:3},{n:'Courage moral',w:3},{n:'Incorruptible',w:4},{n:'Vertueux',w:5},
+      {n:'Pardon',w:2.5},{n:'Miséricorde',w:3},{n:'Clémence',w:2.5},{n:'Repentir sincère',w:2},{n:'Rédemption',w:3}
+    ],
+    emotional: [
+      {n:'Joie de vivre',w:1},{n:'Optimisme',w:1.5},{n:'Calme',w:1.5},{n:'Stabilité émotionnelle',w:2},
+      {n:'Patience',w:2},{n:'Maîtrise de soi',w:2},{n:'Empathie',w:2.5},{n:'Compassion',w:2.5},
+      {n:'Sensibilité',w:1.5},{n:'Intelligence émotionnelle',w:2.5},{n:'Résilience',w:3},{n:'Confiance en soi',w:2},
+      {n:'Courage',w:3},{n:'Gratitude',w:1.5},{n:'Humilité',w:2},{n:'Acceptation',w:2},{n:'Paix intérieure',w:3},
+      {n:'Intrépidité',w:3.5},{n:'Sérénité',w:4},{n:'Enthousiasme',w:1.5},{n:'Espièglerie',w:1},
+      {n:'Tendresse',w:2},{n:'Affection',w:2},{n:'Nostalgie positive',w:1},{n:'Euphorie saine',w:1.5}
+    ],
+    social: [
+      {n:'Amabilité',w:1},{n:'Sourire',w:0.5},{n:'Écoute active',w:1.5},{n:'Communication',w:2},{n:'Gentillesse',w:2},
+      {n:'Générosité',w:2},{n:'Respect',w:2},{n:'Tolérance',w:2},{n:'Ouverture d\'esprit',w:2},{n:'Loyauté',w:2.5},
+      {n:'Coopération',w:2},{n:'Esprit d\'équipe',w:2},{n:'Diplomatie',w:2.5},{n:'Charisme',w:2.5},{n:'Leadership',w:3},
+      {n:'Mentorat',w:2.5},{n:'Altruisme',w:3},{n:'Dévouement',w:3.5},{n:'Héroïsme',w:5},
+      {n:'Networking',w:1.5},{n:'Négociation',w:2},{n:'Médiation',w:2.5},{n:'Humour',w:1.5},
+      {n:'Éloquence',w:2},{n:'Séduction',w:1.5},{n:'Influence positive',w:2.5}
+    ],
+    physical: [
+      {n:'Bonne santé',w:2},{n:'Endurance',w:1.5},{n:'Force',w:1.5},{n:'Agilité',w:1.5},{n:'Coordination',w:1},
+      {n:'Réflexes',w:1.5},{n:'Beauté',w:1},{n:'Hygiène',w:1},{n:'Longévité',w:2},{n:'Immunité forte',w:2},
+      {n:'Récupération rapide',w:1.5},{n:'Absence de maladie',w:2},{n:'Fertilité',w:1},{n:'Bon sommeil',w:1},
+      {n:'Alimentation saine',w:1},{n:'Souplesse',w:1},{n:'Équilibre',w:1},{n:'Dextérité',w:1.5},
+      {n:'Voix agréable',w:1},{n:'Présence physique',w:1.5},{n:'Résistance douleur',w:1.5},{n:'Tolérance climat',w:1}
+    ],
+    existential: [
+      {n:'Sens de la vie',w:2},{n:'But / Mission',w:2.5},{n:'Spiritualité',w:2},{n:'Philosophie de vie',w:2},
+      {n:'Acceptation de la mort',w:2},{n:'Connexion au monde',w:2},{n:'Émerveillement',w:1.5},
+      {n:'Contemplation',w:1.5},{n:'Transcendance',w:3},{n:'Harmonie intérieure',w:3},{n:'Éveil spirituel',w:4},
+      {n:'Gratitude existentielle',w:2},{n:'Acceptation radicale',w:2.5},{n:'Amor fati',w:3},
+      {n:'Présence au moment',w:2},{n:'Conscience écologique',w:2},{n:'Conscience cosmique',w:2.5},{n:'Legacy thinking',w:2}
+    ],
+    behavioral: [
+      {n:'Ponctualité',w:1},{n:'Fiabilité engagements',w:2},{n:'Hygiène de vie',w:1.5},{n:'Routines saines',w:1.5},
+      {n:'Modération',w:2},{n:'Autodiscipline',w:2.5},{n:'Persévérance',w:2.5},{n:'Proactivité',w:2},
+      {n:'Prise d\'initiative',w:2},{n:'Gestion du temps',w:2},{n:'Gestion du stress',w:2},{n:'Assertivité',w:2}
+    ],
+    professional: [
+      {n:'Éthique de travail',w:2},{n:'Ambition saine',w:2},{n:'Expertise',w:2.5},{n:'Compétence technique',w:2},
+      {n:'Productivité',w:2},{n:'Efficacité',w:2},{n:'Professionnalisme',w:2},{n:'Mentorat pro',w:2.5},
+      {n:'Innovation pro',w:2.5},{n:'Entrepreneuriat',w:2.5},{n:'Gestion d\'équipe',w:2.5},{n:'Vision stratégique',w:3}
+    ],
+    creative: [
+      {n:'Talent artistique',w:2},{n:'Talent musical',w:2},{n:'Talent littéraire',w:2},{n:'Expression créative',w:2},
+      {n:'Imagination fertile',w:2},{n:'Sens esthétique',w:1.5},{n:'Originalité',w:2},{n:'Virtuosité',w:3}
+    ],
+    temporal: [
+      {n:'Réhabilitation',w:2.5},{n:'Reconstruction',w:2},{n:'Succès passés',w:1.5},{n:'Apprentissage des erreurs',w:2},
+      {n:'Évolution positive',w:2.5},{n:'Second chance méritée',w:2}
+    ],
+    genetic: [
+      {n:'Héritage génétique favorable',w:2},{n:'Absence prédisposition maladie',w:2},{n:'Longévité familiale',w:1.5},
+      {n:'Lignée remarquable',w:1},{n:'Potentiel génétique',w:1.5}
+    ],
+    impact: [
+      {n:'Impact positif sur autrui',w:2.5},{n:'Vies sauvées',w:4},{n:'Héritage culturel',w:2},
+      {n:'Contribution humanité',w:3},{n:'Empreinte carbone faible',w:1.5},{n:'Philanthropie',w:2.5},
+      {n:'Changement systémique positif',w:3.5}
+    ]
+  },
+  negative: {
+    cognitive: [
+      {n:'Distraction',w:-0.5},{n:'Oubli fréquent',w:-0.5},{n:'Lenteur mentale',w:-1},{n:'Désorganisation',w:-1},
+      {n:'Paresse intellectuelle',w:-1},{n:'Procrastination',w:-1.5},{n:'Entêtement',w:-1.5},{n:'Rigidité mentale',w:-2},
+      {n:'Esprit fermé',w:-2},{n:'Crédulité',w:-1.5},{n:'Complotisme',w:-2},{n:'Obsession malsaine',w:-2.5},
+      {n:'Paranoïa',w:-2.5},{n:'Imprudence',w:-2},{n:'Délire',w:-3},{n:'Démence',w:-3},{n:'Folie destructrice',w:-4},
+      {n:'Difficultés d\'apprentissage',w:-1},{n:'TDAH non géré',w:-1.5},{n:'Overthinking',w:-1.5},
+      {n:'Rationalité excessive',w:-1},{n:'Dyslexie sévère',w:-1}
+    ],
+    moral: [
+      {n:'Petits mensonges',w:-0.5},{n:'Retards chroniques',w:-0.5},{n:'Commérage',w:-1},{n:'Négligence',w:-1},
+      {n:'Hypocrisie',w:-2},{n:'Malhonnêteté',w:-2.5},{n:'Tromperie',w:-2.5},{n:'Mensonge pathologique',w:-3},
+      {n:'Vol',w:-3},{n:'Fraude',w:-3.5},{n:'Trahison',w:-3.5},{n:'Corruption',w:-4},{n:'Exploitation',w:-4},
+      {n:'Chantage',w:-4},{n:'Extorsion',w:-4},{n:'Dépravation',w:-4.5},{n:'Crimes de guerre',w:-7},
+      {n:'Crimes contre l\'humanité',w:-9},{n:'Avarice',w:-2},{n:'Cupidité',w:-2.5},{n:'Gloutonnerie',w:-1},
+      {n:'Luxure',w:-1.5},{n:'Orgueil',w:-2},{n:'Envie',w:-1.5},{n:'Lâcheté morale',w:-2.5},
+      {n:'Complaisance',w:-1.5},{n:'Indifférence au mal',w:-3}
+    ],
+    emotional: [
+      {n:'Humeur changeante',w:-0.5},{n:'Pessimisme',w:-1},{n:'Mélancolie',w:-1},{n:'Anxiété',w:-1.5},
+      {n:'Jalousie',w:-1.5},{n:'Envie',w:-1.5},{n:'Amertume',w:-2},{n:'Ressentiment',w:-2},{n:'Rancune',w:-2},
+      {n:'Lâcheté',w:-2},{n:'Apathie',w:-2},{n:'Instabilité émotionnelle',w:-2.5},{n:'Impulsivité',w:-2},
+      {n:'Colère explosive',w:-2.5},{n:'Rage incontrôlable',w:-3},{n:'Désir de vengeance',w:-3},
+      {n:'Haine profonde',w:-3.5},{n:'Soif de sang',w:-5},{n:'Dépression',w:-2},{n:'Trauma non résolu',w:-2},
+      {n:'Attachement anxieux',w:-1.5},{n:'Attachement évitant',w:-1.5},{n:'Détachement émotionnel',w:-2},
+      {n:'Alexithymie',w:-2},{n:'Hypersensibilité',w:-1},{n:'Anesthésie émotionnelle',w:-2.5},
+      {n:'Culpabilité chronique',w:-2},{n:'Honte toxique',w:-2.5}
+    ],
+    social: [
+      {n:'Impolitesse',w:-0.5},{n:'Mauvaises manières',w:-0.5},{n:'Égocentrisme',w:-1.5},{n:'Égoïsme',w:-1.5},
+      {n:'Arrogance',w:-2},{n:'Mépris',w:-2},{n:'Intolérance',w:-2},{n:'Racisme',w:-3},{n:'Sexisme',w:-3},
+      {n:'Homophobie',w:-3},{n:'Transphobie',w:-3},{n:'Xénophobie',w:-3},{n:'Narcissisme',w:-2.5},
+      {n:'Manipulation',w:-3},{n:'Abus de pouvoir',w:-3.5},{n:'Harcèlement',w:-4},{n:'Intimidation',w:-3},
+      {n:'Cruauté',w:-4},{n:'Sadisme',w:-4.5},{n:'Malveillance',w:-4},{n:'Torture',w:-6},{n:'Viol',w:-8},
+      {n:'Meurtre',w:-7},{n:'Meurtre en série',w:-9},{n:'Génocide',w:-10},{n:'Phobie sociale',w:-1.5},
+      {n:'Isolement volontaire',w:-1.5},{n:'Dépendance affective',w:-2},{n:'Co-dépendance',w:-2},
+      {n:'Parasitisme social',w:-2.5},{n:'Misogynie',w:-3},{n:'Misandrie',w:-3},{n:'Âgisme',w:-2},
+      {n:'Classisme',w:-2},{n:'Validisme',w:-2.5},{n:'Sectarisme',w:-3},{n:'Fanatisme de groupe',w:-3},
+      {n:'Suivisme aveugle',w:-2},{n:'Conformisme excessif',w:-1.5}
+    ],
+    physical: [
+      {n:'Fatigue chronique',w:-1},{n:'Insomnie',w:-1},{n:'Surpoids',w:-0.5},{n:'Maigreur excessive',w:-0.5},
+      {n:'Addiction tabac',w:-1},{n:'Addiction alcool',w:-2},{n:'Addiction drogues',w:-3},{n:'Maladie chronique',w:-2},
+      {n:'Handicap moteur',w:-1},{n:'Handicap sensoriel',w:-1},{n:'Douleur chronique',w:-1.5},
+      {n:'Maladie dégénérative',w:-2.5},{n:'Maladie terminale',w:-3},{n:'Infertilité',w:-0.5},
+      {n:'Immunodéficience',w:-2},{n:'Allergie sévère',w:-1},{n:'Asthme',w:-0.5},{n:'Diabète',w:-1},
+      {n:'Épilepsie',w:-1},{n:'Anorexie',w:-2.5},{n:'Boulimie',w:-2},{n:'Automutilation',w:-3},
+      {n:'Hypocondrie',w:-1.5},{n:'Dysmorphie corporelle',w:-2},{n:'Maladie auto-immune',w:-2},{n:'Cancer',w:-2.5}
+    ],
+    existential: [
+      {n:'Absence de sens',w:-2},{n:'Nihilisme destructeur',w:-2.5},{n:'Désespoir',w:-2},{n:'Vide existentiel',w:-2},
+      {n:'Peur de la mort',w:-1.5},{n:'Déconnexion du monde',w:-2},{n:'Cynisme extrême',w:-2},
+      {n:'Misanthropie',w:-2.5},{n:'Fanatisme religieux',w:-3},{n:'Fanatisme idéologique',w:-3},
+      {n:'Messianisme destructeur',w:-4},{n:'Peur du vide',w:-1.5},{n:'Crise de sens',w:-2},
+      {n:'Regret existentiel',w:-2},{n:'Terreur existentielle',w:-2.5},{n:'Déni de mortalité',w:-1.5},
+      {n:'Obsession immortalité',w:-2},{n:'Éco-anxiété paralysante',w:-1.5}
+    ],
+    behavioral: [
+      {n:'Rituels compulsifs',w:-1.5},{n:'Comportement à risque',w:-2},{n:'Automédication',w:-2},
+      {n:'Jeu pathologique',w:-3},{n:'Achats compulsifs',w:-2},{n:'Accumulation compulsive',w:-2},
+      {n:'Exhibitionnisme',w:-3},{n:'Voyeurisme',w:-2.5},{n:'Pyromanie',w:-4},{n:'Kleptomanie',w:-3},
+      {n:'Procrastination chronique',w:-2},{n:'Autodestruction',w:-3.5},{n:'Sabotage',w:-2.5}
+    ],
+    professional: [
+      {n:'Perfectionnisme toxique',w:-2},{n:'Workaholisme',w:-2},{n:'Burn-out',w:-2},{n:'Bore-out',w:-1.5},
+      {n:'Incompétence',w:-2},{n:'Sabotage professionnel',w:-3},{n:'Harcèlement au travail',w:-4},
+      {n:'Abus hiérarchique',w:-3.5},{n:'Fraude professionnelle',w:-4},{n:'Plagiat',w:-2.5}
+    ],
+    creative: [
+      {n:'Blocage créatif',w:-1},{n:'Stérilité artistique',w:-1.5},{n:'Plagiat artistique',w:-2.5},
+      {n:'Destruction d\'art',w:-2}
+    ],
+    temporal: [
+      {n:'Crimes passés',w:-3},{n:'Casier judiciaire',w:-2},{n:'Dettes impayées',w:-1.5},{n:'Faillite',w:-1},
+      {n:'Échecs répétés',w:-1.5},{n:'Patterns destructeurs',w:-2.5},{n:'Récidive',w:-3},{n:'Impunité',w:-2.5}
+    ],
+    genetic: [
+      {n:'Prédisposition maladie',w:-1.5},{n:'Antécédents maladie mentale',w:-1},{n:'Maladie héréditaire',w:-2},
+      {n:'Consanguinité',w:-2}
+    ],
+    impact: [
+      {n:'Impact négatif sur autrui',w:-2.5},{n:'Vies détruites',w:-5},{n:'Empreinte carbone élevée',w:-1},
+      {n:'Dette karmique',w:-2},{n:'Destruction environnementale',w:-3},{n:'Dommages irréparables',w:-4}
+    ]
+  }
+};
+
+const CATEGORIES = ['cognitive','moral','emotional','social','physical','existential','behavioral','professional','creative','temporal','genetic','impact'];
+const CAT_NAMES = {
+  cognitive:'🧠 COGNITIF',moral:'⚖️ MORAL',emotional:'💜 ÉMOTIONNEL',social:'🤝 SOCIAL',
+  physical:'💪 PHYSIQUE',existential:'✨ EXISTENTIEL',behavioral:'🎭 COMPORTEMENTAL',
+  professional:'💼 PROFESSIONNEL',creative:'🎨 CRÉATIF',temporal:'⏳ TEMPOREL',
+  genetic:'🧬 GÉNÉTIQUE',impact:'🌍 IMPACT'
+};
+
+const AGE_CATS = [
+  {max:0,l:'NOUVEAU-NÉ'},{max:2,l:'NOURRISSON'},{max:5,l:'PETIT ENFANT'},{max:12,l:'ENFANT'},
+  {max:17,l:'ADOLESCENT'},{max:25,l:'JEUNE ADULTE'},{max:40,l:'ADULTE'},{max:60,l:'ADULTE MATURE'},
+  {max:75,l:'SENIOR'},{max:90,l:'AÎNÉ'},{max:Infinity,l:'VÉNÉRABLE'}
+];
+
+function getAgeCat(age) {
+  if(!age||isNaN(age)) return '—';
+  for(const c of AGE_CATS) if(age<=c.max) return c.l;
+  return 'VÉNÉRABLE';
+}
+
+function calcTier(s) {
+  if(s>=50) return {t:'S',n:'EXCEPTIONNEL',c:'t-s'};
+  if(s>=30) return {t:'A',n:'SUPÉRIEUR',c:'t-a'};
+  if(s>=15) return {t:'B',n:'AU-DESSUS MOY.',c:'t-b'};
+  if(s>=-5) return {t:'C',n:'STANDARD',c:'t-c'};
+  if(s>=-20) return {t:'D',n:'EN-DESSOUS MOY.',c:'t-d'};
+  if(s>=-40) return {t:'F',n:'DÉFICIENT',c:'t-f'};
+  return {t:'X',n:'MENACE',c:'t-x'};
+}
+
+function calcStatus(s,cnt) {
+  if(cnt===0) return {t:'⏳ EN ATTENTE',c:'pending'};
+  if(s>=30) return {t:'✓ APPROUVÉ',c:'approved'};
+  if(s>=5) return {t:'✓ CONDITIONNEL',c:'approved'};
+  if(s>=-15) return {t:'⚠ EN RÉVISION',c:'review'};
+  return {t:'✗ REJETÉ',c:'rejected'};
+}
+
+// Build traits UI
+function buildTraits() {
+  const posContainer = document.getElementById('pos-traits');
+  const negContainer = document.getElementById('neg-traits');
+  
+  CATEGORIES.forEach(cat => {
+    // Positive
+    if(TRAITS.positive[cat] && TRAITS.positive[cat].length > 0) {
+      const block = document.createElement('div');
+      block.className = 'cat-block';
+      block.innerHTML = `<div class="cat-head ${cat}">${CAT_NAMES[cat]}</div><div class="traits" id="pos-${cat}"></div>`;
+      posContainer.appendChild(block);
+      
+      const grid = block.querySelector('.traits');
+      TRAITS.positive[cat].forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'trait pos';
+        div.innerHTML = `<input type="checkbox" data-w="${t.w}" data-cat="${cat}"><span class="trait-name">${t.n}</span><span class="trait-w pos">+${t.w}</span>`;
+        div.onclick = e => { if(e.target.tagName!=='INPUT') div.querySelector('input').click(); };
+        div.querySelector('input').onchange = function() { div.classList.toggle('sel',this.checked); compute(); };
+        grid.appendChild(div);
+      });
+    }
+    
+    // Negative
+    if(TRAITS.negative[cat] && TRAITS.negative[cat].length > 0) {
+      const block = document.createElement('div');
+      block.className = 'cat-block';
+      block.innerHTML = `<div class="cat-head neg">${CAT_NAMES[cat]}</div><div class="traits" id="neg-${cat}"></div>`;
+      negContainer.appendChild(block);
+      
+      const grid = block.querySelector('.traits');
+      TRAITS.negative[cat].forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'trait neg';
+        div.innerHTML = `<input type="checkbox" data-w="${t.w}" data-cat="${cat}"><span class="trait-name">${t.n}</span><span class="trait-w neg">${t.w}</span>`;
+        div.onclick = e => { if(e.target.tagName!=='INPUT') div.querySelector('input').click(); };
+        div.querySelector('input').onchange = function() { div.classList.toggle('sel',this.checked); compute(); };
+        grid.appendChild(div);
+      });
+    }
+  });
+  
+  // Build category bars
+  const catBars = document.getElementById('cat-bars');
+  CATEGORIES.forEach(cat => {
+    const div = document.createElement('div');
+    div.className = `cb-item ${cat}`;
+    div.innerHTML = `<div class="cb-top"><span class="cb-name">${CAT_NAMES[cat].split(' ')[1]||CAT_NAMES[cat]}</span><span class="cb-val" id="cv-${cat}">0</span></div><div class="cb-bar"><div class="cb-fill" id="cb-${cat}" style="width:50%"></div></div>`;
+    catBars.appendChild(div);
+  });
+}
+
+function compute() {
+  const checked = document.querySelectorAll('.trait input:checked');
+  let total = 0, posC = 0, negC = 0;
+  const catScores = {};
+  CATEGORIES.forEach(c => catScores[c] = 0);
+
+  checked.forEach(inp => {
+    const w = parseFloat(inp.dataset.w);
+    const cat = inp.dataset.cat;
+    total += w;
+    catScores[cat] += w;
+    if(w > 0) posC++; else negC++;
+  });
+
+  // Update header
+  document.getElementById('h-count').textContent = posC + negC;
+  document.getElementById('h-score').textContent = total.toFixed(1);
+
+  // Update counts
+  document.getElementById('pos-count').textContent = posC + ' sélectionnés';
+  document.getElementById('neg-count').textContent = negC + ' sélectionnés';
+
+  // Update results
+  document.getElementById('r-pos').textContent = posC;
+  document.getElementById('r-neg').textContent = negC;
+  document.getElementById('r-total').textContent = total.toFixed(1);
+  document.getElementById('r-total').style.color = total >= 0 ? 'var(--good)' : 'var(--bad)';
+
+  const pct = Math.max(1, Math.min(99, Math.round(50 + (total / 60) * 40)));
+  document.getElementById('r-pct').innerHTML = `${pct}<sup>e</sup>`;
+
+  const tier = calcTier(total);
+  const tierEl = document.getElementById('r-tier');
+  tierEl.textContent = tier.t;
+  tierEl.className = `tier-badge ${tier.c}`;
+  document.getElementById('r-tier-name').textContent = tier.n;
+
+  document.getElementById('r-bar').style.width = `${Math.max(5, Math.min(95, 50 + total))}%`;
+
+  const status = calcStatus(total, posC + negC);
+  const statusEl = document.getElementById('r-status');
+  statusEl.textContent = status.t;
+  statusEl.className = `status-box ${status.c}`;
+
+  // Category bars
+  CATEGORIES.forEach(cat => {
+    const s = catScores[cat];
+    const valEl = document.getElementById(`cv-${cat}`);
+    if(valEl) {
+      valEl.textContent = s >= 0 ? `+${s.toFixed(1)}` : s.toFixed(1);
+      valEl.style.color = s >= 0 ? 'var(--good)' : 'var(--bad)';
+    }
+    const barEl = document.getElementById(`cb-${cat}`);
+    if(barEl) barEl.style.width = `${Math.max(5, Math.min(95, 50 + s * 3))}%`;
+  });
+}
+
+function reset() {
+  document.querySelectorAll('.trait').forEach(el => {
+    el.classList.remove('sel');
+    el.querySelector('input').checked = false;
+  });
+  document.querySelectorAll('.fg-input').forEach(el => {
+    if(el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.getElementById('photo-img').style.display = 'none';
+  document.querySelector('.photo-ph').style.display = 'block';
+  document.getElementById('disp-id').textContent = `HSP-${String(Math.floor(Math.random()*900)+100).padStart(3,'0')}`;
+  document.getElementById('disp-meta').textContent = 'Nouveau dossier • En attente';
+  document.getElementById('disp-age').textContent = 'CATÉGORIE: —';
+  document.querySelectorAll('.archive').forEach(el => el.classList.remove('active'));
+  compute();
+}
+
+// Archives data
+const ARCHIVES = {
+  '001': {
+    name:'Dr. Elena Vasquez',age:42,sex:'F',gender:'F',orient:'HET',eth:'Hispanique',nat:'Espagne',
+    rel:'married',edu:'phd',job:'Neuroscientifique',class:'upper-mid',relig:'agnostic',
+    pos:['Sagesse','Empathie','Intégrité','Leadership','Résilience','Honnêteté','Intelligence émotionnelle','Sens de la vie','Expertise','Mentorat'],
+    neg:['Entêtement']
+  },
+  '002': {
+    name:'Marcus Chen',age:28,sex:'M',gender:'H',orient:'BI',eth:'Asiatique',nat:'Canada',
+    rel:'relation',edu:'bachelor',job:'Designer UX',class:'middle',relig:'buddhism',
+    pos:['Créativité','Curiosité','Amabilité','Optimisme','Tolérance','Ouverture d\'esprit','Talent artistique','Expression créative'],
+    neg:['Procrastination','Désorganisation','Anxiété']
+  },
+  '003': {
+    name:'Viktor Kozlov',age:51,sex:'M',gender:'H',orient:'HET',eth:'Slave',nat:'Russie',
+    rel:'divorced',edu:'master',job:'Oligarque',class:'elite',relig:'orthodox',
+    pos:['Esprit stratégique','Force'],
+    neg:['Manipulation','Corruption','Malhonnêteté','Cruauté','Mépris','Arrogance','Exploitation','Cupidité','Abus de pouvoir','Crimes passés']
+  },
+  '004': {
+    name:'Amara Okonkwo',age:35,sex:'F',gender:'F',orient:'HET',eth:'Africain',nat:'Nigeria',
+    rel:'married',edu:'master',job:'Médecin humanitaire',class:'middle',relig:'christian',
+    pos:['Héroïsme','Intégrité','Courage','Altruisme','Sagesse','Résilience','Leadership','Compassion','Justice','Dévouement','Sens de la vie','Transcendance','Vies sauvées','Contribution humanité'],
+    neg:[]
+  },
+  '005': {
+    name:'[REDACTED]',age:44,sex:'M',gender:'H',orient:'',eth:'[CLASSIFIED]',nat:'[CLASSIFIED]',
+    rel:'',edu:'',job:'[CLASSIFIED]',class:'',relig:'',
+    pos:[],
+    neg:['Sadisme','Meurtre en série','Torture','Dépravation','Manipulation','Soif de sang','Folie destructrice','Cruauté','Vies détruites','Crimes contre l\'humanité']
+  },
+  '006': {
+    name:'Yuki Tanaka',age:24,sex:'F',gender:'NB',orient:'PAN',eth:'Asiatique',nat:'Japon',
+    rel:'poly',edu:'bachelor',job:'Artiste digitale',class:'lower-mid',relig:'shinto',
+    pos:['Créativité','Empathie','Ouverture d\'esprit','Tolérance','Sensibilité','Émerveillement','Communication','Talent artistique','Expression créative'],
+    neg:['Anxiété','Instabilité émotionnelle']
+  },
+  '007': {
+    name:'Jean-Pierre Moreau',age:45,sex:'M',gender:'H',orient:'HET',eth:'Caucasien',nat:'France',
+    rel:'married',edu:'master',job:'Directeur financier',class:'upper-mid',relig:'none',
+    pos:['Esprit stratégique','Organisation','Logique'],
+    neg:['Narcissisme','Arrogance','Hypocrisie','Mépris','Égoïsme','Workaholisme','Classisme']
+  }
+};
+
+function loadArchive(id) {
+  const d = ARCHIVES[id];
+  if(!d) return;
+  reset();
+  
+  document.getElementById('f-name').value = d.name||'';
+  document.getElementById('f-age').value = d.age||'';
+  document.getElementById('f-sex').value = d.sex||'';
+  document.getElementById('f-gender').value = d.gender||'';
+  document.getElementById('f-orient').value = d.orient||'';
+  document.getElementById('f-eth').value = d.eth||'';
+  document.getElementById('f-nat').value = d.nat||'';
+  document.getElementById('f-rel').value = d.rel||'';
+  document.getElementById('f-edu').value = d.edu||'';
+  document.getElementById('f-job').value = d.job||'';
+  document.getElementById('f-class').value = d.class||'';
+  document.getElementById('f-relig').value = d.relig||'';
+  
+  document.getElementById('disp-id').textContent = `HSP-${id}`;
+  document.getElementById('disp-meta').textContent = `${d.name} • ${d.age||'?'} ans`;
+  document.getElementById('disp-age').textContent = `CATÉGORIE: ${getAgeCat(d.age)}`;
+
+  // Check matching traits
+  document.querySelectorAll('.trait').forEach(item => {
+    const name = item.querySelector('.trait-name').textContent;
+    const isPos = item.classList.contains('pos');
+    const list = isPos ? d.pos : d.neg;
+    if(list && list.includes(name)) {
+      item.classList.add('sel');
+      item.querySelector('input').checked = true;
+    }
+  });
+
+  document.querySelectorAll('.archive').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-id="${id}"]`)?.classList.add('active');
+  
+  compute();
+}
+
+// Events
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+  };
+});
+
+document.querySelectorAll('.archive').forEach(el => {
+  el.onclick = () => loadArchive(el.dataset.id);
+});
+
+document.getElementById('btn-new').onclick = reset;
+document.getElementById('btn-reset').onclick = reset;
+
+document.getElementById('photo-box').onclick = () => document.getElementById('photo-input').click();
+document.getElementById('photo-input').onchange = function() {
+  if(this.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('photo-img');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.querySelector('.photo-ph').style.display = 'none';
+    };
+    reader.readAsDataURL(this.files[0]);
+  }
+};
+
+document.getElementById('f-age').oninput = function() {
+  document.getElementById('disp-age').textContent = `CATÉGORIE: ${getAgeCat(parseInt(this.value))}`;
+};
+
+document.getElementById('btn-export').onclick = () => {
+  const data = {
+    id: document.getElementById('disp-id').textContent,
+    name: document.getElementById('f-name').value,
+    age: document.getElementById('f-age').value,
+    ageCategory: getAgeCat(parseInt(document.getElementById('f-age').value)),
+    sex: document.getElementById('f-sex').value,
+    gender: document.getElementById('f-gender').value,
+    orientation: document.getElementById('f-orient').value,
+    tier: document.getElementById('r-tier').textContent,
+    score: document.getElementById('r-total').textContent,
+    status: document.getElementById('r-status').textContent,
+    traits: {
+      positive: [...document.querySelectorAll('.trait.pos.sel .trait-name')].map(el => el.textContent),
+      negative: [...document.querySelectorAll('.trait.neg.sel .trait-name')].map(el => el.textContent)
+    }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${data.id}.json`;
+  a.click();
+};
+
+// Init
+buildTraits();
+compute();
+</script>
+</body>
+</html>

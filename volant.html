@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏁 Madswerve - Championnat 🏁</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bungee&family=Comic+Neue:wght@400;700&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#FFD700;--silver:#C0C0C0;--bronze:#CD7F32;--neon-pink:#ff1493;--neon-blue:#00dfff;--neon-green:#39ff14;--L1:#FFD700;--L2:#C0C0C0;--L3:#CD7F32;--dead:#666}
+body{font-family:'Comic Neue',cursive;background:linear-gradient(180deg,#0a0a1a,#1a1a3a,#0a0a1a);min-height:100vh;padding:8px}
+.header{text-align:center;padding:8px;margin-bottom:8px}
+.main-title{font-family:'Bangers',cursive;font-size:clamp(1.4rem,3vw,2.2rem);color:var(--gold);text-shadow:0 0 10px var(--gold),3px 3px 0 #000}
+.season-bar{display:flex;justify-content:center;align-items:center;gap:15px;margin-top:6px;flex-wrap:wrap}
+.season-badge{font-family:'Press Start 2P',monospace;font-size:8px;padding:5px 10px;border-radius:4px;background:rgba(255,255,255,0.1);border:1px solid #444;color:#fff}
+.season-badge.hl{background:linear-gradient(180deg,var(--neon-pink),#aa1166);border-color:#fff}
+.top-tabs{display:flex;justify-content:center;gap:5px;margin-top:8px}
+.top-tab{padding:6px 14px;font-family:'Russo One',sans-serif;font-size:10px;border:none;border-radius:5px 5px 0 0;cursor:pointer;background:#333;color:#888;transition:all 0.2s}
+.top-tab:hover{background:#444}
+.top-tab.active{background:linear-gradient(180deg,var(--gold),#aa8800);color:#000}
+.top-tab.cemetery{background:linear-gradient(180deg,#444,#222)}
+.top-tab.cemetery.active{background:linear-gradient(180deg,#666,#333);color:#fff}
+.main-grid{display:grid;grid-template-columns:260px 1fr 280px;gap:10px;max-width:1700px;margin:0 auto}
+@media(max-width:1300px){.main-grid{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,#1a1a2e,#0d0d1a);border:2px solid #333;border-radius:8px;padding:8px;margin-bottom:8px}
+.panel-title{font-family:'Bungee',cursive;font-size:11px;color:var(--gold);text-align:center;padding-bottom:5px;margin-bottom:6px;border-bottom:2px solid var(--gold);display:flex;justify-content:center;align-items:center;gap:8px}
+.panel-title .sort-btns{display:flex;gap:3px}
+.sort-btn{padding:2px 5px;font-size:7px;background:#333;border:1px solid #555;color:#fff;border-radius:3px;cursor:pointer}
+.sort-btn:hover,.sort-btn.active{background:var(--neon-pink);color:#000}
+.left-col,.right-col{display:flex;flex-direction:column;gap:8px}
+.wallet-box{text-align:center;padding:10px;background:radial-gradient(ellipse,#2a2a4a,#1a1a2e);border-radius:6px;border:2px solid var(--gold)}
+.wallet-label{font-family:'Press Start 2P',monospace;font-size:6px;color:#888}
+.wallet-amount{font-family:'Bungee',cursive;font-size:26px;color:var(--gold);text-shadow:0 0 10px var(--gold)}
+.bet-btns{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+.bet-btn{padding:5px 8px;font-family:'Russo One',sans-serif;font-size:10px;border:none;border-radius:3px;cursor:pointer;transition:transform 0.2s}
+.bet-btn:hover{transform:scale(1.05)}
+.bet-btn.amt{background:linear-gradient(180deg,#444,#222);color:#fff;border:1px solid #555}
+.bet-btn.amt.sel{background:linear-gradient(180deg,var(--neon-pink),#aa1166);border-color:#fff}
+.bet-btn.place{background:linear-gradient(180deg,var(--neon-green),#228822);color:#000;font-weight:bold;width:100%;margin-top:5px;padding:8px}
+.bet-btn.place:disabled{background:#333;color:#666;cursor:not-allowed}
+.sel-display{margin-top:6px;padding:6px;background:rgba(255,20,147,0.2);border:1px dashed var(--neon-pink);border-radius:5px;text-align:center;display:none}
+.sel-display.show{display:block}
+.sel-name{font-family:'Bangers',cursive;font-size:13px;color:#fff}
+.sel-odds{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);margin-top:3px}
+.hist-list{max-height:150px;overflow-y:auto}
+.winner-item{display:flex;align-items:center;padding:4px 5px;margin-bottom:2px;background:linear-gradient(90deg,rgba(40,40,60,0.5),transparent);border-radius:3px;font-size:9px;border-left:3px solid var(--gold)}
+.winner-race{font-family:'Press Start 2P',monospace;font-size:6px;color:#666;width:35px}
+.winner-name{flex:1;color:#fff;font-weight:bold}
+.winner-vehicle{font-size:13px;margin:0 4px}
+.winner-league{font-size:6px;padding:2px 4px;border-radius:2px}
+.winner-league.L1{background:var(--L1);color:#000}
+.winner-league.L2{background:var(--L2);color:#000}
+.winner-league.L3{background:var(--L3);color:#000}
+.hist-item{display:flex;align-items:center;padding:4px 5px;margin-bottom:2px;background:linear-gradient(90deg,rgba(40,40,60,0.4),transparent);border-radius:3px;font-size:9px}
+.hist-item.win{background:linear-gradient(90deg,rgba(0,150,0,0.3),transparent);border-left:2px solid #4CAF50;color:#4CAF50}
+.hist-item.lose{background:linear-gradient(90deg,rgba(150,0,0,0.3),transparent);border-left:2px solid #f44336;color:#f44336}
+.comment-hist-item{padding:4px 6px;margin-bottom:2px;border-radius:3px;font-size:9px;border-left:3px solid var(--gold);background:linear-gradient(90deg,rgba(255,215,0,0.1),transparent);color:#fff}
+.comment-hist-item.crash{border-left-color:#f44336;background:linear-gradient(90deg,rgba(244,67,54,0.15),transparent)}
+.comment-hist-item.boost{border-left-color:#4CAF50;background:linear-gradient(90deg,rgba(76,175,80,0.15),transparent)}
+.comment-hist-item.finish{border-left-color:#FFD700;background:linear-gradient(90deg,rgba(255,215,0,0.2),transparent);font-weight:bold}
+.comment-hist-item.death{border-left-color:#000;background:linear-gradient(90deg,rgba(0,0,0,0.4),transparent);color:#f44}
+.comment-hist-item .time{color:#888;font-size:8px;margin-right:5px}
+.center-col{display:flex;flex-direction:column;gap:6px}
+.league-tabs{display:flex;gap:3px;justify-content:center}
+.league-tab{padding:7px 18px;font-family:'Bungee',cursive;font-size:11px;border:none;border-radius:6px 6px 0 0;cursor:pointer;position:relative;transition:all 0.2s}
+.league-tab.L1{background:linear-gradient(180deg,#FFD700,#CC9900);color:#000}
+.league-tab.L2{background:linear-gradient(180deg,#C0C0C0,#888);color:#000}
+.league-tab.L3{background:linear-gradient(180deg,#CD7F32,#8B4513);color:#fff}
+.league-tab:not(.active){opacity:0.5;transform:translateY(3px)}
+.league-tab.active{opacity:1;transform:translateY(0)}
+.league-tab.done::after{content:"✓";position:absolute;top:-5px;left:-5px;background:#4CAF50;color:#fff;font-size:10px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.tv-cabinet{background:linear-gradient(135deg,#8B4513,#A0522D,#6B3510,#8B4513);border-radius:12px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,0.8);position:relative}
+.tv-brand{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-family:'Press Start 2P',monospace;font-size:6px;color:var(--gold)}
+.tv-frame{background:#111;border-radius:10px;padding:6px;border:3px solid #222}
+.tv-screen{width:100%;height:420px;background:radial-gradient(ellipse at 30% 20%,#2a2a2a,#0a0a0a);border-radius:6px;position:relative;overflow:hidden;border:2px solid #333}
+.tv-screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0px,rgba(0,0,0,0.15) 1px,transparent 2px);pointer-events:none;z-index:100}
+.race-track{position:absolute;top:42px;left:8px;right:8px;bottom:55px;background:linear-gradient(180deg,#3a3a3a,#2a2a2a);border:3px solid #fff;border-radius:5px;overflow:hidden;min-width:450px}
+.track-lanes{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 53px,rgba(255,255,255,0.2) 53px,rgba(255,255,255,0.2) 55px);pointer-events:none}
+.finish-line{position:absolute;right:0;top:0;width:18px;height:100%;background:repeating-conic-gradient(#fff 0deg 90deg,#000 90deg 180deg);background-size:9px 9px;border-left:2px solid var(--gold)}
+.racer{position:absolute;left:5px;height:45px;display:flex;align-items:center;transition:left 0.07s linear;cursor:pointer;z-index:10}
+.racer-vehicle{font-size:32px;filter:drop-shadow(2px 2px 0 #000);transition:transform 0.1s;display:inline-block;transform:scaleX(-1)}
+.racer.boosted .racer-vehicle{animation:boost 0.2s}
+.racer.crashed .racer-vehicle{animation:crash 0.35s}
+.racer.dead .racer-vehicle{filter:grayscale(1) brightness(0.5);animation:death 1s}
+@keyframes boost{50%{transform:scaleX(-1) scale(1.4) translateX(-6px)}}
+@keyframes crash{25%{transform:scaleX(-1) rotate(-25deg) translateY(-6px)}75%{transform:scaleX(-1) rotate(15deg)}}
+@keyframes death{0%{transform:scaleX(-1) rotate(0)}100%{transform:scaleX(-1) rotate(360deg) scale(0)}}
+.racer-label{position:absolute;right:38px;left:auto;background:rgba(0,0,0,0.9);padding:2px 6px;border-radius:3px;font-size:9px;font-family:'Russo One',sans-serif;color:#fff;white-space:nowrap;border:2px solid;pointer-events:none}
+.race-banner{position:absolute;top:6px;left:8px;right:8px;display:flex;justify-content:space-between;z-index:50}
+.race-badge{padding:4px 8px;border-radius:3px;font-family:'Russo One',sans-serif;font-size:10px;color:#fff;border:1px solid rgba(255,255,255,0.2)}
+.race-badge.league{background:linear-gradient(180deg,var(--L1),#aa8800)}
+.race-badge.league.L2{background:linear-gradient(180deg,var(--L2),#666)}
+.race-badge.league.L3{background:linear-gradient(180deg,var(--L3),#5a3a1a)}
+.race-badge.lap{background:linear-gradient(180deg,#f44,#a00)}
+.race-badge.day{background:linear-gradient(180deg,var(--neon-blue),#088);color:#000}
+.comment-box{position:absolute;bottom:6px;left:8px;right:8px;background:linear-gradient(180deg,rgba(0,0,0,0.95),rgba(20,20,40,0.95));border:2px solid var(--gold);border-radius:5px;padding:6px 8px;display:flex;align-items:center;gap:8px;z-index:50}
+.comment-avatar{width:32px;height:32px;background:linear-gradient(135deg,var(--neon-pink),var(--neon-blue));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid #fff;flex-shrink:0}
+.comment-text{font-family:'Bangers',cursive;font-size:13px;color:#fff;text-shadow:1px 1px 0 var(--neon-pink);line-height:1.2}
+.comment-text.excited{animation:shake 0.12s infinite;color:var(--gold)}
+@keyframes shake{50%{transform:translateX(2px)}}
+.tv-controls{display:flex;justify-content:center;gap:8px;margin-top:10px;padding:6px;background:#222;border-radius:6px;flex-wrap:wrap}
+.tv-btn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;font-size:16px;transition:all 0.2s;box-shadow:0 3px 6px rgba(0,0,0,0.4);display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.tv-btn:hover{transform:scale(1.1)}
+.tv-btn.start{background:linear-gradient(180deg,#4CAF50,#2E7D32)}
+.tv-btn.pause{background:linear-gradient(180deg,#FF9800,#E65100)}
+.tv-btn.reset{background:linear-gradient(180deg,#f44336,#c62828)}
+.tv-btn.speed{background:linear-gradient(180deg,#9C27B0,#6A1B9A);font-size:9px;font-family:'Press Start 2P',monospace;color:#fff}
+.tv-btn.sound{background:linear-gradient(180deg,#2196F3,#1565C0)}
+.tv-btn.auto{background:linear-gradient(180deg,#607D8B,#37474F);font-size:10px}
+.tv-btn.next{background:linear-gradient(180deg,#FF9800,#E65100);font-size:9px;width:auto;padding:0 12px;border-radius:8px;display:none}
+.tv-btn.save{background:linear-gradient(180deg,#8BC34A,#558B2F)}
+.tv-btn.load{background:linear-gradient(180deg,#00BCD4,#00838F)}
+.tv-btn.pause{background:linear-gradient(180deg,#FF9800,#E65100)}
+.race-badge.chrono{background:linear-gradient(180deg,#9C27B0,#6A1B9A);font-family:'Press Start 2P',monospace;font-size:8px}
+/* News Ticker */
+.news-ticker-container{background:linear-gradient(180deg,#1a1a2e,#0d0d1a);border:2px solid var(--gold);border-radius:6px;padding:8px 12px;margin-top:10px;overflow:hidden}
+.news-ticker{white-space:nowrap;font-family:'Russo One',sans-serif;font-size:11px;color:var(--gold);animation:ticker 30s linear infinite}
+.news-item{margin-right:30px}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.standing-item{display:flex;align-items:center;padding:4px 5px;margin-bottom:2px;background:linear-gradient(90deg,rgba(40,40,60,0.4),transparent);border-radius:3px;cursor:pointer;transition:all 0.2s;border:1px solid transparent;font-size:9px}
+.standing-item:hover{background:linear-gradient(90deg,rgba(60,60,100,0.6),rgba(40,40,60,0.2));border-color:var(--neon-blue)}
+.standing-item.promo{border-left:3px solid #4CAF50}
+.standing-item.releg{border-left:3px solid #f44336}
+.standing-item.dead{opacity:0.5;background:linear-gradient(90deg,rgba(0,0,0,0.4),transparent)}
+.standing-pos{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-family:'Bungee',cursive;font-size:9px;border-radius:50%;margin-right:5px;color:#000}
+.standing-pos.p1{background:var(--gold)}
+.standing-pos.p2{background:var(--silver)}
+.standing-pos.p3{background:var(--bronze)}
+.standing-pos.other{background:#444;color:#fff}
+.standing-info{flex:1;min-width:0}
+.standing-name{font-size:9px;color:#fff;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.standing-stats{font-size:7px;color:#888}
+.standing-vehicle{font-size:14px;margin:0 4px}
+.standing-age{font-size:7px;color:#888;margin-right:4px}
+.records-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.record-item{background:rgba(255,255,255,0.05);padding:6px;border-radius:4px;text-align:center}
+.record-label{font-size:7px;color:#888}
+.record-value{font-size:10px;color:var(--gold);font-family:'Russo One',sans-serif}
+.record-holder{font-size:8px;color:#fff;margin-top:2px}
+/* Modal Bio */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:1000;padding:15px}
+.modal.show{display:flex}
+.modal-content{background:linear-gradient(180deg,#1a1a3a,#0d0d1a);border:3px solid var(--gold);border-radius:12px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:8px;right:12px;font-size:24px;color:#fff;cursor:pointer;z-index:10}
+.bio-header{padding:15px;text-align:center;background:linear-gradient(180deg,rgba(255,215,0,0.1),transparent);border-bottom:2px solid #333}
+.bio-vehicle{font-size:50px}
+.bio-name{font-family:'Bangers',cursive;font-size:22px;color:var(--gold)}
+.bio-meta{font-size:10px;color:#888;margin-top:4px}
+.bio-league{display:inline-block;padding:3px 10px;border-radius:12px;font-family:'Russo One',sans-serif;font-size:10px;margin-top:6px}
+.bio-league.L1{background:var(--L1);color:#000}
+.bio-league.L2{background:var(--L2);color:#000}
+.bio-league.L3{background:var(--L3);color:#fff}
+.bio-league.dead{background:#333;color:#888}
+.bio-tabs{display:flex;border-bottom:2px solid #333}
+.bio-tab{flex:1;padding:8px;text-align:center;font-size:10px;cursor:pointer;background:transparent;border:none;color:#888}
+.bio-tab.active{color:var(--gold);background:rgba(255,215,0,0.1)}
+.bio-body{padding:12px;display:none}
+.bio-body.active{display:block}
+.bio-section{margin-bottom:12px}
+.bio-section-title{font-family:'Bungee',cursive;font-size:10px;color:var(--neon-blue);margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #333}
+.bio-text{font-size:11px;color:#ccc;line-height:1.4}
+.bio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.bio-stat{background:rgba(255,255,255,0.05);padding:6px;border-radius:4px;text-align:center}
+.bio-stat-val{font-family:'Bungee',cursive;font-size:14px;color:var(--gold)}
+.bio-stat-lbl{font-size:6px;color:#888;margin-top:2px}
+.bio-special{background:linear-gradient(90deg,rgba(255,20,147,0.2),transparent);padding:10px;border-radius:6px;border-left:3px solid var(--neon-pink)}
+/* Cemetery */
+.cemetery-view{display:none;padding:20px}
+.cemetery-view.active{display:block}
+.cemetery-title{font-family:'Bangers',cursive;font-size:24px;color:#666;text-align:center;margin-bottom:15px}
+.tomb{background:linear-gradient(180deg,#2a2a2a,#1a1a1a);border:2px solid #444;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.tomb-vehicle{font-size:30px;filter:grayscale(1)}
+.tomb-info{flex:1}
+.tomb-name{font-family:'Russo One',sans-serif;font-size:12px;color:#888}
+.tomb-dates{font-size:9px;color:#666}
+.tomb-cause{font-size:9px;color:#f44;margin-top:4px}
+.tomb-stats{font-size:8px;color:#555;margin-top:4px}
+.rip{font-family:'Press Start 2P',monospace;font-size:8px;color:#444}
+/* Stats Panel */
+.stats-table{width:100%;border-collapse:collapse;font-size:11px}
+.stats-table th{background:#333;color:var(--gold);padding:8px 6px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
+.stats-table th:hover{background:#444}
+.stats-table th.sorted-asc::after{content:" ▲";color:var(--neon-green)}
+.stats-table th.sorted-desc::after{content:" ▼";color:var(--neon-pink)}
+.stats-table td{padding:8px 6px;border-bottom:1px solid #333;color:#ccc}
+.stats-table tr:hover{background:rgba(255,215,0,0.1)}
+.stats-table tr.dead{opacity:0.5;background:rgba(255,0,0,0.1)}
+.stats-table tr.retired{opacity:0.7;background:rgba(0,150,0,0.1)}
+.stats-table .clickable-name{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.stats-table tr:hover .clickable-name{text-decoration-style:solid;color:var(--gold)}
+.league-history{display:flex;align-items:center;gap:2px;font-size:9px}
+.league-dot{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:bold;position:relative}
+.league-dot.L1{background:var(--L1);color:#000}
+.league-dot.L2{background:var(--L2);color:#000}
+.league-dot.L3{background:var(--L3);color:#fff}
+.league-dot.promo::before{content:"▲";position:absolute;top:-8px;font-size:7px;color:#4CAF50}
+.league-dot.releg::before{content:"▼";position:absolute;top:-8px;font-size:7px;color:#f44336}
+.league-arrow{color:#666;font-size:10px}
+/* Records agrandis */
+.records-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.record-item{background:rgba(255,255,255,0.05);padding:12px;border-radius:6px;text-align:center}
+.record-label{font-size:9px;color:#888;margin-bottom:4px}
+.record-value{font-size:18px;color:var(--gold);font-family:'Bungee',cursive}
+.record-holder{font-size:10px;color:#fff;margin-top:4px}
+/* Bio agrandie */
+.bio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bio-stat{background:rgba(255,255,255,0.05);padding:10px;border-radius:6px;text-align:center}
+.bio-stat-val{font-family:'Bungee',cursive;font-size:18px;color:var(--gold)}
+.bio-stat-lbl{font-size:8px;color:#888;margin-top:3px}
+.bio-league-graph{margin-top:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:6px}
+.bio-league-graph-title{font-size:10px;color:var(--neon-blue);margin-bottom:8px}
+.bio-league-graph-content{display:flex;align-items:flex-end;gap:3px;height:60px;border-bottom:1px solid #444;padding-bottom:4px}
+.bio-league-bar{width:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.bio-league-bar-inner{width:16px;border-radius:2px 2px 0 0;transition:height 0.3s}
+.bio-league-bar-inner.L1{background:var(--L1)}
+.bio-league-bar-inner.L2{background:var(--L2)}
+.bio-league-bar-inner.L3{background:var(--L3)}
+.bio-league-bar-label{font-size:7px;color:#666;margin-top:2px}
+/* Victory Overlay */
+.victory-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.95);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:200;border-radius:6px}
+.victory-overlay.show{display:flex}
+.victory-title{font-family:'Bangers',cursive;font-size:32px;color:var(--gold);text-shadow:0 0 20px var(--gold),3px 3px 0 #000;animation:vpulse 0.4s infinite}
+@keyframes vpulse{50%{transform:scale(1.05)}}
+.victory-vehicle{font-size:60px;margin:10px 0;animation:vbounce 0.5s infinite}
+@keyframes vbounce{50%{transform:translateY(-10px)}}
+.victory-name{font-family:'Bungee',cursive;font-size:18px;color:#fff;margin-bottom:5px}
+.victory-time{font-size:12px;color:#888}
+.victory-bet{padding:8px 16px;border-radius:6px;margin-top:10px;font-family:'Russo One',sans-serif;font-size:12px}
+.victory-bet.win{background:linear-gradient(180deg,#4CAF50,#2E7D32);color:#fff}
+.victory-bet.lose{background:linear-gradient(180deg,#f44336,#c62828);color:#fff}
+.victory-bet.none{background:#333;color:#888}
+.victory-next{font-size:10px;color:#666;margin-top:12px}
+.victory-close{margin-top:10px;padding:8px 20px;background:linear-gradient(180deg,var(--gold),#aa8800);color:#000;border:none;border-radius:5px;font-family:'Russo One',sans-serif;cursor:pointer}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1 class="main-title">🏎️ MADSWERVE 🏎️</h1>
+<div class="season-bar">
+<div class="season-badge">SAISON <span id="seasonNum">1</span></div>
+<div class="season-badge hl">JOURNÉE <span id="dayNum">1</span>/10</div>
+</div>
+<div class="top-tabs">
+<button class="top-tab active" data-view="race">🏁 COURSE</button>
+<button class="top-tab" data-view="stats">📊 STATS</button>
+<button class="top-tab" data-view="records">🏆 RECORDS</button>
+<button class="top-tab cemetery" data-view="cemetery">⚰️ CIMETIÈRE</button>
+</div>
+</div>
+
+<div id="raceView">
+<div class="main-grid">
+<div class="left-col">
+<div class="panel">
+<div class="panel-title">💰 PARIS</div>
+<div class="wallet-box">
+<div class="wallet-label">FORTUNE</div>
+<div class="wallet-amount">$<span id="wallet">1000</span></div>
+</div>
+<div class="bet-btns">
+<button class="bet-btn amt" data-amt="50">50$</button>
+<button class="bet-btn amt sel" data-amt="100">100$</button>
+<button class="bet-btn amt" data-amt="200">200$</button>
+<button class="bet-btn amt" data-amt="500">500$</button>
+<button class="bet-btn place" id="betBtn" disabled>CHOISIR</button>
+</div>
+<div class="sel-display" id="selDisplay">
+<div class="sel-name" id="selName"></div>
+<div class="sel-odds" id="selOdds"></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">🏆 VAINQUEURS</div>
+<div class="hist-list" id="winnersList"></div>
+</div>
+<div class="panel">
+<div class="panel-title">🎙️ COMMENTAIRES</div>
+<div class="hist-list" id="commentHist" style="max-height:180px"></div>
+</div>
+</div>
+
+<div class="center-col">
+<div class="league-tabs">
+<button class="league-tab L1 active" data-league="1">🥇 L1</button>
+<button class="league-tab L2" data-league="2">🥈 L2</button>
+<button class="league-tab L3" data-league="3">🥉 L3</button>
+</div>
+<div class="tv-cabinet">
+<div class="tv-brand">📺 TURBO VISION</div>
+<div class="tv-frame">
+<div class="tv-screen" id="tvScreen">
+<div class="race-banner">
+<div class="race-badge league" id="leagueBadge">🥇 L1</div>
+<div class="race-badge chrono" id="chronoBadge">⏱ 0.00s</div>
+<div class="race-badge day">J<span id="dayBadge">1</span></div>
+<div class="race-badge lap">Tour <span id="lapDisp">1</span>/3</div>
+</div>
+<div class="race-track" id="track">
+<div class="track-lanes"></div>
+<div class="finish-line"></div>
+</div>
+<div class="comment-box">
+<div class="comment-avatar">🎙️</div>
+<div class="comment-text" id="comment">Bienvenue aux Fous du Volant!</div>
+</div>
+<div class="victory-overlay" id="victoryOverlay">
+<div class="victory-title">🏆 VICTOIRE !</div>
+<div class="victory-vehicle" id="victoryVehicle"></div>
+<div class="victory-name" id="victoryName"></div>
+<div class="victory-time" id="victoryTime"></div>
+<div class="victory-bet" id="victoryBet"></div>
+<div class="victory-next" id="victoryNext"></div>
+<button class="victory-close" id="victoryClose">CONTINUER</button>
+</div>
+</div>
+</div>
+<div class="tv-controls">
+<button class="tv-btn start" id="startBtn">▶️</button>
+<button class="tv-btn reset" id="resetBtn">🔄</button>
+<button class="tv-btn speed" id="speedBtn">x1</button>
+<button class="tv-btn sound" id="soundBtn">🔊</button>
+<button class="tv-btn auto" id="autoBtn">AUTO</button>
+<button class="tv-btn next" id="nextDayBtn">J2→</button>
+<button class="tv-btn save" id="saveBtn" title="Sauvegarder">💾</button>
+<button class="tv-btn load" id="loadBtn" title="Charger">📂</button>
+</div>
+</div>
+</div>
+
+<div class="right-col">
+<div class="panel">
+<div class="panel-title">📊 EN DIRECT</div>
+<div class="hist-list" id="liveStandings"></div>
+</div>
+<div class="panel">
+<div class="panel-title">🏅 CLASSEMENT L<span id="seasonLeague">1</span></div>
+<div class="hist-list" id="seasonStandings"></div>
+</div>
+<div class="panel">
+<div class="panel-title">📈 RECORDS</div>
+<div class="records-grid" id="quickRecords"></div>
+</div>
+</div>
+</div>
+<!-- News Ticker -->
+<div class="news-ticker-container">
+<div class="news-ticker" id="newsTicker">📰 Bienvenue à Madswerve! Saison 1 commence en 1900!</div>
+</div>
+</div>
+
+<div id="statsView" style="display:none;padding:20px;max-width:1400px;margin:0 auto">
+<div class="panel">
+<div class="panel-title">📊 STATISTIQUES COMPLÈTES</div>
+<table class="stats-table" id="statsTable">
+<thead><tr>
+<th data-sort="name" title="Nom du coureur - Cliquez pour voir la bio">Coureur</th>
+<th data-sort="age" title="Âge actuel">Âge</th>
+<th data-sort="career" title="Années de carrière">Car</th>
+<th data-sort="league" title="Ligue actuelle">Lig</th>
+<th data-sort="wins" title="Nombre de victoires">Vic</th>
+<th data-sort="podiums" title="Nombre de podiums (top 3)">Pod</th>
+<th data-sort="races" title="Nombre de courses">Crs</th>
+<th data-sort="winrate" title="Pourcentage de victoires">%</th>
+<th data-sort="titles" title="Titres de champion">🏆</th>
+<th data-sort="pts" title="Points totaux carrière">Tot</th>
+<th data-sort="seasonPts" title="Points cette saison">Sai</th>
+<th data-sort="promos" title="Nombre de promotions">⬆️</th>
+<th data-sort="relegs" title="Nombre de relégations">⬇️</th>
+<th data-sort="crashes" title="Nombre de crashes">💥</th>
+<th data-sort="boosts" title="Nombre de boosts">🚀</th>
+<th data-sort="bestLap" title="Meilleur temps au tour">⏱T</th>
+<th data-sort="bestRace" title="Meilleur temps de course">⏱C</th>
+<th title="Parcours en ligue">Parc</th>
+</tr></thead>
+<tbody id="statsBody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="recordsView" style="display:none;padding:20px;max-width:1000px;margin:0 auto">
+<div class="panel">
+<div class="panel-title">🏆 HALL OF FAME</div>
+<div class="records-grid" id="allRecords" style="grid-template-columns:repeat(3,1fr)"></div>
+</div>
+<div class="panel" style="margin-top:15px">
+<div class="panel-title">📜 HISTORIQUE DES CHAMPIONS</div>
+<div id="champHistory"></div>
+</div>
+</div>
+
+<div id="cemeteryView" style="display:none;padding:20px;max-width:800px;margin:0 auto">
+<div class="cemetery-title">⚰️ CIMETIÈRE DES LÉGENDES ⚰️</div>
+<div id="tombsList"></div>
+</div>
+
+<div class="modal" id="bioModal">
+<div class="modal-content">
+<span class="modal-close" id="bioClose">&times;</span>
+<div class="bio-header">
+<div class="bio-vehicle" id="bioVehicle"></div>
+<div class="bio-name" id="bioName"></div>
+<div class="bio-meta" id="bioMeta"></div>
+<div class="bio-league" id="bioLeague"></div>
+</div>
+<div class="bio-tabs">
+<button class="bio-tab active" data-tab="story">Histoire</button>
+<button class="bio-tab" data-tab="career">Carrière</button>
+<button class="bio-tab" data-tab="season">Saison</button>
+</div>
+<div class="bio-body active" id="bioStoryTab">
+<div class="bio-section">
+<div class="bio-section-title">📖 BIOGRAPHIE</div>
+<div class="bio-text" id="bioStory"></div>
+</div>
+<div class="bio-section">
+<div class="bio-section-title">⚡ COUP SPÉCIAL</div>
+<div class="bio-special" id="bioSpecial"></div>
+</div>
+</div>
+<div class="bio-body" id="bioCareerTab">
+<div class="bio-section">
+<div class="bio-section-title">📊 CARRIÈRE</div>
+<div class="bio-stats" id="bioCareerStats"></div>
+</div>
+</div>
+<div class="bio-body" id="bioSeasonTab">
+<div class="bio-section">
+<div class="bio-section-title">📅 SAISON EN COURS</div>
+<div class="bio-stats" id="bioSeasonStats"></div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// === DATA ===
+const deathCauses=["Explosion du moteur","Chute dans un ravin","Collision fatale","Incendie du véhicule","Disparition mystérieuse","Attaque de mouettes","Mangé par un requin","Téléporté dans une autre dimension","Transformé en citrouille définitivement","Foudroyé en pleine course","Avalé par un trou noir","Enlevé par des extraterrestres","Victime d'une météorite","Emporté par une tornade","Dévoré par un yéti","Aspiré par les sables mouvants","Figé dans la glace","Écrasé par un piano","Attaqué par des abeilles géantes","Tombé dans un volcan"];
+let cemetery=[];
+let champions=[];
+let timeRecords={bestLap:{time:999,name:'',vehicle:'',season:0,day:0},bestRace:{time:999,name:'',vehicle:'',season:0,day:0},bestSeason:{time:9999,name:'',vehicle:'',season:0}};
+let seasonTimes={};
+
+const R={1:[
+{id:'l1_1',name:"Baron Von Crampe",vehicle:"🏎️",color:"#8B0000",special:"Clous Traîtres",specialDesc:"Lance des clous!",bio:"Aristocrate déchu de Transylvanie au rire sardonique.",age:52,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:2.5,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l1_2',name:"Pénélope Joli-Cœur",vehicle:"🚗",color:"#FF69B4",special:"Bisou Paralysant",specialDesc:"Distrait les pilotes!",bio:"Ex-espionne qui utilise son charme.",age:34,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:2.0,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l1_3',name:"Satanas & Diabolo",vehicle:"🚙",color:"#4B0082",special:"Piège Infernal",specialDesc:"Pose une bombe!",bio:"Duo diabolique, jamais gagné proprement.",age:45,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.5,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l1_4',name:"Prof. Dément",vehicle:"🚐",color:"#00CED1",special:"Rayon Réducteur",specialDesc:"Rétrécit l'adversaire!",bio:"Ex-Nobel banni pour expériences.",age:67,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:2.8,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l1_5',name:"Red Max",vehicle:"✈️",color:"#DC143C",special:"Bombardement",specialDesc:"Largue des bombes!",bio:"As de l'aviation reconverti.",age:41,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:1.8,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l1_6',name:"Mlle Rafistole",vehicle:"🏍️",color:"#FFD700",special:"Pièces Volantes",specialDesc:"Lance des pièces!",bio:"Génie mécanique, véhicule recyclé.",age:28,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.0,league:1,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:1}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}}
+],2:[
+{id:'l2_1',name:"Sergent Blast",vehicle:"🚛",color:"#556B2F",special:"Tir de Mortier",specialDesc:"Tire un obus!",bio:"Vétéran de 47 conflits imaginaires.",age:58,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.2,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l2_2',name:"Les Frères Plouc",vehicle:"🛻",color:"#8B4513",special:"Cochon Lancé",specialDesc:"Lance un cochon!",bio:"Billy-Bob et Jimmy-Joe, fermiers.",age:38,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:4.0,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l2_3',name:"Grosse Bertha",vehicle:"🚜",color:"#FF4500",special:"Écrasement Total",specialDesc:"Détruit tout!",bio:"Ex-championne de démolition.",age:44,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:2.5,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l2_4',name:"Tonton Zig",vehicle:"🛵",color:"#9932CC",special:"Zigzag Infernal",specialDesc:"Zigzague partout!",bio:"78 ans, toujours pas de permis.",age:78,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.8,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l2_5',name:"Docteur Gluon",vehicle:"🚑",color:"#32CD32",special:"Glu Quantique",specialDesc:"Colle les adversaires!",bio:"Physicien le jour, pilote la nuit.",age:39,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:2.8,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l2_6',name:"Princesse Tornade",vehicle:"🏎️",color:"#FF1493",special:"Tourbillon Royal",specialDesc:"Crée une tornade!",bio:"Héritière, paye ses amendes cash.",age:25,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.0,league:2,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:2}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}}
+],3:[
+{id:'l3_1',name:"Pongo Banane",vehicle:"🚗",color:"#FFFF00",special:"Peau de Banane",specialDesc:"Fait déraper!",bio:"Mi-homme mi-singe, pieds nus.",age:32,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:4.5,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l3_2',name:"Yéti Félix",vehicle:"🚙",color:"#E0FFFF",special:"Souffle Glacé",specialDesc:"Gèle la piste!",bio:"De l'Himalaya, fond souvent.",age:120,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:4.0,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l3_3',name:"Ragnar Frigo",vehicle:"🚐",color:"#4169E1",special:"Charge Viking",specialDesc:"Charge berserk!",bio:"Viking décongelé, crie VALHALLA.",age:1043,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.5,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l3_4',name:"Momo Chaudron",vehicle:"🚛",color:"#8B008B",special:"Potion Explosive",specialDesc:"Transforme en citrouille!",bio:"Sorcier raté, roule en Renault 5.",age:89,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:5.0,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l3_5',name:"Rex Tonnerre",vehicle:"🏍️",color:"#FF6347",special:"Saut Spectaculaire",specialDesc:"Saute par-dessus!",bio:"Ex-cascadeur, 12 caméras détruites.",age:36,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:3.8,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}},
+{id:'l3_6',name:"Gigi Plume",vehicle:"🛵",color:"#98FB98",special:"Plume Magique",specialDesc:"S'envole!",bio:"Ex-danseuse étoile, pilote gracieuse.",age:31,birthSeason:1,wins:0,podiums:0,races:0,pts:0,odds:5.5,league:3,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,leagueHistory:[{season:1,league:3}],bestLapTime:999,bestRaceTime:999,totalRaceTime:0,finishes:{1:0,2:0,3:0,4:0,5:0,6:0}}
+]};
+
+const replacementFirstNames=["Gustave","Fernand","Alphonse","Prosper","Théodule","Archibald","Léopold","Barnabé","Honoré","Célestin","Balthazar","Amédée","Gaston","Anatole","Isidore","Eustache","Philibert","Séraphin","Casimir","Norbert","Colette","Bernadette","Germaine","Cunégonde","Hortense","Joséphine","Margot","Sidonie","Augustine","Bertille","Édouard","Théophile","Crépin","Modeste","Parfait","Dieudonné","Félicien","Polycarpe","Onésime","Aristide","Clémence","Eulalie","Pélagie","Zéphirine","Appoline","Blandine","Clotilde","Désirée","Églantine","Flavie","Marcel","Raymond","Lucien","Albert","Émile","Félix","Henri","Jules","Maurice","Nestor","Roger","Sylvain","Urbain","Victor","Xavier","Yvon","Achille","Baptiste","Cyprien"];
+const replacementLastNames=["Boulon","Turbo","Carbure","Bidouille","Pétarade","Flamèche","Grognard","Biscotte","Poussière","Caramel","Ferraille","Troufion","Moustache","Cassoulet","Ravioli","Cornichon","Cracotte","Papillon","Saucisse","Ciboulette","Persil","Romarin","Basilic","Thym","Cerfeuil","Estragon","Origan","Sauge","Menthe","Laurier","Cumin","Curry","Safran","Gingembre","Cannelle","Muscade","Poivre","Piment","Paprika","Cardamome","Béchamel","Mayonnaise","Moutarde","Ketchup","Tartare","Rémoulade","Vinaigre","Huile","Citron","Oignon","Échalote","Ail","Câpre","Olive","Anchois","Cornichon","Radis","Navet","Carotte","Céleri","Artichaut","Betterave","Chou","Épinard","Fenouil","Haricot","Lentille","Pois","Tomate","Courgette"];
+const replacementVehicles=["🚗","🏎️","🚙","🚐","🛻","🚛","🏍️","🛵","🚜","✈️"];
+const replacementBios=["Nouveau venu assoiffé de victoire.","Rookie prometteur sorti de nulle part.","Héritier d'une longue lignée de pilotes.","Ex-champion de karting reconverti.","Mystérieux pilote au passé trouble.","Amateur de sensations fortes et de camembert.","Ancien boulanger devenu pilote par passion.","Fils de mécanicien, huile dans les veines.","Rêve de gloire depuis tout petit.","A vendu sa ferme pour s'acheter un bolide."];
+const replacementSpecials=["Super Nitro","Écran de Fumée","Turbo Infernal","Huile Glissante","Klaxon Assourdissant","Pot d'Échappement Fumant","Rétroviseur Aveuglant","Frein à Main Tactique"];
+
+const C={
+start:["ET C'EST PARTI!","FONCEZ!","Que le chaos COMMENCE!","Les moteurs HURLENT!","TOP DÉPART!","C'est la FOLIE!","GO GO GO!"],
+boost:["{n} TURBO!","{n} DÉCOLLE!","{n} met les GAZ!","NITRO {n}!","{n} en FUSÉE!","VROOOM {n}!"],
+crash:["BOUM {n}!","AIE {n}!","{n} dans le MUR!","CATASTROPHE {n}!","{n} en VRILLE!","OH NON {n}!"],
+trap:["{n} piégé!","{n} dans le PANNEAU!","TRAÎTRISE {n}!"],
+special:["{n} utilise {s}!","ATTENTION {s}!","{n} ARME SECRÈTE!"],
+lap:["{n} tour {l}!","{n} franchit la ligne!"],
+close:["C'est SERRÉ!","Coude à coude!","TENSION!","Photo finish!"],
+finish:["{n} GAGNE!","VICTOIRE {n}!","{n} triomphe!"],
+chaos:["Banane géante!","Mouettes!","OVNI!","Météorites!"],
+overtake:["{n} dépasse!","{n} remonte!"],
+lead:["{n} en TÊTE!","Nouveau LEADER!"],
+lastlap:["DERNIER TOUR!","Sprint FINAL!"],
+death:["OH NON! {n} ne se relève pas...","TRAGÉDIE! {n} nous quitte!","RIP {n}...","DRAME sur la piste!"]
+};
+
+let audioCtx,soundOn=true;
+let commentHistory=[];
+let curLeague=1,racers=[],running=false,paused=false,intv,raceTime=0,curLap=1,totalLaps=3,finishPos=0,lastLeader=null;
+let season=1,day=1,totalDays=10,dayDone={1:false,2:false,3:false};
+let startYear=1900;
+let speed=1,autoMode=false,wallet=1000,betAmt=100,selRacer=null,curBet=null,winner=null,winnersHist=[];
+let newsQueue=[];
+const track=document.getElementById('track'),comment=document.getElementById('comment');
+
+// === AUDIO ===
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
+
+// === NEWS ===
+function addNews(text){
+newsQueue.unshift({text,time:Date.now(),season,day});
+if(newsQueue.length>50)newsQueue.pop();
+updateNewsTicker();
+}
+function updateNewsTicker(){
+const ticker=document.getElementById('newsTicker');
+if(!ticker)return;
+ticker.innerHTML=newsQueue.slice(0,10).map(n=>`<span class="news-item">📰 S${n.season}J${n.day}: ${n.text}</span>`).join(' • ');
+}
+function playSound(t){if(!soundOn||!audioCtx)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);const n=audioCtx.currentTime;
+if(t==='start'){o.frequency.setValueAtTime(440,n);o.frequency.exponentialRampToValueAtTime(880,n+0.15);g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.01,n+0.2);o.start();o.stop(n+0.2)}
+else if(t==='boost'){o.type='sawtooth';o.frequency.setValueAtTime(300,n);o.frequency.exponentialRampToValueAtTime(600,n+0.1);g.gain.setValueAtTime(0.1,n);g.gain.exponentialRampToValueAtTime(0.01,n+0.12);o.start();o.stop(n+0.12)}
+else if(t==='crash'){o.type='square';o.frequency.setValueAtTime(100,n);g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.01,n+0.15);o.start();o.stop(n+0.15)}
+else if(t==='victory'){o.frequency.setValueAtTime(523,n);o.frequency.setValueAtTime(659,n+0.1);o.frequency.setValueAtTime(784,n+0.2);g.gain.setValueAtTime(0.1,n);g.gain.exponentialRampToValueAtTime(0.01,n+0.4);o.start();o.stop(n+0.4)}
+else if(t==='death'){o.type='sawtooth';o.frequency.setValueAtTime(200,n);o.frequency.exponentialRampToValueAtTime(50,n+0.5);g.gain.setValueAtTime(0.2,n);g.gain.exponentialRampToValueAtTime(0.01,n+0.5);o.start();o.stop(n+0.5)}
+}catch(e){}}
+
+// === INIT ===
+function init(){
+initAudio();
+document.querySelectorAll('.top-tab').forEach(t=>t.onclick=()=>switchView(t.dataset.view));
+document.querySelectorAll('.league-tab').forEach(t=>t.onclick=()=>{if(!running)loadLeague(+t.dataset.league)});
+document.querySelectorAll('.bet-btn.amt').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bet-btn.amt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');betAmt=+b.dataset.amt;updateBetBtn()});
+document.getElementById('betBtn').onclick=placeBet;
+document.getElementById('startBtn').onclick=toggleStartPause;
+document.getElementById('resetBtn').onclick=resetDay;
+document.getElementById('speedBtn').onclick=()=>{speed=speed===1?2:speed===2?3:1;document.getElementById('speedBtn').textContent='x'+speed};
+document.getElementById('soundBtn').onclick=()=>{soundOn=!soundOn;document.getElementById('soundBtn').textContent=soundOn?'🔊':'🔇'};
+document.getElementById('autoBtn').onclick=toggleAuto;
+document.getElementById('nextDayBtn').onclick=nextDay;
+document.getElementById('victoryClose').onclick=closeVictory;
+document.getElementById('saveBtn').onclick=saveGame;
+document.getElementById('loadBtn').onclick=loadGame;
+document.getElementById('bioClose').onclick=()=>document.getElementById('bioModal').classList.remove('show');
+document.querySelectorAll('.bio-tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.bio-tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.bio-body').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById('bio'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)+'Tab').classList.add('active')});
+loadLeague(1);
+updateAll();
+}
+
+function switchView(v){
+document.querySelectorAll('.top-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===v));
+document.getElementById('raceView').style.display=v==='race'?'block':'none';
+document.getElementById('statsView').style.display=v==='stats'?'block':'none';
+document.getElementById('recordsView').style.display=v==='records'?'block':'none';
+document.getElementById('cemeteryView').style.display=v==='cemetery'?'block':'none';
+if(v==='stats'){setupStatsSort();updateStatsTable()}
+if(v==='records')updateRecordsView();
+if(v==='cemetery')updateCemeteryView();
+}
+
+// === RACE ===
+function loadLeague(l){
+curLeague=l;
+document.querySelectorAll('.league-tab').forEach(t=>{const ll=+t.dataset.league;t.classList.toggle('active',ll===l);t.classList.toggle('done',dayDone[ll])});
+document.getElementById('leagueBadge').textContent=['','🥇 L1','🥈 L2','🥉 L3'][l];
+document.getElementById('leagueBadge').className='race-badge league'+(l>1?' L'+l:'');
+document.getElementById('seasonLeague').textContent=l;
+initRace();
+updateSeasonStandings();
+}
+
+function initRace(){
+track.querySelectorAll('.racer').forEach(e=>e.remove());
+racers=[];lastLeader=null;commentHistory=[];updateCommentHist();
+finishPos=Math.max(track.offsetWidth-45,400);
+const lr=R[curLeague].filter(r=>r.alive).slice(0,6),h=track.offsetHeight,rh=45,sp=(h-lr.length*rh)/(lr.length+1);
+lr.forEach((d,i)=>{
+const r={...d,pos:5,lap:1,finished:false,el:null,lapStartTime:0,finishTime:null,rCrashes:0,rBoosts:0,lapTimes:[]};
+const el=document.createElement('div');el.className='racer';el.style.top=(sp+i*(rh+sp))+'px';
+el.innerHTML=`<span class="racer-vehicle">${d.vehicle}</span><span class="racer-label" style="border-color:${d.color}">${d.name}</span>`;
+el.onclick=()=>selectRacer(r);el.ondblclick=()=>showBio(r);
+track.appendChild(el);r.el=el;racers.push(r);
+});
+raceTime=0;curLap=1;winner=null;
+document.getElementById('lapDisp').textContent='1';
+document.getElementById('dayBadge').textContent=day;
+if(dayDone[curLeague])showComment(`L${curLeague} J${day} terminée!`);
+else showComment(`L${curLeague} J${day} - Pariez!`);
+updateLive();
+}
+
+function selectRacer(r){
+if(running||dayDone[curLeague])return;
+selRacer=r;
+document.getElementById('selDisplay').classList.add('show');
+document.getElementById('selName').textContent=r.vehicle+' '+r.name;
+document.getElementById('selOdds').textContent=`x${r.odds.toFixed(1)} → $${Math.floor(betAmt*r.odds)}`;
+updateBetBtn();
+}
+
+function updateBetBtn(){
+const b=document.getElementById('betBtn');
+if(dayDone[curLeague]){b.disabled=true;b.textContent='TERMINÉ'}
+else if(selRacer&&!running&&!curBet){b.disabled=false;b.textContent=`PARIER ${betAmt}$`}
+else if(curBet){b.disabled=true;b.textContent='✓ PLACÉ'}
+else{b.disabled=true;b.textContent='CHOISIR'}
+}
+
+function placeBet(){
+if(!selRacer||running||betAmt>wallet||curBet)return;
+curBet={racer:selRacer,amount:betAmt,odds:selRacer.odds,league:curLeague};
+wallet-=betAmt;document.getElementById('wallet').textContent=wallet;
+showComment(`${betAmt}$ sur ${selRacer.name}!`);updateBetBtn();
+}
+
+function toggleStartPause(){
+if(dayDone[curLeague])return;
+if(winner){goNext();return}
+if(!running){
+// Start
+initAudio();running=true;paused=false;
+document.getElementById('startBtn').textContent='⏸️';
+showComment(getC('start'),true);playSound('start');
+racers.forEach(r=>{r.lapStartTime=0;r.lapTimes=[]});
+intv=setInterval(tick,50);updateBetBtn();
+}else{
+// Toggle pause
+paused=!paused;
+document.getElementById('startBtn').textContent=paused?'▶️':'⏸️';
+if(paused){
+clearInterval(intv);
+showComment('⏸️ PAUSE',false);
+}else{
+intv=setInterval(tick,50);
+showComment('▶️ REPRISE!',true);
+}
+}
+}
+
+function tick(){
+if(paused||winner)return;
+raceTime+=0.05*speed;
+document.getElementById('chronoBadge').textContent='⏱ '+raceTime.toFixed(2)+'s';
+racers.forEach(r=>{
+if(r.finished)return;
+let sp=1.8+Math.random()*2.8;
+const ev=Math.random();
+// Death check (very rare: 0.02% per tick)
+if(ev<0.0002&&r.age>30){
+const deathChance=(r.age-30)/500;
+if(Math.random()<deathChance){
+killRacer(r);return;
+}
+}
+if(ev<0.005){r.pos-=18+Math.random()*18;r.rCrashes++;r.el.classList.add('crashed');setTimeout(()=>r.el?.classList.remove('crashed'),350);showComment(getC('crash',r),false,'crash');playSound('crash')}
+else if(ev<0.01){sp+=15;r.rBoosts++;r.el.classList.add('boosted');setTimeout(()=>r.el?.classList.remove('boosted'),200);showComment(getC('boost',r),true,'boost');playSound('boost')}
+else if(ev<0.013){r.pos-=10;showComment(getC('trap',r),false,'crash')}
+else if(ev<0.016){sp+=8;showComment(getC('special',r),true,'boost')}
+else if(ev<0.018){showComment(getC('chaos'),false,'normal')}
+r.pos+=sp*speed;if(r.pos<5)r.pos=5;
+if(r.pos>=finishPos){
+r.el.style.left=(finishPos-5)+'px';
+const sorted=getSorted();if(sorted[0]?.id===r.id)r.lapWins++;
+if(r.lap<totalLaps){
+const lapTime=raceTime-r.lapStartTime;
+r.lapTimes.push(lapTime);
+// Update best lap time
+const orig=R[curLeague].find(x=>x.id===r.id);
+if(orig&&lapTime<orig.bestLapTime)orig.bestLapTime=lapTime;
+if(lapTime<timeRecords.bestLap.time){
+timeRecords.bestLap={time:lapTime,name:r.name,vehicle:r.vehicle,season,day};
+}
+const excess=r.pos-finishPos;r.lap++;r.pos=5+excess;r.lapStartTime=raceTime;
+if(r.lap>curLap){curLap=r.lap;document.getElementById('lapDisp').textContent=curLap;showComment(getC('lap',r),true,'lap');playSound('boost');if(curLap===totalLaps)showComment(getC('lastlap'),true,'finish')}
+}else if(!r.finished){
+// Final lap time
+const lapTime=raceTime-r.lapStartTime;r.lapTimes.push(lapTime);
+const orig=R[curLeague].find(x=>x.id===r.id);
+if(orig&&lapTime<orig.bestLapTime)orig.bestLapTime=lapTime;
+if(lapTime<timeRecords.bestLap.time){
+timeRecords.bestLap={time:lapTime,name:r.name,vehicle:r.vehicle,season,day};
+}
+r.finished=true;r.finishTime=raceTime;
+if(!winner){
+winner=r;
+endRace();
+}
+}
+}else{r.el.style.left=r.pos+'px'}
+});
+// Leader change
+const sorted=getSorted();
+if(sorted[0]&&lastLeader&&lastLeader!==sorted[0].id){showComment(getC('lead',sorted[0]),true,'boost');lastLeader=sorted[0].id}
+else if(sorted[0]&&!lastLeader){lastLeader=sorted[0].id}
+if(Math.random()<0.003&&sorted[1]&&sorted[0].pos-sorted[1].pos<25)showComment(getC('close'),false,'normal');
+updateLive();
+}
+
+function killRacer(r){
+const orig=R[curLeague].find(x=>x.id===r.id);
+if(!orig)return;
+orig.alive=false;
+const cause=deathCauses[Math.floor(Math.random()*deathCauses.length)];
+cemetery.push({...orig,deathSeason:season,deathDay:day,cause:cause});
+r.el.classList.add('dead');
+showComment(getC('death',r),false,'death');playSound('death');
+setTimeout(()=>{r.el?.remove();r.finished=true;
+// Check if race can continue
+const alive=racers.filter(x=>!x.finished&&R[curLeague].find(y=>y.id===x.id)?.alive);
+if(alive.length===0&&!winner){winner=getSorted()[0];endRace()}
+},1000);
+// Create replacement
+createReplacement(curLeague);
+}
+
+function createReplacement(league){
+const firstName=replacementFirstNames[Math.floor(Math.random()*replacementFirstNames.length)];
+const lastName=replacementLastNames[Math.floor(Math.random()*replacementLastNames.length)];
+const name=firstName+' '+lastName;
+const vehicle=replacementVehicles[Math.floor(Math.random()*replacementVehicles.length)];
+const age=16+Math.floor(Math.random()*10);
+const newRacer={
+id:'new_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),name,vehicle,color:'#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0'),
+special:replacementSpecials[Math.floor(Math.random()*replacementSpecials.length)],
+specialDesc:"Nouveau pouvoir!",bio:replacementBios[Math.floor(Math.random()*replacementBios.length)],
+age,birthSeason:season,
+wins:0,podiums:0,races:0,pts:0,odds:4.0,league,titles:0,titlesL1:0,titlesL2:0,titlesL3:0,promos:0,relegs:0,lapWins:0,crashes:0,boosts:0,
+seasonWins:0,seasonPodiums:0,seasonPts:0,avgPos:0,posSum:0,bestPos:99,worstPos:0,streak:0,alive:true,
+leagueHistory:[{season,league}],
+bestLapTime:999,bestRaceTime:999,totalRaceTime:0,
+finishes:{1:0,2:0,3:0,4:0,5:0,6:0}
+};
+R[league].push(newRacer);
+addNews(`🆕 RECRUE: ${vehicle} ${name} (${age} ans) rejoint la L${league}!`);
+showComment(`🆕 ${vehicle} ${name} (${age} ans) en L${league}!`,false,'boost');
+}
+
+function endRace(){
+running=false;clearInterval(intv);dayDone[curLeague]=true;
+document.getElementById('startBtn').textContent='▶️';
+document.querySelector(`.league-tab.L${curLeague}`).classList.add('done');
+showComment(getC('finish',winner),true,'finish');playSound('victory');
+// Update stats and time records
+const sorted=getSorted(),pts=[25,18,15,12,10,8];
+sorted.forEach((r,i)=>{
+const o=R[curLeague].find(x=>x.id===r.id);
+if(o&&o.alive){
+o.pts+=pts[i]||0;o.seasonPts+=pts[i]||0;o.races++;o.crashes+=r.rCrashes;o.boosts+=r.rBoosts;
+o.posSum+=i+1;o.avgPos=o.posSum/o.races;
+// Track finish positions
+if(!o.finishes)o.finishes={1:0,2:0,3:0,4:0,5:0,6:0};
+o.finishes[i+1]=(o.finishes[i+1]||0)+1;
+// Time stats
+if(r.finishTime){
+o.totalRaceTime+=r.finishTime;
+if(r.finishTime<o.bestRaceTime)o.bestRaceTime=r.finishTime;
+if(r.finishTime<timeRecords.bestRace.time){
+timeRecords.bestRace={time:r.finishTime,name:r.name,vehicle:r.vehicle,season,day};
+}
+// Season time tracking
+if(!seasonTimes[r.id])seasonTimes[r.id]=0;
+seasonTimes[r.id]+=r.finishTime;
+}
+if(i+1<o.bestPos)o.bestPos=i+1;if(i+1>o.worstPos)o.worstPos=i+1;
+if(i===0){o.wins++;o.seasonWins++;o.streak++;o.odds=Math.max(1.5,o.odds-0.2)}
+else{o.streak=0;o.odds=Math.min(6,o.odds+0.1)}
+if(i<3){o.podiums++;o.seasonPodiums++}
+}
+});
+// Show victory overlay
+document.getElementById('victoryVehicle').textContent=winner.vehicle;
+document.getElementById('victoryName').textContent=winner.name;
+document.getElementById('victoryTime').textContent=`Temps: ${raceTime.toFixed(2)}s · L${curLeague} J${day}`;
+// Bet result
+const betEl=document.getElementById('victoryBet');
+if(curBet&&curBet.league===curLeague){
+if(curBet.racer.id===winner.id){
+const w=Math.floor(curBet.amount*curBet.odds);
+wallet+=w;
+betEl.textContent=`🎉 GAGNÉ +${w}$ !`;
+betEl.className='victory-bet win';
+}else{
+betEl.textContent=`😢 PERDU -${curBet.amount}$`;
+betEl.className='victory-bet lose';
+}
+curBet=null;
+}else{
+betEl.textContent=curBet?'Pari sur autre ligue':'Pas de pari';
+betEl.className='victory-bet none';
+}
+document.getElementById('wallet').textContent=wallet;
+// Next info
+const rem=[1,2,3].filter(l=>!dayDone[l]);
+let nextText='';
+if(rem.length>0)nextText=`Reste: L${rem.join(', L')}`;
+else if(day<totalDays)nextText=`Journée ${day} complète !`;
+else nextText='🏆 FIN DE SAISON !';
+document.getElementById('victoryNext').textContent=nextText;
+document.getElementById('victoryOverlay').classList.add('show');
+winnersHist.unshift({day,league:curLeague,name:winner.name,vehicle:winner.vehicle,season,time:winner.finishTime});
+updateAll();checkDayComplete();
+if(autoMode){setTimeout(closeVictory,1500)}
+}
+
+function closeVictory(){
+document.getElementById('victoryOverlay').classList.remove('show');
+if(autoMode){
+setTimeout(autoNext,800);
+}
+}
+
+function goNext(){
+const rem=[1,2,3].filter(l=>!dayDone[l]);
+if(rem.length){loadLeague(rem[0])}
+selRacer=null;document.getElementById('selDisplay').classList.remove('show');updateBetBtn();
+}
+
+function checkDayComplete(){
+const rem=[1,2,3].filter(l=>!dayDone[l]);
+const btn=document.getElementById('nextDayBtn');
+if(rem.length===0){
+btn.style.display='inline-block';
+btn.textContent=day<totalDays?`J${day+1}→`:'FIN';
+}else{btn.style.display='none'}
+}
+
+function nextDay(){
+if(day>=totalDays){endSeason();return}
+day++;dayDone={1:false,2:false,3:false};
+document.querySelectorAll('.league-tab').forEach(t=>t.classList.remove('done'));
+document.getElementById('nextDayBtn').style.display='none';
+document.getElementById('dayNum').textContent=day;
+loadLeague(1);
+showComment(`JOURNÉE ${day}!`,true);
+if(autoMode)setTimeout(toggleStartPause,1000);
+}
+
+function resetDay(){
+if(running)return;
+dayDone={1:false,2:false,3:false};curBet=null;selRacer=null;
+document.getElementById('selDisplay').classList.remove('show');
+document.querySelectorAll('.league-tab').forEach(t=>t.classList.remove('done'));
+initRace();updateBetBtn();
+}
+
+function toggleAuto(){
+autoMode=!autoMode;
+document.getElementById('autoBtn').style.background=autoMode?'linear-gradient(180deg,#4CAF50,#2E7D32)':'';
+if(autoMode&&!running&&!winner)toggleStartPause();
+}
+
+function autoNext(){
+if(!autoMode)return;
+const rem=[1,2,3].filter(l=>!dayDone[l]);
+if(rem.length>0){
+loadLeague(rem[0]);
+setTimeout(()=>{if(autoMode)toggleStartPause()},500);
+}else if(day<totalDays){
+nextDay();
+}else{
+endSeason();
+}
+}
+
+function endSeason(){
+// Determine champions with league-specific titles
+const trophies=['🏆','🥈','🥉'];
+[1,2,3].forEach(l=>{
+const sorted=[...R[l]].filter(r=>r.alive).sort((a,b)=>b.seasonPts-a.seasonPts);
+if(sorted[0]){
+sorted[0].titles++;
+if(l===1)sorted[0].titlesL1=(sorted[0].titlesL1||0)+1;
+else if(l===2)sorted[0].titlesL2=(sorted[0].titlesL2||0)+1;
+else sorted[0].titlesL3=(sorted[0].titlesL3||0)+1;
+champions.push({season,league:l,name:sorted[0].name,vehicle:sorted[0].vehicle,pts:sorted[0].seasonPts,year:startYear+season-1});
+addNews(`${trophies[l-1]} CHAMPION L${l}: ${sorted[0].vehicle} ${sorted[0].name} (${sorted[0].seasonPts}pts)`);
+}
+});
+
+// Best season time record
+Object.entries(seasonTimes).forEach(([id,time])=>{
+if(time<timeRecords.bestSeason.time){
+const r=getRacerById(id);
+if(r)timeRecords.bestSeason={time,name:r.name,vehicle:r.vehicle,season};
+}
+});
+seasonTimes={};
+
+// Age everyone by 1 year
+Object.values(R).flat().filter(r=>r.alive).forEach(r=>r.age++);
+cemetery.forEach(r=>{}); // dead don't age
+
+// Check retirements (based on age, random chance) - REDUCED RATE
+const retirementReasons=["Prend sa retraite bien méritée","Reconversion en commentateur TV","Ouvre un garage de course","Devient instructeur de pilotage","Part élever des chèvres","Écrit ses mémoires","Devient politicien","Part sur une île déserte","Ouvre un restaurant","Devient acteur de cinéma","Se lance dans la chanson","Crée sa marque de vêtements","Devient entraîneur","Problèmes de dos chroniques","Perd son permis définitivement","Gagne au loto","Hérite d'un château","Se marie et arrête tout"];
+Object.values(R).flat().filter(r=>r.alive).forEach(r=>{
+const retireChance=(r.age>60?(r.age-60)*0.015:0)+(r.age>80?0.08:0);
+if(Math.random()<retireChance){
+r.alive=false;
+const reason=retirementReasons[Math.floor(Math.random()*retirementReasons.length)];
+const isLegend=r.wins>=5||r.titles>=1;
+cemetery.push({...r,deathSeason:season,deathDay:'fin',cause:'🎖️ '+reason,retired:true,legend:isLegend});
+addNews(`🎖️ RETRAITE: ${r.vehicle} ${r.name} (${r.age} ans) - ${r.wins}V, ${r.titles}🏆`);
+createReplacement(r.league);
+}
+});
+
+// Promotions/Relegations - FIXED: L1 last goes to L2, not L3
+const promoted=[],relegated=[];
+[1,2].forEach(l=>{
+const sorted=[...R[l]].filter(r=>r.alive).sort((a,b)=>b.seasonPts-a.seasonPts);
+const last=sorted[sorted.length-1];
+if(last){
+last.relegs++;
+const newLeague=l+1;
+last.league=newLeague;
+const idx=R[l].indexOf(last);if(idx>-1)R[l].splice(idx,1);
+R[newLeague].push(last);
+relegated.push(last);
+}
+});
+[2,3].forEach(l=>{
+const sorted=[...R[l]].filter(r=>r.alive).sort((a,b)=>b.seasonPts-a.seasonPts);
+const first=sorted[0];
+if(first){
+first.promos++;
+const newLeague=l-1;
+first.league=newLeague;
+const idx=R[l].indexOf(first);if(idx>-1)R[l].splice(idx,1);
+R[newLeague].push(first);
+promoted.push(first);
+}
+});
+
+// Update league history for all racers
+Object.values(R).flat().filter(r=>r.alive).forEach(r=>{
+if(!r.leagueHistory)r.leagueHistory=[];
+r.leagueHistory.push({season:season+1,league:r.league});
+});
+
+// Reset season stats
+Object.values(R).flat().forEach(r=>{r.seasonWins=0;r.seasonPodiums=0;r.seasonPts=0});
+
+// Advance season
+season++;day=1;dayDone={1:false,2:false,3:false};
+document.getElementById('seasonNum').textContent=season;
+document.getElementById('dayNum').textContent=day;
+document.querySelectorAll('.league-tab').forEach(t=>t.classList.remove('done'));
+document.getElementById('nextDayBtn').style.display='none';
+loadLeague(1);
+addNews(`🎉 NOUVELLE SAISON ${season} (${startYear+season-1})!`);
+showComment(`🎉 SAISON ${season} ! Les pilotes vieillissent d'1 an !`,true);
+updateAll();
+if(autoMode)setTimeout(toggleStartPause,1500);
+}
+
+function getSorted(){return[...racers].filter(r=>r.el).sort((a,b)=>{if(a.finished&&!b.finished)return-1;if(!a.finished&&b.finished)return 1;if(b.lap!==a.lap)return b.lap-a.lap;return b.pos-a.pos})}
+
+// === UI UPDATES ===
+function updateLive(){
+const s=getSorted();
+document.getElementById('liveStandings').innerHTML=s.map((r,i)=>{
+const pc=i===0?'p1':i===1?'p2':i===2?'p3':'other';
+const pct=Math.min(100,Math.floor((r.pos/finishPos)*100));
+return`<div class="standing-item" onclick="showBio(getRacerById('${r.id}'))"><div class="standing-pos ${pc}">${i+1}</div><span class="standing-vehicle">${r.vehicle}</span><div class="standing-info"><div class="standing-name">${r.name}</div><div class="standing-stats">${r.lap}/${totalLaps} · ${pct}% ${r.rBoosts?'🚀'+r.rBoosts:''} ${r.rCrashes?'💥'+r.rCrashes:''}</div></div><span class="standing-age">${r.age}ans</span></div>`}).join('')||'<div style="color:#666;text-align:center;padding:10px">Aucun coureur</div>';
+}
+
+function updateSeasonStandings(){
+const s=[...R[curLeague]].filter(r=>r.alive).sort((a,b)=>b.seasonPts-a.seasonPts),n=s.length;
+document.getElementById('seasonStandings').innerHTML=s.map((r,i)=>{
+const pc=i===0?'p1':i===1?'p2':i===2?'p3':'other';
+const zc=(curLeague>1&&i===0)?'promo':(curLeague<3&&i===n-1)?'releg':'';
+return`<div class="standing-item ${zc}" onclick="showBio(getRacerById('${r.id}'))"><div class="standing-pos ${pc}">${i+1}</div><span class="standing-vehicle">${r.vehicle}</span><div class="standing-info"><div class="standing-name">${r.name}</div><div class="standing-stats">${r.seasonPts}pts · ${r.seasonWins}V</div></div><span class="standing-age">${r.age}ans</span></div>`}).join('');
+}
+
+function updateQuickRecords(){
+const all=[...Object.values(R).flat(),...cemetery];
+if(!all.length)return;
+const alive=all.filter(r=>r.alive);
+const topWins=all.reduce((a,b)=>a.wins>b.wins?a:b);
+const topPodiums=all.reduce((a,b)=>a.podiums>b.podiums?a:b);
+const topTitles=all.reduce((a,b)=>a.titles>b.titles?a:b);
+const oldest=alive.length?alive.reduce((a,b)=>a.age>b.age?a:b):{age:0,vehicle:'',name:''};
+const bestLap=timeRecords.bestLap.time<999?timeRecords.bestLap:null;
+const bestRace=timeRecords.bestRace.time<999?timeRecords.bestRace:null;
+document.getElementById('quickRecords').innerHTML=`
+<div class="record-item"><div class="record-label">VICTOIRES</div><div class="record-value">${topWins.wins}</div><div class="record-holder">${topWins.vehicle} ${topWins.name}</div></div>
+<div class="record-item"><div class="record-label">PODIUMS</div><div class="record-value">${topPodiums.podiums}</div><div class="record-holder">${topPodiums.vehicle} ${topPodiums.name}</div></div>
+<div class="record-item"><div class="record-label">TITRES</div><div class="record-value">${topTitles.titles}</div><div class="record-holder">${topTitles.vehicle} ${topTitles.name}</div></div>
+<div class="record-item"><div class="record-label">DOYEN</div><div class="record-value">${oldest.age}ans</div><div class="record-holder">${oldest.vehicle} ${oldest.name}</div></div>
+<div class="record-item"><div class="record-label">⏱ TOUR</div><div class="record-value" style="color:var(--neon-blue)">${bestLap?bestLap.time.toFixed(2)+'s':'-'}</div><div class="record-holder">${bestLap?bestLap.vehicle+' '+bestLap.name:'-'}</div></div>
+<div class="record-item"><div class="record-label">⏱ COURSE</div><div class="record-value" style="color:var(--neon-green)">${bestRace?bestRace.time.toFixed(2)+'s':'-'}</div><div class="record-holder">${bestRace?bestRace.vehicle+' '+bestRace.name:'-'}</div></div>`;
+}
+
+function updateWinnersHist(){
+document.getElementById('winnersList').innerHTML=winnersHist.slice(0,12).map(w=>`<div class="winner-item"><span class="winner-race">S${w.season}J${w.day}</span><span class="winner-vehicle">${w.vehicle}</span><span class="winner-name">${w.name}</span><span class="winner-league L${w.league}">L${w.league}</span></div>`).join('')||'<div style="color:#666;text-align:center;padding:10px">Aucune course</div>';
+}
+
+function updateAll(){
+document.getElementById('seasonNum').textContent=season;
+document.getElementById('dayNum').textContent=day;
+updateSeasonStandings();
+updateQuickRecords();
+updateWinnersHist();
+}
+
+// === COMMENTS ===
+function getC(t,r){const a=C[t];let x=a[Math.floor(Math.random()*a.length)];if(r){x=x.replace(/{n}/g,r.name).replace('{s}',r.special).replace('{l}',r.lap)}return x}
+function showComment(t,ex,type='normal'){
+comment.textContent=t;comment.className='comment-text'+(ex?' excited':'');
+if(running||type==='finish'||type==='death'){
+commentHistory.unshift({time:raceTime.toFixed(1),text:t,type});
+if(commentHistory.length>50)commentHistory.pop();
+updateCommentHist();
+}
+}
+function updateCommentHist(){
+document.getElementById('commentHist').innerHTML=commentHistory.slice(0,20).map(c=>`<div class="comment-hist-item ${c.type}"><span class="time">${c.time}s</span>${c.text}</div>`).join('')||'<div style="color:#666;text-align:center;padding:8px">En attente...</div>';
+}
+
+// === STATS TABLE ===
+let currentSort={col:'wins',dir:'desc'};
+function setupStatsSort(){
+document.querySelectorAll('.stats-table th[data-sort]').forEach(th=>{
+th.onclick=()=>{
+const col=th.dataset.sort;
+if(currentSort.col===col){currentSort.dir=currentSort.dir==='desc'?'asc':'desc'}
+else{currentSort={col,dir:'desc'}}
+updateStatsTable();
+}
+});
+}
+function updateStatsTable(){
+// Only alive from R + all from cemetery (no duplicates)
+const alive=Object.values(R).flat().filter(r=>r.alive);
+const all=[...alive,...cemetery];
+// Sort
+all.sort((a,b)=>{
+let va,vb;
+switch(currentSort.col){
+case'name':va=a.name;vb=b.name;break;
+case'age':va=a.age;vb=b.age;break;
+case'career':va=season-a.birthSeason;vb=season-b.birthSeason;break;
+case'league':va=a.league;vb=b.league;break;
+case'wins':va=a.wins;vb=b.wins;break;
+case'podiums':va=a.podiums;vb=b.podiums;break;
+case'races':va=a.races;vb=b.races;break;
+case'winrate':va=a.races>0?a.wins/a.races:0;vb=b.races>0?b.wins/b.races:0;break;
+case'titles':va=a.titles;vb=b.titles;break;
+case'pts':va=a.pts||0;vb=b.pts||0;break;
+case'seasonPts':va=a.seasonPts||0;vb=b.seasonPts||0;break;
+case'promos':va=a.promos;vb=b.promos;break;
+case'relegs':va=a.relegs;vb=b.relegs;break;
+case'crashes':va=a.crashes;vb=b.crashes;break;
+case'boosts':va=a.boosts;vb=b.boosts;break;
+case'bestLap':va=a.bestLapTime||999;vb=b.bestLapTime||999;break;
+case'bestRace':va=a.bestRaceTime||999;vb=b.bestRaceTime||999;break;
+default:va=a.wins;vb=b.wins;
+}
+if(typeof va==='string')return currentSort.dir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
+return currentSort.dir==='asc'?va-vb:vb-va;
+});
+// Update headers
+document.querySelectorAll('.stats-table th').forEach(th=>{
+th.classList.remove('sorted-asc','sorted-desc');
+if(th.dataset.sort===currentSort.col){
+th.classList.add(currentSort.dir==='asc'?'sorted-asc':'sorted-desc');
+}
+});
+// Render
+document.getElementById('statsBody').innerHTML=all.map(r=>{
+const winRate=r.races>0?(r.wins/r.races*100).toFixed(0):0;
+const isDead=!r.alive;
+const isRetired=isDead&&r.retired;
+const status=isDead?(isRetired?'🎖️':'💀'):'';
+const rowClass=isDead?(isRetired?'retired':'dead'):'';
+const history=renderLeagueHistory(r.leagueHistory||[]);
+const bestLap=r.bestLapTime&&r.bestLapTime<999?r.bestLapTime.toFixed(2)+'s':'-';
+const bestRace=r.bestRaceTime&&r.bestRaceTime<999?r.bestRaceTime.toFixed(2)+'s':'-';
+const careerYears=season-r.birthSeason;
+const trophyL1=r.titlesL1?'🏆'.repeat(Math.min(r.titlesL1,3)):'';
+const trophyL2=r.titlesL2?'🥈'.repeat(Math.min(r.titlesL2,3)):'';
+const trophyL3=r.titlesL3?'🥉'.repeat(Math.min(r.titlesL3,3)):'';
+const trophies=trophyL1+trophyL2+trophyL3||'-';
+return`<tr class="${rowClass}" onclick="showBio(getRacerById('${r.id}'))" style="cursor:pointer">
+<td class="racer-name-cell">${r.vehicle} <span class="clickable-name">${r.name}</span> ${status}</td>
+<td>${r.age}</td>
+<td>${careerYears}an${careerYears>1?'s':''}</td>
+<td>L${r.league}</td>
+<td><b>${r.wins}</b></td>
+<td>${r.podiums}</td>
+<td>${r.races}</td>
+<td>${winRate}%</td>
+<td>${trophies}</td>
+<td><b>${r.pts||0}</b></td>
+<td>${r.seasonPts||0}</td>
+<td style="color:#4CAF50">${r.promos||0}</td>
+<td style="color:#f44336">${r.relegs||0}</td>
+<td>${r.crashes}</td>
+<td>${r.boosts}</td>
+<td style="color:var(--neon-blue)">${bestLap}</td>
+<td style="color:var(--neon-green)">${bestRace}</td>
+<td>${history}</td>
+</tr>`}).join('');
+}
+function renderLeagueHistory(history){
+if(!history||history.length===0)return'-';
+return'<div class="league-history">'+history.map((h,i)=>{
+const prev=i>0?history[i-1]:null;
+let cls='L'+h.league;
+if(prev){
+if(h.league<prev.league)cls+=' promo';
+else if(h.league>prev.league)cls+=' releg';
+}
+return(i>0?'<span class="league-arrow">→</span>':'')+`<div class="league-dot ${cls}">${h.league}</div>`;
+}).join('')+'</div>';
+}
+
+// === RECORDS VIEW ===
+function updateRecordsView(){
+const all=Object.values(R).flat();
+const alive=all.filter(r=>r.alive);
+const dead=cemetery;
+const allTime=[...all,...dead];
+
+const records=[
+{label:'VICTOIRES',get:r=>r.wins},
+{label:'PODIUMS',get:r=>r.podiums},
+{label:'COURSES',get:r=>r.races},
+{label:'TITRES',get:r=>r.titles},
+{label:'PROMOTIONS',get:r=>r.promos},
+{label:'RELÉGATIONS',get:r=>r.relegs},
+{label:'TOURS GAGNÉS',get:r=>r.lapWins},
+{label:'CRASHES',get:r=>r.crashes},
+{label:'BOOSTS',get:r=>r.boosts}
+];
+
+document.getElementById('allRecords').innerHTML=records.map(rec=>{
+const best=allTime.reduce((a,b)=>rec.get(a)>rec.get(b)?a:b,allTime[0]);
+if(!best)return'';
+return`<div class="record-item"><div class="record-label">${rec.label}</div><div class="record-value">${rec.get(best)}</div><div class="record-holder">${best.vehicle} ${best.name}${best.alive?'':' ☠️'}</div></div>`;
+}).join('');
+
+document.getElementById('champHistory').innerHTML=champions.map(c=>`<div class="winner-item"><span class="winner-race">S${c.season}</span><span class="winner-vehicle">${c.vehicle}</span><span class="winner-name">${c.name}</span><span class="winner-league L${c.league}">L${c.league}</span><span style="margin-left:auto;color:#888">${c.pts}pts</span></div>`).join('')||'<div style="color:#666;text-align:center;padding:10px">Aucun champion encore</div>';
+}
+
+// === CEMETERY ===
+function updateCemeteryView(){
+const sortedCemetery=[...cemetery].sort((a,b)=>{
+if(a.deathSeason!==b.deathSeason)return b.deathSeason-a.deathSeason;
+return(b.deathDay==='fin'?99:b.deathDay)-(a.deathDay==='fin'?99:a.deathDay);
+});
+const dead=sortedCemetery.filter(r=>!r.retired);
+const retired=sortedCemetery.filter(r=>r.retired);
+let html='';
+if(dead.length>0){
+html+=`<h3 style="color:#f44;font-family:Bangers;font-size:18px;margin-bottom:10px">💀 DÉCÉDÉS (${dead.length})</h3>`;
+html+=dead.map(r=>`<div class="tomb"><div class="tomb-vehicle">${r.vehicle}</div><div class="tomb-info"><div class="tomb-name">${r.name}</div><div class="tomb-dates">Apparu S${r.birthSeason} · Mort S${r.deathSeason} J${r.deathDay} · ${r.age} ans</div><div class="tomb-cause">💀 ${r.cause}</div><div class="tomb-stats">🏆 ${r.wins}V · ${r.titles} titres · ${r.races} courses · ${r.podiums} podiums</div></div><div class="rip">R.I.P.</div></div>`).join('');
+}
+if(retired.length>0){
+html+=`<h3 style="color:#4CAF50;font-family:Bangers;font-size:18px;margin:20px 0 10px">🎖️ RETRAITÉS (${retired.length})</h3>`;
+html+=retired.map(r=>`<div class="tomb" style="border-color:#4CAF50"><div class="tomb-vehicle">${r.vehicle}</div><div class="tomb-info"><div class="tomb-name">${r.name}</div><div class="tomb-dates">Apparu S${r.birthSeason} · Retraite S${r.deathSeason} · ${r.age} ans</div><div class="tomb-cause" style="color:#4CAF50">${r.cause}</div><div class="tomb-stats">🏆 ${r.wins}V · ${r.titles} titres · ${r.races} courses · ${r.podiums} podiums</div></div><div class="rip" style="color:#4CAF50">LÉGENDE</div></div>`).join('');
+}
+if(cemetery.length===0)html='<div style="color:#666;text-align:center;padding:30px">Aucun pilote décédé ou retraité... pour l\'instant 💀</div>';
+document.getElementById('tombsList').innerHTML=html;
+}
+
+// === BIO ===
+function showBio(r){
+if(!r)return;
+document.getElementById('bioVehicle').textContent=r.vehicle;
+document.getElementById('bioName').textContent=r.name;
+document.getElementById('bioMeta').textContent=`${r.age} ans · Apparu saison ${r.birthSeason}${r.alive?'':' · DÉCÉDÉ'}`;
+const bl=document.getElementById('bioLeague');
+bl.textContent=r.alive?'LIGUE '+r.league:'DÉCÉDÉ';
+bl.className='bio-league '+(r.alive?'L'+r.league:'dead');
+document.getElementById('bioStory').textContent=r.bio;
+document.getElementById('bioSpecial').innerHTML=`<strong>${r.special}</strong>: ${r.specialDesc}`;
+const winRate=r.races>0?(r.wins/r.races*100).toFixed(1):0;
+// Career stats with league graph
+let leagueGraphHtml='';
+if(r.leagueHistory&&r.leagueHistory.length>0){
+leagueGraphHtml=`<div class="bio-league-graph">
+<div class="bio-league-graph-title">📈 ÉVOLUTION PAR SAISON</div>
+<div class="bio-league-graph-content">
+${r.leagueHistory.map(h=>{
+const height=(4-h.league)*18;
+return`<div class="bio-league-bar"><div class="bio-league-bar-inner L${h.league}" style="height:${height}px"></div><div class="bio-league-bar-label">S${h.season}</div></div>`;
+}).join('')}
+</div>
+</div>`;
+}
+document.getElementById('bioCareerStats').innerHTML=`
+<div class="bio-stat"><div class="bio-stat-val">${r.wins}</div><div class="bio-stat-lbl">VICTOIRES</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.podiums}</div><div class="bio-stat-lbl">PODIUMS</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.races}</div><div class="bio-stat-lbl">COURSES</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${winRate}%</div><div class="bio-stat-lbl">TAUX VIC</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.titles}</div><div class="bio-stat-lbl">🏆 TITRES</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.promos}</div><div class="bio-stat-lbl">⬆️ PROMOS</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.relegs}</div><div class="bio-stat-lbl">⬇️ RELEG</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.lapWins}</div><div class="bio-stat-lbl">TOURS 1ER</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.crashes}</div><div class="bio-stat-lbl">💥 CRASHES</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.boosts}</div><div class="bio-stat-lbl">🚀 BOOSTS</div></div>
+<div class="bio-stat"><div class="bio-stat-val" style="color:var(--neon-blue)">${r.bestLapTime&&r.bestLapTime<999?r.bestLapTime.toFixed(2)+'s':'-'}</div><div class="bio-stat-lbl">⏱ TOUR</div></div>
+<div class="bio-stat"><div class="bio-stat-val" style="color:var(--neon-green)">${r.bestRaceTime&&r.bestRaceTime<999?r.bestRaceTime.toFixed(2)+'s':'-'}</div><div class="bio-stat-lbl">⏱ COURSE</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.bestPos===99?'-':r.bestPos}</div><div class="bio-stat-lbl">BEST POS</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.avgPos>0?r.avgPos.toFixed(1):'-'}</div><div class="bio-stat-lbl">MOY POS</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.streak}</div><div class="bio-stat-lbl">SÉRIE</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.totalRaceTime>0?(r.totalRaceTime/60).toFixed(1)+'m':'-'}</div><div class="bio-stat-lbl">TEMPS TOT</div></div>
+${leagueGraphHtml?'</div>'+leagueGraphHtml:''}`;
+document.getElementById('bioSeasonStats').innerHTML=`
+<div class="bio-stat"><div class="bio-stat-val">${r.seasonPts}</div><div class="bio-stat-lbl">POINTS</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.seasonWins}</div><div class="bio-stat-lbl">VICTOIRES</div></div>
+<div class="bio-stat"><div class="bio-stat-val">${r.seasonPodiums}</div><div class="bio-stat-lbl">PODIUMS</div></div>`;
+document.getElementById('bioModal').classList.add('show');
+}
+
+function getRacerById(id){return Object.values(R).flat().find(r=>r.id===id)||cemetery.find(r=>r.id===id)}
+
+// === SAVE / LOAD ===
+function saveGame(){
+if(!confirm('⚠️ Sauvegarder la partie?\n\nCeci écrasera toute sauvegarde existante dans le navigateur.\n\nSaison '+season+' - Journée '+day+' - Année '+(startYear+season-1)))return;
+const saveData={
+R:JSON.parse(JSON.stringify(R)),
+cemetery:JSON.parse(JSON.stringify(cemetery)),
+champions:JSON.parse(JSON.stringify(champions)),
+timeRecords:JSON.parse(JSON.stringify(timeRecords)),
+newsQueue:JSON.parse(JSON.stringify(newsQueue)),
+season,day,wallet,winnersHist:JSON.parse(JSON.stringify(winnersHist)),
+startYear,
+version:'1.1'
+};
+// Save to localStorage
+try{
+localStorage.setItem('fousVolant_save',JSON.stringify(saveData));
+showComment('💾 Sauvegarde OK!',true,'boost');
+addNews('💾 Partie sauvegardée');
+}catch(e){console.error(e)}
+// Also offer file download
+const blob=new Blob([JSON.stringify(saveData,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download=`fousvolant_S${season}J${day}_${startYear+season-1}.json`;a.click();
+URL.revokeObjectURL(url);
+}
+
+function loadGame(){
+// Try localStorage first
+const localSave=localStorage.getItem('fousVolant_save');
+if(localSave){
+const data=JSON.parse(localSave);
+const info=data.season?`S${data.season}J${data.day}`:'?';
+if(confirm('Charger la sauvegarde du navigateur?\n\n'+info+'\n\n(Annuler pour charger un fichier)')){
+applyLoadData(data);
+return;
+}
+}
+// File picker
+const input=document.createElement('input');
+input.type='file';input.accept='.json';
+input.onchange=e=>{
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=ev=>{
+try{
+const data=JSON.parse(ev.target.result);
+applyLoadData(data);
+}catch(err){alert('Fichier invalide!')}
+};
+reader.readAsText(file);
+};
+input.click();
+}
+
+function applyLoadData(data){
+if(!data.R||!data.cemetery)return alert('Sauvegarde corrompue!');
+// Restore data
+R[1]=data.R[1]||[];R[2]=data.R[2]||[];R[3]=data.R[3]||[];
+cemetery.length=0;cemetery.push(...(data.cemetery||[]));
+champions.length=0;champions.push(...(data.champions||[]));
+if(data.timeRecords)Object.assign(timeRecords,data.timeRecords);
+if(data.newsQueue){newsQueue.length=0;newsQueue.push(...data.newsQueue)}
+season=data.season||1;day=data.day||1;wallet=data.wallet||1000;
+startYear=data.startYear||1900;
+winnersHist.length=0;winnersHist.push(...(data.winnersHist||[]));
+dayDone={1:false,2:false,3:false};
+document.getElementById('seasonNum').textContent=season;
+document.getElementById('dayNum').textContent=day;
+document.getElementById('wallet').textContent=wallet;
+document.querySelectorAll('.league-tab').forEach(t=>t.classList.remove('done'));
+loadLeague(1);
+updateAll();
+updateNewsTicker();
+showComment(`📂 Partie chargée! S${season} J${day}`,true,'boost');
+}
+window.getRacerById=getRacerById;
+window.showBio=showBio;
+
+init();
+</script>
+</body>
+</html>

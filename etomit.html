@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etomit Rodem</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
+<style>
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.96; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes socialPulse {
+  0%, 100% { transform: scale(1); box-shadow: 1px 1px 0 #000000; }
+  50% { transform: scale(1.05); box-shadow: 3px 3px 8px rgba(255, 255, 255, 0.6); }
+}
+
+@keyframes unfoldCover {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 250px;
+    opacity: 1;
+  }
+}
+
+@keyframes badgeGlow {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 2px 2px 0 #000000;
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(1.1); 
+    box-shadow: 0 0 15px #FFD700, 2px 2px 0 #000000;
+    filter: brightness(1.2);
+  }
+}
+
+* {
+  cursor: none !important;
+}
+
+body {
+  margin: 0;
+  padding: 40px 20px;
+  background-color: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", "Lucida Console", monospace;
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  animation: flicker 0.15s infinite;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+
+  border: 2px solid #FFFFFF;
+  display: inline-block;
+  padding: 4px 16px;
+  margin-bottom: 30px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.logo:hover {
+  background: #FFFFFF;
+}
+
+
+.logo span {
+  background-color: #FFFFFF;
+  color: #0000AA;
+  padding: 0 4px;
+  font-weight: bold;
+}
+
+.error-header {
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border-bottom: 2px solid #FFFFFF;
+  padding-bottom: 15px;
+}
+
+.error-code {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.fiche {
+  max-width: 900px;
+  margin: 0 auto;
+  border: 3px solid #FFFFFF;
+  border-style: outset;
+  padding: 25px;
+  box-sizing: border-box;
+  background-color: #0000AA;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1),
+              4px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.system-info {
+  font-size: 0.85em;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #FFFFFF;
+  background-color: rgba(0, 0, 100, 0.5);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border: 3px solid #FFFFFF;
+  background-color: #000088;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3em;
+  box-shadow: 0 0 15px #FFFFFF;
+  background-image: url('etomit.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.avatar.changing {
+  animation: flicker 0.1s 5;
+}
+
+.avatar-flag {
+  display: flex;
+  width: 48px;
+  height: 32px;
+  border: 2px solid #FFFFFF;
+  overflow: hidden;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #0000AA;
+  z-index: 5;
+}
+
+.info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.name {
+  font-size: 1.6em;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  letter-spacing: 1px;
+}
+
+.alias {
+  font-size: 0.9em;
+  color: #FFD700;
+  font-style: italic;
+  font-weight: normal;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.socials {
+  margin: 15px 0;
+}
+
+.socials a {
+  background-color: #C0C0C0;
+  color: #000000;
+  text-decoration: none;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 5px 15px;
+  font-size: 0.9em;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  box-shadow: 1px 1px 0 #000000;
+  font-family: "MS Sans Serif", "Lucida Console", monospace;
+  transition: all 0.2s;
+}
+
+.socials a:hover {
+  animation: socialPulse 0.5s infinite;
+  background: #000080;
+  color: #FFFFFF;
+  border-color: #FFFFFF #000080 #000080 #FFFFFF;
+}
+
+.socials a:active {
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+  box-shadow: inset 1px 1px 0 #000000;
+}
+
+.bio {
+  margin-top: 15px;
+  font-size: 0.95em;
+  line-height: 1.6em;
+  padding: 10px;
+  border-left: 3px solid #FFFFFF;
+  background-color: rgba(0, 0, 100, 0.3);
+}
+
+.stats-container {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #FFFFFF;
+  padding: 15px;
+  background-color: rgba(0, 0, 80, 0.5);
+  min-width: 280px;
+}
+
+.radar-container {
+  width: 250px;
+  height: 250px;
+}
+
+.radar-label {
+  font-size: 11px;
+  fill: #FFFFFF;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  cursor: help;
+}
+
+.radar-point {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 0 3px #FFFFFF);
+}
+
+.tooltip {
+  position: fixed;
+  background-color: #FFFFE1;
+  color: #000000;
+  padding: 5px 10px;
+  border: 1px solid #000000;
+  font-size: 11px;
+  pointer-events: none;
+  z-index: 10000;
+  display: none;
+  font-family: "MS Sans Serif", "Courier New", monospace;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Citation simplifiée */
+.quote-simple {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 255, 255, 0.1));
+  border: 2px solid #FFD700;
+  padding: 15px 20px;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.quote-simple-text {
+  flex: 1;
+  font-style: italic;
+  font-size: 1.1em;
+  color: #FFD700;
+}
+
+.quote-simple-btn {
+  background: #FFD700;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 8px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+}
+
+.quote-simple-btn:hover {
+  background: #FFFF00;
+}
+
+.category {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  background: linear-gradient(135deg, rgba(0, 0, 100, 0.4) 0%, rgba(0, 0, 120, 0.3) 100%);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+  transition: all 0.3s;
+}
+
+.category:hover {
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.category-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #FFFFFF;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 2px solid #FFFFFF;
+  padding-bottom: 8px;
+  text-shadow: 2px 2px #000000;
+}
+
+.stat-period-btn {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  color: #000000;
+  font-weight: bold;
+  margin-left: 5px;
+}
+.stat-period-btn:hover {
+  background: #DFDFDF;
+}
+.stat-period-btn.active {
+  background: #000080;
+  color: #FFFFFF;
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.category-content {
+  font-size: 0.95em;
+  line-height: 1.8em;
+  padding-left: 15px;
+  font-family: "Courier New", monospace;
+}
+
+.article-filters {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  color: #000000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  background: #DFDFDF;
+}
+
+.filter-btn.active {
+  background: #000080;
+  color: #FFFFFF;
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.articles-dropdown {
+  background: #C0C0C0;
+  border: 2px solid #000000;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.article-item {
+  background: #FFFFFF;
+  padding: 10px;
+  border: 2px solid #000000;
+  color: #000000;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.article-item:hover {
+  background: #FFFFCC;
+  transform: translateX(5px);
+  box-shadow: 3px 3px 0 #000000;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pagination-btn {
+  padding: 8px 20px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  color: #000000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #DFDFDF;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.book-card {
+  background: #C0C0C0;
+  padding: 10px;
+  border: 2px solid #000000;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 5px 0 #000000;
+  border-color: #FFD700;
+}
+
+.book-info-text {
+  position: relative;
+  z-index: 2;
+  background: #C0C0C0;
+  padding: 5px;
+}
+
+.book-cover {
+  width: 100%;
+  height: 0;
+  max-height: 0;
+  overflow: hidden;
+  border: 2px solid #000000;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #808080;
+  transition: max-height 0.5s ease, height 0.5s ease;
+  opacity: 0;
+}
+
+.book-card:hover .book-cover {
+  height: 250px;
+  max-height: 250px;
+  opacity: 1;
+  animation: unfoldCover 0.5s ease forwards;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-title {
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.book-info {
+  font-size: 12px;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.book-formats {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.format-badge {
+  background: #000080;
+  color: #FFF;
+  padding: 4px 8px;
+  text-decoration: none;
+  border: 1px solid #000000;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s;
+  box-shadow: 1px 1px 0 #000000;
+  font-size: 11px;
+}
+
+.format-badge:hover {
+  background: #0000FF;
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 #000000;
+  border: 1px solid #FFFFFF;
+}
+
+.timeline-graph-container {
+  overflow-x: auto;
+  padding: 10px;
+  border: 2px solid;
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+  background-color: rgba(0, 0, 80, 0.5);
+  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+.timeline-graph {
+  min-width: 2000px;
+  height: 280px;
+  position: relative;
+}
+
+.graph-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.year-popup {
+  position: fixed;
+  background-color: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 10px;
+  font-size: 12px;
+  z-index: 10000;
+  display: none;
+  max-width: 350px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+  color: #000000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.year-popup-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 3px;
+}
+
+.year-popup-list {
+  line-height: 1.5;
+}
+
+.badge-item {
+  background: #FFD700;
+  color: #000000;
+  padding: 5px 12px;
+  font-size: 11px;
+  border: 2px solid #000000;
+  font-weight: bold;
+  box-shadow: 2px 2px 0 #000000;
+  display: inline-block;
+  transition: all 0.3s;
+  cursor: help;
+  position: relative;
+}
+
+.badge-item:hover {
+  animation: badgeGlow 0.8s ease-in-out infinite;
+  z-index: 10;
+}
+
+.badge-item::after {
+  content: attr(data-description);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  background: #FFFFE1;
+  color: #000000;
+  padding: 5px 10px;
+  border: 1px solid #000000;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.badge-item:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 15px;
+  background-color: #FFFFFF;
+  animation: blink 1s infinite;
+  margin-left: 5px;
+}
+
+.fake-cursor {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  display: none;
+}
+
+body:hover .fake-cursor {
+  display: block;
+}
+
+.footer-error {
+  max-width: 900px;
+  margin: 30px auto 0 auto;
+  text-align: center;
+  font-size: 0.85em;
+  padding-top: 20px;
+  border-top: 2px solid #FFFFFF;
+}
+
+.modal-viewer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 170, 0.95);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+}
+
+.modal-viewer * {
+  cursor: auto !important;
+}
+
+.modal-content {
+  background: #C0C0C0;
+  border: 3px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  max-width: 95%;
+  max-height: 95%;
+  width: 1000px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.7);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.modal-content.fullscreen {
+  width: 98vw !important;
+  height: 98vh !important;
+  max-width: 98vw !important;
+  max-height: 98vh !important;
+}
+
+.modal-header {
+  background: linear-gradient(to right, #000080, #1084D0);
+  color: #FFFFFF;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-icon {
+  width: 16px;
+  height: 16px;
+  background: #FFFFFF;
+  color: #000080;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.modal-header-right {
+  display: flex;
+  gap: 5px;
+}
+
+.modal-maximize {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 2px 8px;
+  cursor: pointer !important;
+  font-weight: bold;
+  color: #000000;
+  font-size: 14px;
+  min-width: 24px;
+}
+
+.modal-maximize:hover {
+  background: #DFDFDF;
+}
+
+.modal-maximize:active {
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.modal-close {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 2px 10px;
+  cursor: pointer !important;
+  font-weight: bold;
+  color: #000000;
+  font-size: 14px;
+}
+
+.modal-close:hover {
+  background: #DFDFDF;
+}
+
+.modal-close:active {
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.modal-toolbar {
+  background: #C0C0C0;
+  padding: 8px;
+  border-bottom: 2px solid #808080;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.modal-body {
+  flex: 1;
+  overflow: auto;
+  background: #FFFFFF;
+  border: 2px solid;
+  border-color: #808080 #FFFFFF #FFFFFF #808080;
+  margin: 5px;
+  position: relative;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.download-btn {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  padding: 6px 16px;
+  cursor: pointer !important;
+  font-weight: bold;
+  color: #000000;
+  font-family: "Courier New", monospace;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.download-btn:hover {
+  background: #DFDFDF;
+}
+
+.download-btn:active {
+  border-color: #000000 #FFFFFF #FFFFFF #000000;
+}
+
+.video-player-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-player {
+  width: 100%;
+  flex: 1;
+  background: #000000;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .stats-container {
+    width: 100%;
+  }
+  
+  .error-code {
+    font-size: 1.5em;
+  }
+  
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="content-wrapper">
+  <div class="fake-cursor" id="fakeCursor"></div>
+  
+  <a href="borne.html" style="text-decoration: none;">
+    <div class="logo"><span>:vitalism</span></div>
+  </a>
+
+  <div class="error-header">
+    <div class="error-code">*** STOP: 0x0000RODEMISM (0xETOMIT_ROD, 0x00000004)</div>
+    <div>PROFIL_SYSTEM_DATA</div>
+  </div>
+
+  <div class="fiche">
+    <div class="system-info">
+      *** Adresse: 0xBF7C2A84 base à 0xBF7C0000, DateStamp 4a5bc600 - profil.sys<br>
+      *** Synchronisé avec: data.json | Dernière MAJ: <span id="lastUpdate">--</span> | 👁️ <span id="viewCount">0</span> vues
+    </div>
+
+    <div class="header">
+      <div class="avatar-container">
+        <div class="avatar" id="mainAvatar"></div>
+        <div class="avatar-flag">
+          <div style="width: 33.33%; background-color: #0055A4;"></div>
+          <div style="width: 33.33%; background-color: #FFFFFF;"></div>
+          <div style="width: 33.33%; background-color: #EF4135;"></div>
+        </div>
+      </div>
+      <div class="info">
+        <p class="name">&gt; <span id="contributorName">Chargement...</span><span class="cursor"></span></p>
+        <span class="alias" id="contributorAlias"></span>
+        <div class="socials" id="contributorSocials"></div>
+        <div class="bio" id="contributorBio">&gt; Chargement...</div>
+      </div>
+      <div class="stats-container">
+        <svg class="radar-container" viewBox="0 0 250 250" id="radar-svg"></svg>
+      </div>
+    </div>
+
+    <!-- Citation simplifiée -->
+    <div class="quote-simple">
+      <div class="quote-simple-text" id="quoteSimpleText">"Cliquez pour révéler une citation..."</div>
+      <button class="quote-simple-btn" onclick="spinQuote()">🎲</button>
+    </div>
+
+    <div class="category">
+      <div class="category-title">📚 Bibliothèque / Livres</div>
+      <div class="category-content">
+        <div class="book-grid" id="booksGrid"></div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">📄 Articles & Essais</div>
+      <div class="category-content">
+        <div class="article-filters" id="articleFilters"></div>
+        <div class="articles-dropdown" id="articlesContainer"></div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">◀ PRÉCÉDENT</button>
+          <span id="pageInfo" style="color: #000000; font-weight: bold;">Page 1</span>
+          <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">SUIVANT ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">🎥 Vidéos & Conférences</div>
+      <div class="category-content" id="videosContainer"></div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">🎧 Audio & Podcasts</div>
+      <div class="category-content" id="audioContainer"></div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">🐦 Twitter/X Feed</div>
+      <div class="category-content">
+        <div id="tweetsContainer" style="min-height: 150px; background: #FFFFFF; padding: 10px; border: 2px solid; border-color: #808080 #FFFFFF #FFFFFF #808080;">
+          <div style="text-align: center; padding: 20px; color: #000080;">
+            <div style="font-size: 24px; margin-bottom: 10px;">🔄</div>
+            <div>Chargement du feed Twitter/X...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">*** Production Timeline</div>
+      <div class="timeline-graph-container">
+        <canvas class="graph-canvas" id="timelineCanvas"></canvas>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">*** Stats
+        <span style="float: right;">
+          <button class="stat-period-btn active" id="btnStatYear" onclick="showYearStats()">2025</button>
+          <button class="stat-period-btn" id="btnStatMonth" onclick="showMonthStats()">MOIS</button>
+        </span>
+      </div>
+      <div class="category-content">
+        [0x01] Pages livres : <strong style="color: #FFD700;" id="stat-pages-livres">0</strong><br>
+        [0x02] Pages articles : <strong style="color: #00BFFF;" id="stat-pages-articles">0</strong><br>
+        [0x03] Vidéo (min) : <strong style="color: #FF69B4;" id="stat-video-min">0</strong><br>
+        [0x04] Audio (min) : <strong style="color: #FFA500;" id="stat-audio-min">0</strong><br>
+        [0x05] Retweets : <strong style="color: #00FF00;" id="stat-retweets">0</strong><br>
+        [0x06] Likes : <strong style="color: #FFFFFF;" id="stat-likes">0</strong><br>
+        [0x07] Score : <strong style="color: #FF0000;" id="stat-score">0</strong>
+      </div>
+    </div>
+
+    <div class="category">
+      <div class="category-title">*** Achievements / Badges</div>
+      <div class="category-content">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;" id="badgesContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-error">
+    *** If this is the first time you have seen this screen, restart your computer.<br>
+    *** If this screen appears again, follow these steps: contact the Anône for more information.
+  </div>
+</div>
+
+<div class="modal-viewer" id="modalViewer">
+  <div class="modal-content" id="modalContent">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-icon" id="modalIcon">📄</div>
+        <span id="modalTitle">Document</span>
+      </div>
+      <div class="modal-header-right">
+        <div class="modal-maximize" onclick="toggleMaximize()" id="maximizeBtn">□</div>
+        <div class="modal-close" onclick="closeModal()">×</div>
+      </div>
+    </div>
+    <div class="modal-toolbar">
+      <a href="#" id="downloadPdf" class="download-btn" style="display:none;">📄 Télécharger PDF</a>
+      <a href="#" id="downloadEpub" class="download-btn" style="display:none;">📱 Télécharger EPUB</a>
+      <a href="#" id="downloadVideo" class="download-btn" style="display:none;">⬇️ Télécharger Vidéo</a>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="year-popup" id="yearPopup"></div>
+
+<script>
+// Chargement des données depuis JSON
+let contributorData = null;
+
+// Fonction pour charger les données
+async function loadData() {
+  try {
+    const response = await fetch('data.json');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const allData = await response.json();
+    statsData = allData; // Stocker pour accès global (formule scoring)
+    console.log('✅ Données chargées depuis data.json:', allData);
+    
+    // CORRECTION: Chercher Venehon par son nom au lieu d'utiliser l'index [0]
+    contributorData = allData.contributors.find(c => c.name === "Etomit Rodem");
+    
+    if (!contributorData) {
+      throw new Error('Contributeur "Etomit Rodem" non trouvé dans data.json');
+    }
+    
+    console.log('📊 Données de Etomit Rodem chargées:', contributorData);
+    console.log('📊 Nombre d\'articles:', (contributorData.articles || []).length);
+    initializePage();
+  } catch (error) {
+    console.error('❌ ERREUR de chargement des données:', error);
+    alert('Erreur: Impossible de charger data.json. Vérifiez que le fichier existe et que le serveur web est lancé.');
+  }
+}
+
+// Variables
+let statsData = null;
+let allArticles = [];
+let filteredArticles = [];
+let currentArticlePage = 0;
+const articlesPerPage = 3;
+
+// Curseur
+const fakeCursor = document.getElementById('fakeCursor');
+document.addEventListener('mousemove', (e) => {
+  fakeCursor.style.left = e.clientX + 'px';
+  fakeCursor.style.top = e.clientY + 'px';
+});
+
+// Citations simplifiées
+function spinQuote() {
+  const quoteText = document.getElementById('quoteSimpleText');
+  const quotes = contributorData.quotes || [];
+  if (quotes.length === 0) {
+    quoteText.textContent = '"Aucune citation disponible"';
+    return;
+  }
+  const finalQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  quoteText.textContent = `"${finalQuote}"`;
+}
+
+// Calcul du score
+// Formule : (pages_livres + pages_articles) × 1750 × 0.0093 + (videos × 10) + (RT × 1) + (likes × 0.3)
+// Simplifié : (pages_livres + pages_articles) × 16.275 + (videos × 10) + (RT × 1) + (likes × 0.3)
+// 
+// Pages par article selon contributeur (jusqu'à 2025) :
+// - Venehon : 1 page/article
+// - Caverne : 10 pages/article
+// - Autres : 3 pages/article
+// À partir de 2026 : utiliser le champ "pages" de chaque article dans le JSON
+
+function getArticlePagesPerContributor(contributorName) {
+  switch(contributorName) {
+    case "Venehon": return 1;
+    case "Caverne": return 5;
+    case "Raffaello Bellino": return 5;
+    default: return 3;
+  }
+}
+
+function calculateScore(year) {
+  const yearKey = 'y' + year;
+  const data = contributorData[yearKey];
+  if (!data) return 0;
+  
+  // Récupérer les poids depuis le JSON centralisé
+  const weights = statsData?.scoring?.weights || {
+    page: 15, page_traduction: 7.5, video_minute: 7, audio_minute: 3.5, retweets: 1, likes: 0.3
+  };
+  
+  // Pages des livres de cette année
+  const yearBooks = (contributorData.books || []).filter(b => b.year === year);
+  // Utiliser le compteur data.books si la liste détaillée est vide
+  const bookCount = yearBooks.length > 0 ? yearBooks.length : (data.books || 0);
+  const bookPages = yearBooks.length > 0 
+    ? yearBooks.reduce((sum, b) => sum + (b.pages || 0), 0)
+    : bookCount * 200;  // Estimation 200 pages par livre si pas de détails
+  
+  // Pages des articles de cette année
+  const yearArticles = (contributorData.articles || []).filter(a => a.year === year);
+  let articlePages = 0;
+  
+  // Utiliser le compteur data.articles si la liste détaillée est vide
+  const articleCount = yearArticles.length > 0 ? yearArticles.length : (data.articles || 0);
+  
+  if (year >= 2026) {
+    articlePages = yearArticles.length > 0 
+      ? yearArticles.reduce((sum, a) => sum + (a.pages || 3), 0)
+      : articleCount * 3;
+  } else {
+    const pagesPerArticle = getArticlePagesPerContributor(contributorData.name);
+    articlePages = articleCount * pagesPerArticle;
+  }
+  
+  // Minutes vidéo et audio
+  const videoMinutes = data.video_minutes || 0;
+  const audioMinutes = data.audio_minutes || 0;
+  
+  // Nouvelle formule
+  const score = (bookPages * weights.page) + 
+                (articlePages * weights.page) + 
+                (videoMinutes * weights.video_minute) + 
+                (audioMinutes * weights.audio_minute) + 
+                ((data.retweets || 0) * weights.retweets) + 
+                ((data.likes || 0) * weights.likes);
+  
+  return Math.round(score);
+}
+
+// Livres avec modal et téléchargement
+function updateBooks() {
+  document.getElementById('booksGrid').innerHTML = contributorData.books.map(book => `
+    <div class="book-card" onclick="openBookModal('${book.title.replace(/'/g, "\\'")}', ${book.year}, ${book.pages}, '${book.pdf}', '${book.epub}')">
+      <div class="book-cover">
+        <img src="covers/${book.title.toLowerCase().replace(/[^a-z0-9]/g, '')}.jpg" alt="${book.title}" onerror="this.style.display='none'">
+      </div>
+      <div class="book-info-text">
+        <div class="book-title">${book.title}</div>
+        <div class="book-info">${book.year} • ${book.pages} pages</div>
+        <div class="book-formats">
+          <a href="${book.pdf}" class="format-badge" download onclick="event.stopPropagation()">PDF</a>
+          <a href="${book.epub}" class="format-badge" download onclick="event.stopPropagation()">EPUB</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openBookModal(title, year, pages, pdfUrl, epubUrl) {
+  // Cacher le faux curseur
+  document.getElementById('fakeCursor').style.display = 'none';
+  
+  document.getElementById('modalIcon').textContent = '📖';
+  document.getElementById('modalTitle').textContent = title;
+  
+  // Afficher les boutons de téléchargement
+  document.getElementById('downloadPdf').style.display = 'inline-block';
+  document.getElementById('downloadPdf').href = pdfUrl;
+  document.getElementById('downloadPdf').download = pdfUrl;
+  
+  document.getElementById('downloadEpub').style.display = 'inline-block';
+  document.getElementById('downloadEpub').href = epubUrl;
+  document.getElementById('downloadEpub').download = epubUrl;
+  
+  document.getElementById('downloadVideo').style.display = 'none';
+  
+  // Afficher le PDF dans un iframe
+  document.getElementById('modalBody').innerHTML = `
+    <iframe src="${pdfUrl}" class="pdf-viewer" frameborder="0">
+      <p>Votre navigateur ne supporte pas l'affichage de PDF. <a href="${pdfUrl}" download>Télécharger le fichier</a></p>
+    </iframe>
+  `;
+  
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+// Articles avec modal et téléchargement
+function updateArticles() {
+  allArticles = contributorData.articles;
+  filteredArticles = [...allArticles];
+  console.log('Total articles:', allArticles.length);
+  console.log('Articles par année:', allArticles.reduce((acc, a) => {
+    acc[a.year] = (acc[a.year] || 0) + 1;
+    return acc;
+  }, {}));
+  const years = [...new Set(allArticles.map(a => a.year))].sort().reverse();
+  console.log('Années détectées:', years);
+  document.getElementById('articleFilters').innerHTML = `
+    <button class="filter-btn active" onclick="filterArticlesByYear('all')">TOUS</button>
+    ${years.map(y => `<button class="filter-btn" onclick="filterArticlesByYear(${y})">${y}</button>`).join('')}
+  `;
+  renderArticlesPage();
+}
+
+function filterArticlesByYear(year) {
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  filteredArticles = year === 'all' ? [...allArticles] : allArticles.filter(a => a.year === year);
+  currentArticlePage = 0;
+  renderArticlesPage();
+}
+
+function renderArticlesPage() {
+  const start = currentArticlePage * articlesPerPage;
+  const pageArticles = filteredArticles.slice(start, start + articlesPerPage);
+  document.getElementById('articlesContainer').innerHTML = pageArticles.map(article => `
+    <div class="article-item" onclick="openArticleModal('${article.title.replace(/'/g, "\\'")}', '${article.date}', '${article.pdf}', '${article.epub || ''}')">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>✍️ ${article.title}</strong>
+          <div style="font-size: 0.85em; color: #000080;">${article.date}</div>
+        </div>
+        <div style="display: flex; gap: 5px;">
+          <a href="${article.pdf}" class="format-badge" download onclick="event.stopPropagation()">PDF</a>
+          ${article.epub ? `<a href="${article.epub}" class="format-badge" style="background: #00AA00;" download onclick="event.stopPropagation()">EPUB</a>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+  const totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
+  document.getElementById('pageInfo').textContent = `Page ${currentArticlePage + 1} / ${totalPages}`;
+  document.getElementById('prevBtn').disabled = currentArticlePage === 0;
+  document.getElementById('nextBtn').disabled = currentArticlePage >= totalPages - 1;
+}
+
+function openArticleModal(title, date, pdfUrl, epubUrl) {
+  // Cacher le faux curseur
+  document.getElementById('fakeCursor').style.display = 'none';
+  
+  document.getElementById('modalIcon').textContent = '✍️';
+  document.getElementById('modalTitle').textContent = title;
+  
+  // Afficher les boutons de téléchargement
+  document.getElementById('downloadPdf').style.display = 'inline-block';
+  document.getElementById('downloadPdf').href = pdfUrl;
+  document.getElementById('downloadPdf').download = pdfUrl;
+  
+  if (epubUrl) {
+    document.getElementById('downloadEpub').style.display = 'inline-block';
+    document.getElementById('downloadEpub').href = epubUrl;
+    document.getElementById('downloadEpub').download = epubUrl;
+  } else {
+    document.getElementById('downloadEpub').style.display = 'none';
+  }
+  
+  document.getElementById('downloadVideo').style.display = 'none';
+  
+  // Afficher le PDF dans un iframe
+  document.getElementById('modalBody').innerHTML = `
+    <iframe src="${pdfUrl}" class="pdf-viewer" frameborder="0">
+      <p>Votre navigateur ne supporte pas l'affichage de PDF. <a href="${pdfUrl}" download>Télécharger le fichier</a></p>
+    </iframe>
+  `;
+  
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+function changePage(dir) {
+  currentArticlePage += dir;
+  if (currentArticlePage < 0) currentArticlePage = 0;
+  if (currentArticlePage >= Math.ceil(filteredArticles.length / articlesPerPage)) currentArticlePage = Math.ceil(filteredArticles.length / articlesPerPage) - 1;
+  renderArticlesPage();
+}
+
+// Vidéos avec lecteur dans modal
+function updateVideos() {
+  const videos = contributorData.videos || [];
+  if (videos.length === 0) {
+    document.getElementById('videosContainer').innerHTML = '<div style="color: #808080; padding: 20px; text-align: center;">Aucune vidéo disponible</div>';
+    return;
+  }
+  document.getElementById('videosContainer').innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
+      ${videos.map(v => `
+        <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer; transition: all 0.2s;" 
+             class="video-item"
+             onclick="openVideoModal('${v.title.replace(/'/g, "\\'")}', '${v.file}', '${v.year}', '${v.duration}')"
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='3px 3px 0 #000000'; this.style.borderColor='#FFFF00';"
+             onmouseout="this.style.transform=''; this.style.boxShadow=''; this.style.borderColor='#000000';">
+          <div style="background: #000000; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+            <div style="font-size: 3em;">▶️</div>
+          </div>
+          <div style="font-weight: bold; color: #000080;">${v.title}</div>
+          <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">${v.year} • ${v.duration}</div>
+          <a href="${v.file}" class="format-badge" style="display: inline-block; margin-top: 8px; background: #FF69B4;" download onclick="event.stopPropagation()">⬇️ MP4</a>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// Audio avec lecteur dans modal
+function updateAudio() {
+  const audios = contributorData.audio || [];
+  if (audios.length === 0) {
+    document.getElementById('audioContainer').innerHTML = '<div style="color: #808080; padding: 20px; text-align: center;">Aucun audio disponible</div>';
+    return;
+  }
+  document.getElementById('audioContainer').innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
+      ${audios.map(a => `
+        <div style="background: #C0C0C0; padding: 10px; border: 2px solid #000000; cursor: pointer; transition: all 0.2s;" 
+             class="audio-item"
+             onclick="openAudioModal('${a.title.replace(/'/g, "\\'")}', '${a.file}', '${a.year}', '${a.duration}')"
+             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='3px 3px 0 #000000'; this.style.borderColor='#FFA500';"
+             onmouseout="this.style.transform=''; this.style.boxShadow=''; this.style.borderColor='#000000';">
+          <div style="background: #1a1a2e; height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+            <div style="font-size: 2.5em;">🎧</div>
+          </div>
+          <div style="font-weight: bold; color: #000080;">${a.title}</div>
+          <div style="font-size: 0.85em; color: #000000; margin-top: 5px;">${a.year} • ${a.duration}</div>
+          <a href="${a.file}" class="format-badge" style="display: inline-block; margin-top: 8px; background: #FFA500;" download onclick="event.stopPropagation()">⬇️ MP3</a>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function openAudioModal(title, audioUrl, year, duration) {
+  document.getElementById('fakeCursor').style.display = 'none';
+  
+  document.getElementById('modalIcon').textContent = '🎧';
+  document.getElementById('modalTitle').textContent = title;
+  
+  document.getElementById('downloadPdf').style.display = 'none';
+  document.getElementById('downloadEpub').style.display = 'none';
+  document.getElementById('downloadVideo').style.display = 'inline-block';
+  document.getElementById('downloadVideo').href = audioUrl;
+  document.getElementById('downloadVideo').download = audioUrl;
+  document.getElementById('downloadVideo').textContent = '💾 Télécharger MP3';
+  
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e);">
+      <div style="font-size: 5em; margin-bottom: 30px;">🎧</div>
+      <div style="color: #FFFFFF; font-size: 1.2em; margin-bottom: 20px;">${title}</div>
+      <div style="color: #808080; margin-bottom: 30px;">${year} • ${duration}</div>
+      <audio controls style="width: 80%;">
+        <source src="${audioUrl}" type="audio/mpeg">
+        Votre navigateur ne supporte pas la lecture audio.
+      </audio>
+    </div>
+  `;
+  
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+function openVideoModal(title, videoUrl, year, duration) {
+  // Cacher le faux curseur
+  document.getElementById('fakeCursor').style.display = 'none';
+  
+  document.getElementById('modalIcon').textContent = '🎥';
+  document.getElementById('modalTitle').textContent = title;
+  
+  // Afficher le bouton de téléchargement vidéo uniquement
+  document.getElementById('downloadPdf').style.display = 'none';
+  document.getElementById('downloadEpub').style.display = 'none';
+  document.getElementById('downloadVideo').style.display = 'inline-block';
+  document.getElementById('downloadVideo').href = videoUrl;
+  document.getElementById('downloadVideo').download = videoUrl;
+  
+  // Afficher la vidéo
+  document.getElementById('modalBody').innerHTML = `
+    <video controls style="width: 100%; height: 100%; background: #000000;">
+      <source src="${videoUrl}" type="video/mp4">
+      Votre navigateur ne supporte pas la lecture vidéo.
+    </video>
+  `;
+  
+  document.getElementById('modalViewer').style.display = 'flex';
+}
+
+// Radar avec tooltips
+function drawRadar() {
+  const branches = [
+    {name: "RAIS", fullName: "Raisonnement", value: contributorData.radar.raisonnement},
+    {name: "ETH", fullName: "Éthique", value: contributorData.radar.ethique},
+    {name: "LOG", fullName: "Logique", value: contributorData.radar.logique},
+    {name: "ESTH", fullName: "Esthétique", value: contributorData.radar.esthetique},
+    {name: "META", fullName: "Métaphysique", value: contributorData.radar.metaphysique},
+    {name: "SOC", fullName: "Sociologie", value: contributorData.radar.sociologie}
+  ];
+  
+  const svg = document.getElementById("radar-svg");
+  svg.innerHTML = "";
+  const cX = 125, cY = 125, maxR = 80, levels = 4;
+  const tooltip = document.getElementById('tooltip');
+  
+  for(let i = 1; i <= levels; i++){
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", cX);
+    circle.setAttribute("cy", cY);
+    circle.setAttribute("r", (maxR / levels) * i);
+    circle.setAttribute("stroke", "#FFFFFF");
+    circle.setAttribute("stroke-width", "1");
+    circle.setAttribute("fill", "none");
+    circle.setAttribute("opacity", "0.4");
+    svg.appendChild(circle);
+  }
+  
+  const pts = [];
+  
+  branches.forEach((b, i) => {
+    const angle = (i / branches.length) * 2 * Math.PI - Math.PI / 2;
+    const lx2 = cX + maxR * Math.cos(angle);
+    const ly2 = cY + maxR * Math.sin(angle);
+    
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", cX);
+    line.setAttribute("y1", cY);
+    line.setAttribute("x2", lx2);
+    line.setAttribute("y2", ly2);
+    line.setAttribute("stroke", "#FFFFFF");
+    line.setAttribute("stroke-width", "1");
+    line.setAttribute("opacity", "0.5");
+    svg.appendChild(line);
+    
+    const rad = maxR * (b.value / 100);
+    const x = cX + rad * Math.cos(angle);
+    const y = cY + rad * Math.sin(angle);
+    pts.push([x, y]);
+    
+    const lR = maxR + 28;
+    const lx = cX + lR * Math.cos(angle);
+    const ly = cY + lR * Math.sin(angle);
+    
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", lx);
+    text.setAttribute("y", ly);
+    text.textContent = b.name;
+    text.setAttribute("class", "radar-label");
+    text.style.cursor = 'help';
+    
+    const cosA = Math.cos(angle);
+    if(cosA > 0.2) text.setAttribute("text-anchor", "start");
+    else if(cosA < -0.2) text.setAttribute("text-anchor", "end");
+    else text.setAttribute("text-anchor", "middle");
+    text.setAttribute("alignment-baseline", "middle");
+    
+    // Tooltip au survol
+    text.addEventListener('mouseenter', (e) => {
+      tooltip.innerHTML = `<strong>${b.fullName}</strong>: ${b.value}%`;
+      tooltip.style.display = 'block';
+    });
+    
+    text.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.clientX + 10) + 'px';
+      tooltip.style.top = (e.clientY + 10) + 'px';
+    });
+    
+    text.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+    
+    svg.appendChild(text);
+  });
+  
+  const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  poly.setAttribute("points", pts.map(p => p.join(",")).join(" "));
+  poly.setAttribute("fill", "rgba(255, 255, 255, 0.4)");
+  poly.setAttribute("stroke", "#FFFFFF");
+  poly.setAttribute("stroke-width", "2.5");
+  svg.appendChild(poly);
+  
+  pts.forEach(([x, y]) => {
+    const pt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    pt.setAttribute("cx", x);
+    pt.setAttribute("cy", y);
+    pt.setAttribute("r", 4);
+    pt.setAttribute("class", "radar-point");
+    svg.appendChild(pt);
+  });
+}
+
+// Timeline avec score par année et articles
+function drawTimeline() {
+  const canvas = document.getElementById('timelineCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 2000;
+  canvas.height = 280;
+  const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+  const productionData = {};
+  
+  years.forEach(year => {
+    const yearKey = 'y' + year;
+    const data = contributorData[yearKey];
+    const yearArticles = contributorData.articles.filter(a => a.year === year);
+    const yearBooks = contributorData.books.filter(b => b.year === year);
+    const yearVideos = contributorData.videos.filter(v => v.year === year);
+    const score = calculateScore(year);
+    productionData[year] = {
+      score: score,
+      books: data.books,
+      articles: data.articles,
+      videos: data.videos,
+      articlesList: yearArticles,
+      booksList: yearBooks,
+      videosList: yearVideos
+    };
+  });
+  
+  // Utiliser les scores pour tracer la ligne
+  const scores = years.map(y => productionData[y].score);
+  const maxScore = Math.max(...scores, 1);
+  const padding = 50;
+  const graphWidth = canvas.width - padding * 2;
+  const graphHeight = canvas.height - padding * 2 - 80;
+  const stepX = graphWidth / (years.length - 1);
+  
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
+  for(let i = 0; i <= 5; i++){
+    const y = padding + (graphHeight / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(canvas.width - padding, y);
+    ctx.stroke();
+  }
+  
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, canvas.height - padding - 70);
+  ctx.lineTo(canvas.width - padding, canvas.height - padding - 70);
+  ctx.stroke();
+  
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '14px "Courier New"';
+  ctx.textAlign = 'right';
+  for(let i = 0; i <= 5; i++){
+    const val = Math.round((maxScore / 5) * i);
+    const y = canvas.height - padding - 70 - (graphHeight / maxScore) * val;
+    ctx.fillText(val.toLocaleString('fr-FR'), padding - 10, y + 4);
+  }
+  
+  ctx.font = 'bold 18px "Courier New"';
+  ctx.textAlign = 'center';
+  years.forEach((year, i) => {
+    const x = padding + stepX * i;
+    
+    // Année en haut
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(year, x, canvas.height - padding - 50);
+    
+    // Score avec effet arcade/high-score
+    const scoreText = `★ ${productionData[year].score.toLocaleString('fr-FR')}`;
+    ctx.font = 'bold 20px "Courier New"';
+    
+    // Fond noir derrière le score
+    const textWidth = ctx.measureText(scoreText).width;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x - textWidth/2 - 6, canvas.height - padding - 35, textWidth + 12, 24);
+    
+    // Bordure jaune
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - textWidth/2 - 6, canvas.height - padding - 35, textWidth + 12, 24);
+    
+    // Texte jaune vif
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText(scoreText, x, canvas.height - padding - 16);
+    
+    ctx.font = 'bold 18px "Courier New"';
+  });
+  
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(padding, canvas.height - padding - 70);
+  
+  const points = [];
+  years.forEach((year, i) => {
+    const x = padding + stepX * i;
+    const y = canvas.height - padding - 70 - (graphHeight / maxScore) * scores[i];
+    points.push({x, y, year, data: productionData[year]});
+    if(i === 0) ctx.lineTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  
+  ctx.lineTo(canvas.width - padding, canvas.height - padding - 70);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  
+  points.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.strokeStyle = '#0000AA';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+  
+  // Popup au survol avec score détaillé
+  const yearPopup = document.getElementById('yearPopup');
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    // Calculer le ratio entre la taille réelle du canvas et sa taille affichée
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    // Appliquer le ratio aux coordonnées de la souris
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+    let found = false;
+    
+    points.forEach(p => {
+      // Augmenter la zone de détection pour faciliter le survol
+      if (Math.sqrt((mouseX - p.x) ** 2 + (mouseY - p.y) ** 2) < 40) {
+        found = true;
+        yearPopup.style.display = 'block';
+        yearPopup.style.left = (e.clientX + 10) + 'px';
+        yearPopup.style.top = (e.clientY + 10) + 'px';
+        
+        // Calculer les détails du score
+        const yearBooks = contributorData.books.filter(b => b.year === p.year);
+        const bookPages = yearBooks.reduce((sum, b) => sum + b.pages, 0);
+        const yearArticles = contributorData.articles.filter(a => a.year === p.year);
+        const pagesPerArticle = getArticlePagesPerContributor(contributorData.name);
+        const articlePages = yearArticles.length * pagesPerArticle;
+        
+        const scoreBooks = Math.round(bookPages * 16.275);
+        const scoreArticles = Math.round(articlePages * 16.275);
+        const scoreVideos = p.data.videos * 10;
+        
+        yearPopup.innerHTML = `
+          <div class="year-popup-title">📅 ${p.year}</div>
+          <div class="year-popup-list">
+            <strong style="color: #FF0000; font-size: 16px;">⚡ SCORE: ${p.data.score.toLocaleString('fr-FR')}</strong>
+            <div style="margin-top: 10px; border-top: 1px solid #000; padding-top: 8px;">
+              📚 Livres: ${bookPages.toLocaleString('fr-FR')} pages → <strong>${scoreBooks.toLocaleString('fr-FR')} pts</strong><br>
+              ✍️ Articles: ${yearArticles.length} (${articlePages} pages) → <strong>${scoreArticles.toLocaleString('fr-FR')} pts</strong><br>
+              🎥 Vidéos: ${p.data.videos} → <strong>${scoreVideos.toLocaleString('fr-FR')} pts</strong>
+            </div>
+          </div>
+        `;
+      }
+    });
+    
+    if (!found) yearPopup.style.display = 'none';
+  });
+  
+  canvas.addEventListener('mouseleave', () => {
+    yearPopup.style.display = 'none';
+  });
+}
+
+// Badges avec effet Steam - utilise la définition centralisée du JSON
+function updateBadges() {
+  const badges = [];
+  const books = contributorData.books || [];
+  const articles = contributorData.articles || [];
+  const translations = contributorData.translations || [];
+  const videos = contributorData.videos || [];
+  const audio = contributorData.audio || [];
+  const startYear = contributorData.startYear || 2025;
+  const currentYear = new Date().getFullYear();
+  const yearData = contributorData['y' + currentYear] || {};
+  
+  // Calculer les totaux
+  const totalVideoMinutes = yearData.video_minutes || 0;
+  const totalAudioMinutes = yearData.audio_minutes || 0;
+  const totalRetweets = Object.keys(contributorData).filter(k => k.startsWith('y')).reduce((sum, k) => sum + (contributorData[k].retweets || 0), 0);
+  const totalLikes = Object.keys(contributorData).filter(k => k.startsWith('y')).reduce((sum, k) => sum + (contributorData[k].likes || 0), 0);
+  
+  // Badges de production - Livres
+  if (books.length >= 10) badges.push({ icon: '📚', name: 'BOOK MASTER', description: books.length + ' livres publiés', type: 'gold' });
+  else if (books.length >= 5) badges.push({ icon: '📚', name: 'AUTHOR', description: books.length + ' livres publiés', type: 'silver' });
+  else if (books.length >= 1) badges.push({ icon: '📖', name: 'WRITER', description: books.length + ' livre(s) publié(s)', type: 'bronze' });
+  
+  // Badges de production - Articles
+  if (articles.length >= 50) badges.push({ icon: '✍️', name: 'PROLIFIC WRITER', description: articles.length + ' articles publiés', type: 'gold' });
+  else if (articles.length >= 20) badges.push({ icon: '✍️', name: 'COLUMNIST', description: articles.length + ' articles publiés', type: 'silver' });
+  else if (articles.length >= 1) badges.push({ icon: '📝', name: 'CONTRIBUTOR', description: articles.length + ' article(s) publié(s)', type: 'bronze' });
+  
+  // Badges de traduction
+  if (translations.length >= 10) badges.push({ icon: '🌍', name: 'POLYGLOT', description: translations.length + ' traductions', type: 'gold' });
+  else if (translations.length >= 1) badges.push({ icon: '🔄', name: 'TRANSLATOR', description: translations.length + ' traduction(s)', type: 'silver' });
+  
+  // Badges vidéo
+  if (totalVideoMinutes >= 60) badges.push({ icon: '🎬', name: 'FILMMAKER', description: totalVideoMinutes + ' min de vidéo', type: 'gold' });
+  else if (totalVideoMinutes >= 10) badges.push({ icon: '📹', name: 'VIDEOGRAPHER', description: totalVideoMinutes + ' min de vidéo', type: 'silver' });
+  
+  // Badges audio
+  if (totalAudioMinutes >= 120) badges.push({ icon: '🎙️', name: 'PODCASTER', description: totalAudioMinutes + " min d'audio", type: 'gold' });
+  else if (totalAudioMinutes >= 30) badges.push({ icon: '🔊', name: 'SPEAKER', description: totalAudioMinutes + " min d'audio", type: 'silver' });
+  
+  // Badge poète (si type = Poète ou a un recueil de poésie)
+  if (contributorData.type === 'Poète') badges.push({ icon: '🪶', name: 'POET', description: 'Poète', type: 'silver' });
+  
+  // Badge influencer
+  if (totalRetweets >= 1000) badges.push({ icon: '📢', name: 'INFLUENCER', description: totalRetweets + ' RT cumulés', type: 'silver' });
+  if (totalLikes >= 10000) badges.push({ icon: '🦠', name: 'VIRAL', description: totalLikes + ' likes cumulés', type: 'gold' });
+  
+  // Badge ancienneté
+  const years = currentYear - startYear;
+  if (startYear <= 2018) badges.push({ icon: '🏛️', name: 'FOUNDER', description: 'Membre fondateur depuis ' + startYear, type: 'gold' });
+  else if (years >= 5) badges.push({ icon: '🔥', name: 'VETERAN', description: 'Membre depuis ' + startYear, type: 'silver' });
+  else if (years >= 1) badges.push({ icon: '⭐', name: 'VITALISTE', description: 'Membre depuis ' + startYear, type: 'bronze' });
+  else badges.push({ icon: '🆕', name: 'NEWCOMER', description: 'Nouveau membre', type: 'default' });
+  
+  // Badge architecte (créateur de plateforme)
+  if (contributorData.socials && (contributorData.description || '').toLowerCase().includes('plateforme')) {
+    badges.push({ icon: '🏗️', name: 'ARCHITECT', description: 'Créateur de plateforme', type: 'gold' });
+  }
+  
+  // Si aucun badge, mettre un badge par défaut
+  if (badges.length === 0) {
+    badges.push({ icon: '👤', name: 'MEMBER', description: 'Contributeur', type: 'default' });
+  }
+  
+  document.getElementById('badgesContainer').innerHTML = badges.map(badge => `
+    <span class="badge-item ${badge.type || ''}" data-description="${badge.description}">
+      ${badge.icon} ${badge.name}
+    </span>
+  `).join('');
+}
+
+// Twitter réduit
+function loadTwitterFeed() {
+  const tweetsContainer = document.getElementById('tweetsContainer');
+  tweetsContainer.innerHTML = `
+    <a class="twitter-timeline" 
+       data-height="150" 
+       data-theme="light" 
+       data-chrome="noheader nofooter noborders transparent"
+       data-tweet-limit="2"
+       data-lang="fr"
+       href="#" id="twitterLink">
+       Chargement des tweets...
+    </a>
+  `;
+  
+  if (!document.querySelector('script[src*="platform.twitter.com"]')) {
+    const script = document.createElement('script');
+    script.src = 'https://platform.twitter.com/widgets.js';
+    script.async = true;
+    script.charset = 'utf-8';
+    document.head.appendChild(script);
+  } else if (window.twttr && window.twttr.widgets) {
+    window.twttr.widgets.load();
+  }
+}
+
+// Modal
+function closeModal() {
+  const modal = document.getElementById('modalViewer');
+  const modalBody = document.getElementById('modalBody');
+  
+  // Arrêter la vidéo si elle est en cours de lecture
+  const video = modalBody.querySelector('video');
+  if (video) {
+    video.pause();
+    video.currentTime = 0;
+  }
+  
+  modal.style.display = 'none';
+  modalBody.innerHTML = '';
+  
+  // Réinitialiser la taille du modal
+  document.getElementById('modalContent').classList.remove('fullscreen');
+  document.getElementById('maximizeBtn').textContent = '□';
+  
+  // Réafficher le faux curseur
+  setTimeout(() => {
+    document.getElementById('fakeCursor').style.display = 'block';
+  }, 100);
+}
+
+// Fonction pour agrandir/réduire le modal
+function toggleMaximize() {
+  const modalContent = document.getElementById('modalContent');
+  const maximizeBtn = document.getElementById('maximizeBtn');
+  
+  if (modalContent.classList.contains('fullscreen')) {
+    modalContent.classList.remove('fullscreen');
+    maximizeBtn.textContent = '□';
+  } else {
+    modalContent.classList.add('fullscreen');
+    maximizeBtn.textContent = '❐';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeModal();
+});
+
+// Init
+let statPeriod = 'year'; // 'year' ou 'month'
+
+function showYearStats() {
+  statPeriod = 'year';
+  document.getElementById('btnStatYear').classList.add('active');
+  document.getElementById('btnStatMonth').classList.remove('active');
+  updateStats();
+}
+
+function showMonthStats() {
+  statPeriod = 'month';
+  document.getElementById('btnStatMonth').classList.add('active');
+  document.getElementById('btnStatYear').classList.remove('active');
+  updateStats();
+}
+
+function updateStats() {
+  const currentYear = new Date().getFullYear();
+  const monthKeys = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 
+                     'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
+  const currentMonthKey = monthKeys[new Date().getMonth()];
+  
+  // Récupérer les poids depuis le JSON centralisé
+  const weights = statsData.scoring?.weights || {
+    page: 15, page_traduction: 7.5, video_minute: 7, audio_minute: 3.5, retweets: 1, likes: 0.3
+  };
+  
+  if (statPeriod === 'year') {
+    // Stats de l'année
+    const yearKey = 'y' + currentYear;
+    const yearData = contributorData[yearKey] || {};
+    
+    // Pages des livres de l'année
+    const booksThisYear = (contributorData.books || []).filter(b => b.year === currentYear);
+    const pagesLivres = booksThisYear.reduce((sum, b) => sum + (b.pages || 0), 0);
+    
+    // Pages des traductions de l'année
+    const transThisYear = (contributorData.translations || []).filter(t => t.year === currentYear);
+    const pagesTrad = transThisYear.reduce((sum, t) => sum + (t.pages || 0), 0);
+    
+    // Pages des articles de l'année (depuis tableau OU depuis yXXXX.articles)
+    let pagesArticles = 0;
+    const articlesArray = contributorData.articles || [];
+    if (articlesArray.length > 0) {
+      const articlesThisYear = articlesArray.filter(a => a.year === currentYear);
+      pagesArticles = articlesThisYear.reduce((sum, a) => sum + (a.pages || 3), 0);
+    } else {
+      // Pas de tableau détaillé, utiliser le compteur yXXXX.articles × 3 pages
+      const articlesCount = yearData.articles || 0;
+      pagesArticles = articlesCount * 3;
+    }
+    
+    const videoMin = yearData.video_minutes || 0;
+    const audioMin = yearData.audio_minutes || 0;
+    
+    document.getElementById('stat-pages-livres').textContent = pagesLivres;
+    document.getElementById('stat-pages-articles').textContent = pagesArticles;
+    document.getElementById('stat-video-min').textContent = videoMin;
+    document.getElementById('stat-audio-min').textContent = audioMin;
+    document.getElementById('stat-retweets').textContent = yearData.retweets || 0;
+    document.getElementById('stat-likes').textContent = yearData.likes || 0;
+    
+    // Score avec nouvelle formule (incluant traductions)
+    const yearScore = (pagesLivres * weights.page) + 
+                      (pagesTrad * weights.page_traduction) +
+                      (pagesArticles * weights.page) + 
+                      (videoMin * weights.video_minute) + 
+                      (audioMin * weights.audio_minute) + 
+                      ((yearData.retweets || 0) * weights.retweets) + 
+                      ((yearData.likes || 0) * weights.likes);
+    document.getElementById('stat-score').textContent = Math.round(yearScore);
+    
+  } else {
+    // Stats du mois
+    const monthData = contributorData.months?.[currentMonthKey] || {};
+    
+    document.getElementById('stat-pages-livres').textContent = monthData.pages_livres || 0;
+    document.getElementById('stat-pages-articles').textContent = monthData.pages_articles || 0;
+    document.getElementById('stat-video-min').textContent = monthData.video_minutes || 0;
+    document.getElementById('stat-audio-min').textContent = monthData.audio_minutes || 0;
+    document.getElementById('stat-retweets').textContent = monthData.retweets || 0;
+    document.getElementById('stat-likes').textContent = monthData.likes || 0;
+    
+    // Score du mois avec nouvelle formule
+    const monthScore = ((monthData.pages_livres || 0) * weights.page) + 
+                       ((monthData.pages_articles || 0) * weights.page) + 
+                       ((monthData.video_minutes || 0) * weights.video_minute) + 
+                       ((monthData.audio_minutes || 0) * weights.audio_minute) + 
+                       ((monthData.retweets || 0) * weights.retweets) + 
+                       ((monthData.likes || 0) * weights.likes);
+    document.getElementById('stat-score').textContent = Math.round(monthScore);
+  }
+}
+
+function initializePage() {
+  // Remplir les infos du contributeur
+  document.getElementById('contributorName').textContent = contributorData.name;
+  
+  const alias = contributorData.alias;
+  document.getElementById('contributorAlias').textContent = alias ? 'alias "' + alias + '"' : '';
+  
+  // Socials - avec boutons par défaut
+  const socials = contributorData.socials || {};
+  let socialsHTML = '';
+  
+  // Twitter - toujours affiché
+  if (socials.twitter) {
+    socialsHTML += '<a href="' + socials.twitter + '" target="_blank" title="Voir le profil Twitter">Twitter</a>';
+  } else {
+    socialsHTML += '<a href="#" class="social-disabled" title="Pas de compte Twitter lié">Twitter</a>';
+  }
+  
+  // Site web
+  if (socials.website) {
+    socialsHTML += '<a href="' + socials.website + '" target="_blank" title="Visiter le site">Site</a>';
+  } else {
+    socialsHTML += '<a href="#" class="social-disabled" title="Pas de site web lié">Site</a>';
+  }
+  
+  // Substack
+  if (socials.substack) {
+    socialsHTML += '<a href="' + socials.substack + '" target="_blank" title="Voir le Substack">Substack</a>';
+  }
+  
+  // Amazon
+  if (socials.amazon) {
+    socialsHTML += '<a href="' + socials.amazon + '" target="_blank" title="Voir sur Amazon">Amazon</a>';
+  }
+  
+  document.getElementById('contributorSocials').innerHTML = socialsHTML;
+  
+  // Bio
+  const startYear = contributorData.startYear || 2025;
+  const desc = contributorData.description || 'Contributeur vitaliste';
+  document.getElementById('contributorBio').innerHTML = 
+    '&gt; STATUS: <span style="color: #00FF00; font-weight: bold;">● ACTIF</span><br>' +
+    '&gt; ' + desc + '<br>' +
+    '&gt; <span style="color: #FFD700;">★ Membre vitaliste depuis ' + startYear + '</span>';
+  
+  // Twitter link
+  const twitterLink = document.getElementById('twitterLink');
+  if (twitterLink && socials.twitter) {
+    twitterLink.href = socials.twitter;
+  }
+  
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleString('fr-FR');
+  
+  // Afficher le compteur de vues
+  const viewCount = contributorData.views || 0;
+  document.getElementById('viewCount').textContent = viewCount.toLocaleString('fr-FR');
+  updateStats();
+  updateBooks();
+  updateArticles();
+  updateVideos();
+  updateAudio();
+  updateBadges();
+  drawRadar();
+  drawTimeline();
+  loadTwitterFeed();
+  setTimeout(spinQuote, 500);
+}
+
+// Charger les données au démarrage
+loadData();
+</script>
+
+</body>
+</html>

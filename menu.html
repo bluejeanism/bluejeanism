@@ -5,619 +5,547 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MEN∑_404</title>
 <style>
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.96; }
-}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.96}}
+@keyframes glitch{0%{transform:translate(0)}20%{transform:translate(-2px,2px)}40%{transform:translate(-2px,-2px)}60%{transform:translate(2px,2px)}80%{transform:translate(2px,-2px)}100%{transform:translate(0)}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes bsod-glitch{0%,95%{opacity:1}96%{opacity:0}97%{opacity:1}98%{opacity:0}99%{opacity:1}}
+@keyframes doorPulse{0%,100%{box-shadow:0 0 5px rgba(255,255,255,0.1)}50%{box-shadow:0 0 15px rgba(255,255,255,0.3)}}
 
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-}
+html{height:500vh;overflow-x:hidden}
+body{margin:0;padding:0;height:100%;width:100vw;background-color:#0000AA;color:#FFF;font-family:"Courier New",monospace;position:relative;animation:flicker .15s infinite;text-shadow:0 0 2px rgba(255,255,255,.5);transition:background-color 1s ease}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(transparent,rgba(255,255,255,.1),transparent);animation:scanline 8s linear infinite;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15),rgba(0,0,0,.15) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:999}
 
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
+.main-content{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity .8s ease}
+.logo{position:absolute;top:20px;left:20px;border:2px solid #FFF;display:inline-block;padding:4px 12px;background:#0000AA;z-index:10;cursor:pointer;transition:all .2s}
+.logo:hover{background:#FFF}
+.logo:hover span{color:#0000AA}
+.logo span{background:#FFF;color:#0000AA;padding:0 4px;font-weight:bold;font-size:18px}
+.error-code{position:absolute;top:20px;right:20px;font-size:12px;opacity:.7;border:1px solid #FFF;padding:5px 10px;background:rgba(0,0,100,.5);transition:all .8s ease}
+img{max-width:50%;max-height:50vh;transition:transform .5s;margin-bottom:30px;border:3px outset #FFF;display:none;box-shadow:4px 4px 0 rgba(0,0,0,.5);position:relative;z-index:1}
+.buttons{display:flex;gap:20px;z-index:1}
+.buttons button{background:#C0C0C0;border-top:3px solid #FFF;border-left:3px solid #FFF;border-bottom:3px solid #000;border-right:3px solid #000;padding:12px 30px;font-family:"MS Sans Serif",monospace;font-size:1.1em;color:#000;cursor:pointer;font-weight:bold;box-shadow:2px 2px 0 #808080;transition:all .1s}
+.buttons button:hover{background:#DFDFDF}
+.buttons button:active{border-top:3px solid #000;border-left:3px solid #000;border-bottom:3px solid #FFF;border-right:3px solid #FFF;background:#C0C0C0;box-shadow:inset 1px 1px 2px #000;transform:translate(1px,1px)}
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: #0000AA;
-  color: #FFFFFF;
-  font-family: "Courier New", "Lucida Console", monospace;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-  animation: flicker 0.15s infinite;
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
-}
+.popup{position:fixed;width:320px;background:#C0C0C0;border-top:2px solid #FFF;border-left:2px solid #FFF;border-bottom:2px solid #000;border-right:2px solid #000;box-shadow:3px 3px 0 rgba(0,0,0,.5);font-family:"MS Sans Serif",monospace;z-index:100;cursor:default;display:none}
+.popup.glitching{animation:glitch .3s}
+.popupTitle{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:4px 8px;font-weight:bold;font-size:13px;border-bottom:2px solid #000;cursor:grab;display:flex;justify-content:space-between;align-items:center}
+.popupTitle:active{cursor:grabbing}
+.closeBtn{background:#C0C0C0;border:1px solid #000;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:bold;color:#000}
+.closeBtn:active{background:#808080}
+.popupMessage{padding:20px 15px;color:#000;font-size:13px;line-height:1.5;min-height:60px;display:flex;align-items:center}
+.popupButtons{display:flex;justify-content:center;gap:15px;padding:10px;border-top:1px solid #808080}
+.popupButtons button{background:#C0C0C0;border-top:2px solid #FFF;border-left:2px solid #FFF;border-bottom:2px solid #000;border-right:2px solid #000;padding:6px 20px;font-family:"MS Sans Serif",monospace;cursor:pointer;color:#000;font-weight:bold;min-width:80px;box-shadow:1px 1px 0 #808080}
+.popupButtons button:hover{background:#DFDFDF}
+.popupButtons button:active{border-top:2px solid #000;border-left:2px solid #000;border-bottom:2px solid #FFF;border-right:2px solid #FFF;background:#C0C0C0;box-shadow:inset 1px 1px 2px #000}
 
-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
-  animation: scanline 8s linear infinite;
-  pointer-events: none;
-  z-index: 1000;
-}
+.fake-cursor{position:fixed;width:12px;height:18px;background:#FFF;pointer-events:none;z-index:10000;mix-blend-mode:difference;display:none}
+body:hover .fake-cursor{display:block}
 
-body::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  z-index: 999;
-}
+/* La Porte - style La Linea */
+.door-container{position:fixed;bottom:50%;left:50%;transform:translate(-50%,50%);opacity:0;transition:opacity 1s;pointer-events:none;z-index:1001}
+.door-container.visible{opacity:1;pointer-events:auto}
+.door{width:60px;height:100px;background:#111;border:3px solid #fff;border-radius:3px 3px 0 0;position:relative;cursor:pointer;animation:doorPulse 2s infinite}
+.door::before{content:'';position:absolute;right:8px;top:45px;width:8px;height:8px;background:#FFD700;border-radius:50%;box-shadow:0 0 5px #FFD700}
+.door::after{content:'KNOCK';position:absolute;bottom:-25px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2px;white-space:nowrap}
+.door-frame{position:absolute;top:-5px;left:-8px;right:-8px;height:8px;background:#fff;border-radius:2px}
 
-.logo {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  border: 2px solid #FFFFFF;
-  display: inline-block;
-  padding: 4px 12px;
-  background-color: #0000AA;
-  z-index: 10;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+/* Video modal style BSOD/glitch */
+.video-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;align-items:center;justify-content:center}
+.video-modal.visible{display:flex}
+.video-modal.bsod{background:#0000AA}
+.video-modal video{max-width:90vw;max-height:90vh}
+.video-modal .close-btn{position:absolute;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-.logo:hover {
-  background: #FFFFFF;
-}
+/* Win95 video popup */
+.video-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#C0C0C0;border:2px outset #FFF;box-shadow:5px 5px 0 rgba(0,0,0,.5);z-index:2000;display:none;min-width:400px}
+.video-popup.visible{display:block}
+.video-popup.glitch-mode{animation:bsod-glitch 0.5s infinite}
+.video-popup .titlebar{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:3px 6px;font-weight:bold;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.video-popup .titlebar-btns{display:flex;gap:2px}
+.video-popup .titlebar-btn{width:16px;height:14px;background:#C0C0C0;border:2px outset #fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#000}
+.video-popup .video-content{background:#000;padding:4px}
+.video-popup video{width:100%;display:block}
 
-.logo:hover span {
-  color: #0000AA;
-}
+/* Scroll depth indicator */
+.depth-indicator{position:fixed;right:20px;top:50%;transform:translateY(-50%);width:4px;height:200px;background:rgba(255,255,255,0.1);z-index:100}
+.depth-fill{width:100%;background:#fff;transition:height 0.1s}
 
-.logo span {
-  background-color: #FFFFFF;
-  color: #0000AA;
-  padding: 0 4px;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.error-code {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 12px;
-  opacity: 0.7;
-  font-family: "Courier New", monospace;
-  border: 1px solid #FFFFFF;
-  padding: 5px 10px;
-  background-color: rgba(0, 0, 100, 0.5);
-}
-
-img {
-  max-width: 50%;
-  max-height: 50vh;
-  transition: transform 0.5s ease;
-  margin-bottom: 30px;
-  border: 3px solid #FFFFFF;
-  border-style: outset;
-  display: none;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
-  position: relative;
-  z-index: 1;
-}
-
-.buttons {
-  display: flex;
-  gap: 20px;
-  z-index: 1;
-}
-
-.buttons button {
-  background: #C0C0C0;
-  border-top: 3px solid #FFFFFF;
-  border-left: 3px solid #FFFFFF;
-  border-bottom: 3px solid #000000;
-  border-right: 3px solid #000000;
-  padding: 12px 30px;
-  font-family: "MS Sans Serif", "Lucida Console", monospace;
-  font-size: 1.1em;
-  color: #000000;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 2px 2px 0 #808080;
-  transition: all 0.1s;
-}
-
-.buttons button:hover {
-  background: #DFDFDF;
-}
-
-.buttons button:active {
-  border-top: 3px solid #000000;
-  border-left: 3px solid #000000;
-  border-bottom: 3px solid #FFFFFF;
-  border-right: 3px solid #FFFFFF;
-  background: #C0C0C0;
-  box-shadow: inset 1px 1px 2px #000000;
-  transform: translate(1px, 1px);
-}
-
-.popup {
-  position: fixed;
-  width: 320px;
-  background: #C0C0C0;
-  border-top: 2px solid #FFFFFF;
-  border-left: 2px solid #FFFFFF;
-  border-bottom: 2px solid #000000;
-  border-right: 2px solid #000000;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
-  font-family: "MS Sans Serif", "Lucida Console", monospace;
-  z-index: 100;
-  cursor: default;
-  display: none;
-}
-
-.popup.glitching {
-  animation: glitch 0.3s;
-}
-
-.popupTitle {
-  background: linear-gradient(90deg, #000080, #1084d0);
-  color: white;
-  padding: 4px 8px;
-  font-weight: bold;
-  font-size: 13px;
-  border-bottom: 2px solid #000000;
-  cursor: grab;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.popupTitle:active {
-  cursor: grabbing;
-}
-
-.closeBtn {
-  background: #C0C0C0;
-  border: 1px solid #000000;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  color: #000000;
-}
-
-.closeBtn:active {
-  background: #808080;
-}
-
-.popupMessage {
-  padding: 20px 15px;
-  color: black;
-  font-size: 13px;
-  line-height: 1.5;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-}
-
-.popupButtons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  padding: 10px;
-  border-top: 1px solid #808080;
-}
-
-.popupButtons button {
-  background: #C0C0C0;
-  border-top: 2px solid #FFFFFF;
-  border-left: 2px solid #FFFFFF;
-  border-bottom: 2px solid #000000;
-  border-right: 2px solid #000000;
-  padding: 6px 20px;
-  font-family: "MS Sans Serif", "Lucida Console", monospace;
-  cursor: pointer;
-  color: #000000;
-  font-weight: bold;
-  min-width: 80px;
-  box-shadow: 1px 1px 0 #808080;
-}
-
-.popupButtons button:hover {
-  background: #DFDFDF;
-}
-
-.popupButtons button:active {
-  border-top: 2px solid #000000;
-  border-left: 2px solid #000000;
-  border-bottom: 2px solid #FFFFFF;
-  border-right: 2px solid #FFFFFF;
-  background: #C0C0C0;
-  box-shadow: inset 1px 1px 2px #000000;
-}
-
-.fake-cursor {
-  position: fixed;
-  width: 12px;
-  height: 18px;
-  background-color: #FFFFFF;
-  pointer-events: none;
-  z-index: 10000;
-  mix-blend-mode: difference;
-  display: none;
-}
-
-body:hover .fake-cursor {
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .logo {
-    font-size: 18px;
-  }
-  
-  img {
-    max-width: 80%;
-  }
-  
-  .buttons {
-    flex-direction: column;
-  }
-  
-  .popup {
-    width: 90%;
-    max-width: 320px;
-  }
-}
+@media(max-width:768px){.logo{font-size:18px}img{max-width:80%}.buttons{flex-direction:column}.popup{width:90%;max-width:320px}}
 </style>
 </head>
 <body>
 
 <div class="fake-cursor" id="fakeCursor"></div>
+<div class="depth-indicator"><div class="depth-fill" id="depthFill" style="height:0%"></div></div>
 
-<a href="borne.html" style="text-decoration:none;">
-  <div class="logo"><span>:vitalism</span></div>
-</a>
-
-<div class="error-code">0xDEADBEEF</div>
-
+<div class="main-content" id="mainContent">
+<a href="borne.html" style="text-decoration:none"><div class="logo"><span>:vitalism</span></div></a>
+<div class="error-code" id="errorCode">0xDEADBEEF</div>
 <img id="mainImage" src="sydney.png" alt="Image" onerror="this.style.display='none'">
-
 <div class="buttons">
-  <button id="leftButton">Bluepill</button>
-  <button id="rightButton">Redpill</button>
+<button id="leftButton">Bluepill</button>
+<button id="rightButton">Redpill</button>
+</div>
 </div>
 
-<!-- Pop-up gauche -->
 <div id="popupLeft" class="popup">
-  <div class="popupTitle">
-    <span>⚠ Attention</span>
-    <div class="closeBtn" onclick="document.getElementById('popupLeft').style.display='none'">×</div>
+<div class="popupTitle"><span>⚠ Attention</span><div class="closeBtn" onclick="document.getElementById('popupLeft').style.display='none'">×</div></div>
+<div class="popupMessage">Voulez-vous vraiment abandonner et fermer l'onglet ?</div>
+<div class="popupButtons"><button id="popupLeftYes">Oui</button><button id="popupLeftNo">Non</button></div>
+</div>
+
+<!-- La Porte La Linea -->
+<div class="door-container" id="doorContainer">
+  <div class="door-frame"></div>
+  <div class="door" id="theDoor"></div>
+</div>
+
+<!-- Win95 Video Popup -->
+<div class="video-popup" id="videoPopup">
+  <div class="titlebar">
+    <span>⚠️ ERREUR SYSTÈME</span>
+    <div class="titlebar-btns">
+      <div class="titlebar-btn">_</div>
+      <div class="titlebar-btn">□</div>
+      <div class="titlebar-btn" onclick="closeVideoPopup()">×</div>
+    </div>
   </div>
-  <div class="popupMessage">Voulez-vous vraiment abandonner et fermer l'onglet ?</div>
-  <div class="popupButtons">
-    <button id="popupLeftYes">Oui</button>
-    <button id="popupLeftNo">Non</button>
+  <div class="video-content">
+    <video id="doorVideo" controls><source src="door.mp4" type="video/mp4"></video>
   </div>
 </div>
 
 <audio id="clicSound" src="click.mp3"></audio>
 
 <script>
-let stage = 0;
-const image = document.getElementById('mainImage');
-const leftButton = document.getElementById('leftButton');
-const rightButton = document.getElementById('rightButton');
-const popupLeft = document.getElementById('popupLeft');
-const clicSound = document.getElementById('clicSound');
-const fakeCursor = document.getElementById('fakeCursor');
+// ============ AUDIO CONTEXT - DRONE ============
+let audioCtx=null,droneGains=[],droneOscs=[],droneStarted=false;
+let depth=0,knockCount=0;
 
-// Curseur personnalisé carré
-document.addEventListener('mousemove', (e) => {
-  fakeCursor.style.left = e.clientX + 'px';
-  fakeCursor.style.top = e.clientY + 'px';
-});
-
-function playClick() {
-  clicSound.currentTime = 0;
-  clicSound.play().catch(() => {});
+function startDrone(){
+  if(droneStarted)return;
+  try{
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    [38,40,76,120].forEach((f,i)=>{
+      const osc=audioCtx.createOscillator();
+      osc.type=i<2?'sine':'triangle';
+      osc.frequency.value=f;
+      const gain=audioCtx.createGain();
+      gain.gain.value=0;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      droneGains.push(gain);
+      droneOscs.push(osc);
+    });
+    droneStarted=true;
+  }catch(e){console.log('Audio error',e)}
 }
 
-function updateStage() {
-  const scaleMap = [0.05, 0.4, 1, 1];
-  const textMap = ["Redpill ?", "REDPILL ???", "Tellement de retour", "Repertoire"];
-  const index = Math.min(stage - 1, scaleMap.length - 1);
-  image.style.transform = `scale(${scaleMap[index]})`;
-  rightButton.textContent = textMap[index];
-}
-
-// Bouton Gauche
-leftButton.onclick = function() {
-  playClick();
-  if(stage > 1){
-    stage--;
-    updateStage();
-  } else {
-    popupLeft.style.display = "block";
-    popupLeft.style.top = "50%";
-    popupLeft.style.left = "50%";
-    popupLeft.style.transform = "translate(-50%, -50%)";
-  }
-}
-
-// Bouton Droite
-rightButton.onclick = function() {
-  playClick();
-  stage++;
-  if(stage === 1) image.style.display = "block";
-  if(stage === 4){
-    showAllPopups();
-    return;
-  }
-  if(stage >= 4){
-    window.location.href = "repertoire.html";
-    return;
-  }
-  updateStage();
-}
-
-// Pop-up gauche
-document.getElementById('popupLeftYes').onclick = function() {
-  playClick();
-  window.close();
-  setTimeout(() => {
-    window.location.href = "about:blank";
-  }, 100);
-}
-
-document.getElementById('popupLeftNo').onclick = function() {
-  playClick();
-  popupLeft.style.display = "none";
-}
-
-// Pop-ups multiples avec les nouvelles pages
-const popupMessages = [
-  { text: "Voulez-vous accéder au répertoire ?", action: "repertoire.html", icon: "📁" },
-  { text: "Voulez-vous voir le classement ?", action: "classement.html", icon: "🥇" },
-  { text: "Avez-vous besoin d'un verre ?", action: "cocktail.html", icon: "🍹" },
-  { text: "Voulez-vous traverser la frontière ?", action: "frontiere.html", icon: "🚧" },
-  { text: "Voulez-vous vous lancer dans la vie ?", action: "vie.html", icon: "🤸" },
-  { text: "Quelles sont les nouvelles du monde ?", action: "mondial.html", icon: "🌍" },
-  { text: "Tu veux un tuyau ?", action: "tuyau.html", icon: "🔧" },
-  { text: "Voulez-vous rejoindre le chat ?", action: "chat.html", icon: "💬" },
-  { text: "Voulez-vous consulter le codex ?", action: "codex.html", icon: "📖" },
-  { text: "Voulez-vous ouvrir l'index ?", action: "borne.html", icon: "📚" },
-  { text: "Voulez-vous surfer sur Yetscape ?", action: "yetscape.html", icon: "🌐" },
-  { text: "Voulez-vous lire les archives ?", action: null, icon: "📦" },
-  { text: "Voulez-vous écrire à l'Anône ?", action: "anone.html", icon: "✉️" },
-  { text: "Voulez-vous voir les statistiques système ?", action: null, icon: "📊" },
-  { text: "Erreur 404 : Page introuvable. Continuer ?", action: null, icon: "⚠️" },
-  { text: "Voulez-vous revenir au menu principal ?", action: "alert", icon: "🏠" }
-];
-
-function showAllPopups(){
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  let zIndex = 100;
-
-  popupMessages.forEach((msgObj, idx) => {
-    setTimeout(() => {
-      const popup = document.createElement("div");
-      popup.className = "popup glitching";
-      popup.style.display = "block";
-      popup.style.zIndex = zIndex++;
-
-      const maxLeft = w - 350;
-      const maxTop = h - 200;
-      const left = Math.max(20, Math.floor(Math.random() * maxLeft));
-      const top = Math.max(20, Math.floor(Math.random() * maxTop));
-      popup.style.left = left + "px";
-      popup.style.top = top + "px";
-
-      const title = document.createElement("div");
-      title.className = "popupTitle";
-      const titleText = document.createElement("span");
-      titleText.textContent = msgObj.icon + " " + (msgObj.action === "alert" ? "Erreur" : "Question");
-      title.appendChild(titleText);
-      
-      const closeBtn = document.createElement("div");
-      closeBtn.className = "closeBtn";
-      closeBtn.textContent = "×";
-      closeBtn.onclick = () => {
-        playClick();
-        document.body.removeChild(popup);
-      };
-      title.appendChild(closeBtn);
-
-      const message = document.createElement("div");
-      message.className = "popupMessage";
-      message.textContent = msgObj.text;
-
-      const buttonsDiv = document.createElement("div");
-      buttonsDiv.className = "popupButtons";
-
-      const yesBtn = document.createElement("button");
-      yesBtn.textContent = "Oui";
-      yesBtn.onclick = () => {
-        playClick();
-        document.body.removeChild(popup);
-        
-        if(msgObj.action === "repertoire.html") {
-          window.location.href = "repertoire.html";
-        } else if(msgObj.action === "chat.html") {
-          window.open("https://vitalism.forumactif.com/chatbox/", "_blank");
-        } else if(msgObj.action === "codex.html") {
-          window.location.href = "codex.html";
-		} else if(msgObj.action === "anone.html") {
-          window.location.href = "anone.html";
-		} else if(msgObj.action === "classement.html") {
-          window.location.href = "classement.html";
-		} else if(msgObj.action === "cocktail.html") {
-          window.location.href = "cocktail.html";
-		} else if(msgObj.action === "frontiere.html") {
-          window.location.href = "frontiere.html";
-		} else if(msgObj.action === "mondial.html") {
-          window.location.href = "mondial.html";
-		} else if(msgObj.action === "tuyau.html") {
-          window.location.href = "tuyau.html";
-		} else if(msgObj.action === "vie.html") {
-          window.location.href = "vie.html";
-        } else if(msgObj.action === "borne.html") {
-          window.location.href = "borne.html";
-        } else if(msgObj.action === "yetscape.html") {
-          window.location.href = "yetscape.html";
-        } else if(msgObj.action === "alert") {
-          alert("Ce site ne propose pas de menu principal, c'est con ! ¯\\_(ツ)_/¯");
-        } else if(!msgObj.action) {
-          setTimeout(() => {
-            const errorPopup = createErrorPopup("Fonctionnalité non disponible", "Cette section est en construction.");
-            document.body.appendChild(errorPopup);
-            makeDraggable(errorPopup);
-          }, 100);
-        }
-      };
-
-      const noBtn = document.createElement("button");
-      noBtn.textContent = "Non";
-      noBtn.onclick = () => {
-        playClick();
-        document.body.removeChild(popup);
-      };
-
-      buttonsDiv.appendChild(yesBtn);
-      buttonsDiv.appendChild(noBtn);
-
-      popup.appendChild(title);
-      popup.appendChild(message);
-      popup.appendChild(buttonsDiv);
-
-      document.body.appendChild(popup);
-
-      makeDraggable(popup);
-      
-      popup.onclick = () => {
-        popup.style.zIndex = ++zIndex;
-      };
-    }, idx * 150);
+function updateDrone(d){
+  if(!droneStarted||!audioCtx)return;
+  const intensity=Math.pow(d,1.5);
+  droneGains[0]?.gain.setTargetAtTime(intensity*.08,audioCtx.currentTime,.1);
+  droneGains[1]?.gain.setTargetAtTime(intensity*.06,audioCtx.currentTime,.1);
+  droneGains[2]?.gain.setTargetAtTime(intensity*.04,audioCtx.currentTime,.1);
+  droneGains[3]?.gain.setTargetAtTime(intensity*.03,audioCtx.currentTime,.1);
+  // Modulate frequencies slightly based on depth
+  droneOscs.forEach((osc,i)=>{
+    const base=[38,40,76,120][i];
+    osc.frequency.setTargetAtTime(base+d*5*Math.sin(Date.now()/1000+i),audioCtx.currentTime,.1);
   });
 }
 
-function createErrorPopup(title, message) {
-  const popup = document.createElement("div");
-  popup.className = "popup";
-  popup.style.display = "block";
-  popup.style.left = "50%";
-  popup.style.top = "50%";
-  popup.style.transform = "translate(-50%, -50%)";
-  popup.style.zIndex = 1000;
+// ============ COLORS FOR DEPTH ============
+const colors=[
+  {bg:'#0000AA',text:'#FFFFFF'},
+  {bg:'#1a0044',text:'#ddccff'},
+  {bg:'#2a0808',text:'#ffaaaa'},
+  {bg:'#1a0600',text:'#cc6633'},
+  {bg:'#0a0400',text:'#553311'},
+  {bg:'#030101',text:'#0a0505'},
+  {bg:'#000000',text:'#000000'}
+];
 
-  const titleDiv = document.createElement("div");
-  titleDiv.className = "popupTitle";
-  titleDiv.innerHTML = `<span>⚠️ ${title}</span>`;
+function lerp(a,b,t){return a+(b-a)*t}
+function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+function rgbStr(r,g,b){return`rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`}
+
+function getColor(d){
+  const seg=d*(colors.length-1),i=Math.min(Math.floor(seg),colors.length-2),t=seg-i;
+  const[r1,g1,b1]=hexToRgb(colors[i].bg),[r2,g2,b2]=hexToRgb(colors[i+1].bg);
+  const[tr1,tg1,tb1]=hexToRgb(colors[i].text),[tr2,tg2,tb2]=hexToRgb(colors[i+1].text);
+  return{bg:rgbStr(lerp(r1,r2,t),lerp(g1,g2,t),lerp(b1,b2,t)),text:rgbStr(lerp(tr1,tr2,t),lerp(tg1,tg2,t),lerp(tb1,tb2,t))};
+}
+
+const errorCodes=['0xDEADBEEF','0xCAFEBABE','0xDEADC0DE','0x666','0x000000','VOID','NULL','?????'];
+
+function updateDepth(){
+  const c=getColor(depth);
+  document.body.style.backgroundColor=c.bg;
+  document.body.style.color=c.text;
   
-  const closeBtn = document.createElement("div");
-  closeBtn.className = "closeBtn";
-  closeBtn.textContent = "×";
-  closeBtn.onclick = () => document.body.removeChild(popup);
-  titleDiv.appendChild(closeBtn);
+  document.getElementById('mainContent').style.opacity=Math.max(0,1-depth*2);
+  document.getElementById('depthFill').style.height=(depth*100)+'%';
+  
+  const ec=document.getElementById('errorCode');
+  ec.textContent=errorCodes[Math.min(Math.floor(depth*errorCodes.length),errorCodes.length-1)];
+  ec.style.opacity=Math.max(0,1-depth*1.5);
+  
+  // Show door when depth > 0.7
+  const doorContainer=document.getElementById('doorContainer');
+  if(depth>0.7){
+    doorContainer.classList.add('visible');
+  }else{
+    doorContainer.classList.remove('visible');
+  }
+  
+  updateDrone(depth);
+}
 
-  const messageDiv = document.createElement("div");
-  messageDiv.className = "popupMessage";
-  messageDiv.textContent = message;
+// ============ SCROLL HANDLER ============
+let scrollTimeout;
+let lastScrollY = 0;
+window.addEventListener('scroll',()=>{
+  startDrone();
+  const maxScroll=document.documentElement.scrollHeight-window.innerHeight;
+  depth=Math.min(1,window.scrollY/maxScroll);
+  updateDepth();
+  
+  // Buzzing sound on scroll
+  if(audioCtx && Math.abs(window.scrollY - lastScrollY) > 5){
+    const buzz = audioCtx.createOscillator();
+    const buzzGain = audioCtx.createGain();
+    buzz.type = 'sawtooth';
+    buzz.frequency.value = 60 + depth * 40;
+    buzzGain.gain.value = 0.03 + depth * 0.02;
+    buzz.connect(buzzGain);
+    buzzGain.connect(audioCtx.destination);
+    buzz.start();
+    buzzGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+    setTimeout(() => buzz.stop(), 80);
+    lastScrollY = window.scrollY;
+  }
+  
+  clearTimeout(scrollTimeout);
+  scrollTimeout=setTimeout(()=>{
+    // Fade drone when not scrolling
+  },500);
+},{passive:true});
 
-  const buttonsDiv = document.createElement("div");
-  buttonsDiv.className = "popupButtons";
-  const okBtn = document.createElement("button");
-  okBtn.textContent = "OK";
-  okBtn.onclick = () => {
-    playClick();
-    document.body.removeChild(popup);
+// ============ DOOR INTERACTION ============
+const theDoor=document.getElementById('theDoor');
+const videoPopup=document.getElementById('videoPopup');
+const doorVideo=document.getElementById('doorVideo');
+
+theDoor.addEventListener('click',()=>{
+  knockCount++;
+  
+  // Visual knock effect
+  theDoor.style.transform='scale(0.95)';
+  setTimeout(()=>theDoor.style.transform='',100);
+  
+  // Play wood knock sound
+  if(audioCtx){
+    const knock=audioCtx.createOscillator();
+    const knockGain=audioCtx.createGain();
+    const knockFilter=audioCtx.createBiquadFilter();
+    knock.type='triangle';
+    knock.frequency.value=120+Math.random()*30;
+    knockFilter.type='lowpass';
+    knockFilter.frequency.value=800;
+    knockGain.gain.value=0.4;
+    knock.connect(knockFilter);
+    knockFilter.connect(knockGain);
+    knockGain.connect(audioCtx.destination);
+    knock.start();
+    knockGain.gain.setTargetAtTime(0,audioCtx.currentTime,0.08);
+    knock.frequency.setTargetAtTime(60,audioCtx.currentTime,0.05);
+    setTimeout(()=>knock.stop(),120);
+  }
+  
+  if(knockCount>=3){
+    // Show multi-screen surveillance effect
+    setTimeout(()=>{
+      showSurveillanceScreens();
+    },500);
+    knockCount=0;
+  }
+});
+
+function showSurveillanceScreens(){
+  // Play menu.mp3 ambient sound
+  const menuAudio = new Audio('menu.mp3');
+  menuAudio.volume = 0.5;
+  menuAudio.loop = true;
+  menuAudio.play().catch(()=>{});
+  
+  const overlay=document.createElement('div');
+  overlay.id='surveillanceOverlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:3000;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4px;padding:20px;';
+  
+  const screens=[
+    {delay:0,label:'CAM-01'},
+    {delay:1000,label:'CAM-02'},
+    {delay:500,label:'CAM-03'},
+    {delay:1500,label:'CAM-04'},
+    {delay:800,label:'CAM-05'},
+    {delay:1200,label:'CAM-06'}
+  ];
+  
+  screens.forEach((s,i)=>{
+    const screen=document.createElement('div');
+    screen.style.cssText='background:#111;border:2px solid #333;position:relative;overflow:hidden;';
+    screen.innerHTML=`
+      <div class="cam-label" style="position:absolute;top:5px;left:5px;color:#0f0;font-size:10px;font-family:monospace;z-index:1;cursor:pointer">${s.label}</div>
+      <div style="position:absolute;top:5px;right:5px;color:#f00;font-size:8px;animation:blink 1s infinite">●REC</div>
+      <video style="width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s;filter:grayscale(50%) contrast(1.2)" muted></video>
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.1),rgba(0,0,0,0.1) 2px,transparent 2px,transparent 4px);pointer-events:none"></div>
+    `;
+    // SECRET: brouha.mp4 - cliquer sur CAM-03
+    if(s.label==='CAM-03'){
+      screen.querySelector('.cam-label').onclick=()=>{
+        const popup=document.createElement('div');
+        popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:5000';
+        popup.innerHTML='<video src="brouha.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+        popup.onclick=()=>popup.remove();
+        document.body.appendChild(popup);
+      };
+    }
+    const vid=screen.querySelector('video');
+    vid.src='door.mp4';
+    setTimeout(()=>{
+      vid.style.opacity='1';
+      vid.play();
+    },s.delay);
+    overlay.appendChild(screen);
+  });
+  
+  const closeBtn=document.createElement('div');
+  closeBtn.style.cssText='position:fixed;top:10px;right:10px;color:#fff;font-size:24px;cursor:pointer;z-index:3001;border:1px solid #fff;width:30px;height:30px;display:flex;align-items:center;justify-content:center;';
+  closeBtn.textContent='×';
+  closeBtn.onclick=()=>{
+    overlay.querySelectorAll('video').forEach(v=>v.pause());
+    if(menuAudio){menuAudio.pause();menuAudio.currentTime=0;}
+    overlay.remove();
+    closeBtn.remove();
   };
-  buttonsDiv.appendChild(okBtn);
-
-  popup.appendChild(titleDiv);
-  popup.appendChild(messageDiv);
-  popup.appendChild(buttonsDiv);
-
-  return popup;
-}
-
-function makeDraggable(elmnt) {
-  const header = elmnt.querySelector(".popupTitle");
-  let offsetX = 0, offsetY = 0, mouseX = 0, mouseY = 0;
-
-  header.onmousedown = dragMouseDown;
-
-  function dragMouseDown(e){
-    e.preventDefault();
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    document.onmouseup = closeDragElement;
-    document.onmousemove = elementDrag;
-    header.style.cursor = "grabbing";
-  }
-
-  function elementDrag(e){
-    e.preventDefault();
-    offsetX = mouseX - e.clientX;
-    offsetY = mouseY - e.clientY;
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    elmnt.style.top = (elmnt.offsetTop - offsetY) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - offsetX) + "px";
-    elmnt.style.transform = "none";
-  }
-
-  function closeDragElement(){
-    document.onmouseup = null;
-    document.onmousemove = null;
-    header.style.cursor = "grab";
-  }
-}
-
-// Easter egg : Konami code
-let konamiCode = [];
-const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-
-document.addEventListener('keydown', (e) => {
-  konamiCode.push(e.key);
-  konamiCode = konamiCode.slice(-10);
   
-  if (konamiCode.join(',') === konamiSequence.join(',')) {
-    const popup = createErrorPopup("Code secret activé !", "Vous avez découvert un easter egg. Bien joué !");
+  // Store audio reference on overlay for cleanup
+  overlay.menuAudio = menuAudio;
+  
+  document.body.appendChild(overlay);
+  document.body.appendChild(closeBtn);
+}
+
+function closeVideoPopup(){
+  videoPopup.classList.remove('visible');
+  doorVideo.pause();
+  doorVideo.currentTime=0;
+}
+
+doorVideo.addEventListener('ended',()=>{
+  closeVideoPopup();
+});
+
+// ============ MENU NORMAL ============
+let stage=0;
+const image=document.getElementById('mainImage');
+const leftButton=document.getElementById('leftButton');
+const rightButton=document.getElementById('rightButton');
+const popupLeft=document.getElementById('popupLeft');
+const clicSound=document.getElementById('clicSound');
+const fakeCursor=document.getElementById('fakeCursor');
+
+document.addEventListener('mousemove',e=>{fakeCursor.style.left=e.clientX+'px';fakeCursor.style.top=e.clientY+'px';});
+
+function playClick(){clicSound.currentTime=0;clicSound.play().catch(()=>{});}
+
+function updateStage(){
+  const scaleMap=[0.05,.4,1,1];
+  const textMap=["Redpill ?","REDPILL ???","Tellement de retour","Repertoire"];
+  const i=Math.min(stage-1,scaleMap.length-1);
+  image.style.transform=`scale(${scaleMap[i]})`;
+  rightButton.textContent=textMap[i];
+}
+
+leftButton.onclick=function(){
+  if(depth>.1)return;
+  playClick();
+  if(stage>1){stage--;updateStage();}
+  else{popupLeft.style.display="block";popupLeft.style.top="50%";popupLeft.style.left="50%";popupLeft.style.transform="translate(-50%,-50%)";}
+}
+
+rightButton.onclick=function(){
+  if(depth>.1)return;
+  playClick();
+  stage++;
+  if(stage===1)image.style.display="block";
+  if(stage===4){showAllPopups();return;}
+  if(stage>=4){location.href="repertoire.html";return;}
+  updateStage();
+}
+
+document.getElementById('popupLeftYes').onclick=function(){playClick();window.close();setTimeout(()=>location.href="about:blank",100);}
+document.getElementById('popupLeftNo').onclick=function(){playClick();popupLeft.style.display="none";}
+
+const popupMessages=[
+  {text:"Voulez-vous accéder au répertoire ?",action:"repertoire.html",icon:"📁"},
+  {text:"Voulez-vous voir le classement ?",action:"classement.html",icon:"🥇"},
+  {text:"Avez-vous besoin d'un verre ?",action:"cocktail.html",icon:"🍹"},
+  {text:"Voulez-vous traverser la frontière ?",action:"frontiere.html",icon:"🚧"},
+  {text:"Voulez-vous vous lancer dans la vie ?",action:"vie.html",icon:"🤸"},
+  {text:"Quelles sont les nouvelles du monde ?",action:"mondial.html",icon:"🌍"},
+  {text:"Tu veux un tuyau ?",action:"tuyau.html",icon:"🔧"},
+  {text:"Voulez-vous rejoindre le chat ?",action:"chat.html",icon:"💬"},
+  {text:"Voulez-vous consulter le codex ?",action:"codex.html",icon:"📖"},
+  {text:"Voulez-vous ouvrir l'index ?",action:"borne.html",icon:"📚"},
+  {text:"Voulez-vous surfer sur Yetscape ?",action:"yetscape.html",icon:"🌐"},
+  {text:"Voulez-vous lire les archives ?",action:null,icon:"📦"},
+  {text:"Voulez-vous écrire à l'Anône ?",action:"anone.html",icon:"✉️"},
+  {text:"Voulez-vous postuler ?",action:"candidature.html",icon:"📝"},
+  {text:"Voulez-vous tenter votre chance ?",action:"casino.html",icon:"🎰"},
+  {text:"Voulez-vous entrer quelque part ?",action:"cockpit.html",icon:"🛩️"},
+  {text:"Voulez-vous visualiser ?",action:"duf.html",icon:"📰"},
+  {text:"Voulez-vous être tenu au courant ?",action:"evenement.html",icon:"📅"},
+  {text:"Voulez-vous consulter les horaires ?",action:"metro.html",icon:"🚇"},
+  {text:"Voulez-vous vous voir vraiment ?",action:"miroir.html",icon:"🪞"},
+  {text:"Voulez-vous observer la vie artificielle ?",action:"boids.html",icon:"🐦"},
+  {text:"Êtes-vous prêt ?",action:"volant.html",icon:"🏎️"},
+  {text:"Quel est l'intérêt de ce protocole ?",action:"hsp.html",icon:"🧠"},
+  {text:"Voulez-vous voir les statistiques système ?",action:"stat.html",icon:"📊"},
+  {text:"Erreur 404 : Page introuvable. Continuer ?",action:null,icon:"⚠️"},
+  {text:"Voulez-vous revenir au menu principal ?",action:"alert",icon:"🏠"}
+];
+
+function showAllPopups(){
+  const w=innerWidth,h=innerHeight;let z=100;
+  popupMessages.forEach((m,idx)=>{
+    setTimeout(()=>{
+      const p=document.createElement("div");
+      p.className="popup glitching";p.style.display="block";p.style.zIndex=z++;
+      p.style.left=Math.max(20,Math.floor(Math.random()*(w-350)))+"px";
+      p.style.top=Math.max(20,Math.floor(Math.random()*(h-200)))+"px";
+      
+      const t=document.createElement("div");t.className="popupTitle";
+      const ts=document.createElement("span");ts.textContent=m.icon+" "+(m.action==="alert"?"Erreur":"Question");t.appendChild(ts);
+      const cb=document.createElement("div");cb.className="closeBtn";cb.textContent="×";cb.onclick=()=>{playClick();document.body.removeChild(p);};t.appendChild(cb);
+      
+      const msg=document.createElement("div");msg.className="popupMessage";msg.textContent=m.text;
+      const btns=document.createElement("div");btns.className="popupButtons";
+      
+      const yes=document.createElement("button");yes.textContent="Oui";
+      yes.onclick=()=>{
+        playClick();document.body.removeChild(p);
+        if(m.action&&m.action!=="alert"&&m.action!==null){
+          if(m.action==="chat.html")window.open("https://vitalism.forumactif.com/chatbox/","_blank");
+          else location.href=m.action;
+        }else if(m.action==="alert"){
+          alert("Ce site ne propose pas de menu principal, c'est con ! ¯\\_(ツ)_/¯");
+        }else{
+          const ep=createErrorPopup("Fonctionnalité non disponible","Cette section est en construction.");
+          document.body.appendChild(ep);makeDraggable(ep);
+        }
+      };
+      
+      const no=document.createElement("button");no.textContent="Non";no.onclick=()=>{playClick();document.body.removeChild(p);};
+      btns.appendChild(yes);btns.appendChild(no);
+      p.appendChild(t);p.appendChild(msg);p.appendChild(btns);
+      document.body.appendChild(p);makeDraggable(p);
+      p.onclick=()=>{p.style.zIndex=++z;};
+    },idx*150);
+  });
+}
+
+function createErrorPopup(title,message){
+  const p=document.createElement("div");p.className="popup";p.style.display="block";p.style.left="50%";p.style.top="50%";p.style.transform="translate(-50%,-50%)";p.style.zIndex=1000;
+  const t=document.createElement("div");t.className="popupTitle";t.innerHTML=`<span>⚠️ ${title}</span>`;
+  const cb=document.createElement("div");cb.className="closeBtn";cb.textContent="×";cb.onclick=()=>document.body.removeChild(p);t.appendChild(cb);
+  const m=document.createElement("div");m.className="popupMessage";m.textContent=message;
+  const b=document.createElement("div");b.className="popupButtons";
+  const ok=document.createElement("button");ok.textContent="OK";ok.onclick=()=>{playClick();document.body.removeChild(p);};b.appendChild(ok);
+  p.appendChild(t);p.appendChild(m);p.appendChild(b);
+  return p;
+}
+
+function makeDraggable(el){
+  const h=el.querySelector(".popupTitle");let ox=0,oy=0,mx=0,my=0;
+  h.onmousedown=e=>{e.preventDefault();mx=e.clientX;my=e.clientY;document.onmouseup=()=>{document.onmouseup=null;document.onmousemove=null;h.style.cursor="grab";};document.onmousemove=e=>{e.preventDefault();ox=mx-e.clientX;oy=my-e.clientY;mx=e.clientX;my=e.clientY;el.style.top=(el.offsetTop-oy)+"px";el.style.left=(el.offsetLeft-ox)+"px";el.style.transform="none";};h.style.cursor="grabbing";};
+}
+
+// GISCARD Easter Egg - Triple click on logo
+let logoClickCount = 0;
+let logoClickTimer = null;
+document.querySelector('.logo').addEventListener('click', (e) => {
+  logoClickCount++;
+  if(logoClickTimer) clearTimeout(logoClickTimer);
+  
+  if(logoClickCount >= 3) {
+    e.preventDefault();
+    e.stopPropagation();
+    logoClickCount = 0;
+    showGiscardVideo();
+    return false;
+  }
+  
+  logoClickTimer = setTimeout(() => {
+    if(logoClickCount < 3) {
+      // Normal navigation
+      window.location.href = 'borne.html';
+    }
+    logoClickCount = 0;
+  }, 400);
+  
+  e.preventDefault();
+});
+
+function showGiscardVideo() {
+  const popup = document.createElement('div');
+  popup.className = 'video-popup visible';
+  popup.innerHTML = `
+    <div class="titlebar">
+      <span>📺 ARCHIVE</span>
+      <div class="titlebar-btns">
+        <div class="titlebar-btn" onclick="this.closest('.video-popup').remove()">×</div>
+      </div>
+    </div>
+    <div class="video-content">
+      <video controls autoplay style="width:500px"><source src="giscard.mp4" type="video/mp4"></video>
+    </div>
+  `;
+  document.body.appendChild(popup);
+}
+
+updateDepth();
+
+// SECRET: brouha.mp4 - cliquer 10 fois rapidement sur n'importe quel écran (en moins de 3 secondes)
+let clickTimes = [];
+document.addEventListener('click', e => {
+  const now = Date.now();
+  clickTimes.push(now);
+  // Garder seulement les clics des 3 dernières secondes
+  clickTimes = clickTimes.filter(t => now - t < 3000);
+  
+  if (clickTimes.length >= 10) {
+    clickTimes = [];
+    const popup = document.createElement('div');
+    popup.className = 'video-popup visible';
+    popup.innerHTML = `
+      <div class="titlebar">
+        <span>🔊 BROUHA</span>
+        <div class="titlebar-btns">
+          <div class="titlebar-btn" onclick="this.closest('.video-popup').remove()">×</div>
+        </div>
+      </div>
+      <div class="video-content">
+        <video controls autoplay style="width:500px"><source src="brouha.mp4" type="video/mp4"></video>
+      </div>
+    `;
     document.body.appendChild(popup);
-    makeDraggable(popup);
-    konamiCode = [];
   }
 });
 </script>
-
 </body>
 </html>

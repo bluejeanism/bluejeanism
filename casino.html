@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C@S1N0.EXE - Slot Machine</title>
+<style>
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+@keyframes jackpot { 0%,100%{transform:scale(1);color:#FFD700;}50%{transform:scale(1.1);color:#FF0000;} }
+@keyframes glitchVideo { 0%,100%{filter:none;}25%{filter:hue-rotate(90deg);}50%{filter:invert(1);}75%{filter:saturate(3);} }
+@keyframes reelSpinAnim { 0%{transform:translateY(0);}100%{transform:translateY(-60px);} }
+
+* { box-sizing: border-box; }
+body {
+  background-color: #0000AA; color: #FFFFFF; font-family: "Courier New", monospace;
+  font-size: 14px; margin: 0; padding: 40px; min-height: 100vh;
+  animation: flicker 0.15s infinite; text-shadow: 0 0 2px rgba(255,255,255,0.5);
+  position: relative; overflow-x: hidden;
+  cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="8" cy="8" r="6" fill="white"/></svg>') 8 8, auto;
+}
+body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite; pointer-events: none; z-index: 1000; }
+body::after { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events: none; z-index: 999; }
+.content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+.logo { border: 2px solid #FFFFFF; display: inline-block; padding: 4px 16px; margin-bottom: 20px; text-decoration:none; color:inherit; }
+.logo span { background-color: #FFFFFF; color: #0000AA; padding: 0 4px; font-weight: bold; }
+.logo:hover { background: #FFFFFF; }
+.error-line { font-size: 12px; color: #AAAAAA; margin: 5px 0; }
+.machine-container { display: flex; gap: 20px; align-items: stretch; margin-top: 20px; }
+.machine-window { background: #C0C0C0; border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080; box-shadow: 4px 4px 0 #000000; flex: 1; }
+.window-title { background: linear-gradient(90deg, #000080, #1084d0); color: #FFFFFF; padding: 4px 8px;
+  font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+.title-btns { display: flex; gap: 2px; }
+.title-btn { width: 16px; height: 14px; background: #C0C0C0; border-top: 2px solid #FFFFFF;
+  border-left: 2px solid #FFFFFF; border-bottom: 2px solid #808080; border-right: 2px solid #808080;
+  font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000; }
+.machine-content { padding: 15px; }
+.credits-display { background: #000000; border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF; padding: 10px; margin-bottom: 15px;
+  display: flex; justify-content: space-between; color: #00FF00; font-size: 16px; }
+.reels-container { background: #000000; border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF; padding: 20px;
+  display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+.reel { width: 90px; height: 110px; background: #1a1a1a; border: 3px solid #444;
+  display: flex; align-items: center; justify-content: center; font-size: 55px;
+  overflow: hidden; position: relative; cursor: grab; user-select: none; }
+.reel:active { cursor: grabbing; }
+.reel.winner { border-color: #FFD700; box-shadow: 0 0 15px #FFD700; }
+.reel.spinning .symbol { animation: reelSpinAnim 0.1s linear infinite; }
+.lever-container { width: 80px; background: #8B0000; border-top: 2px solid #FF6666;
+  border-left: 2px solid #FF6666; border-bottom: 2px solid #400000; border-right: 2px solid #400000;
+  display: flex; flex-direction: column; align-items: center; padding: 15px 10px;
+  box-shadow: 4px 4px 0 #000000; border-radius: 5px; }
+.lever-track { width: 16px; height: 180px; background: linear-gradient(90deg, #222, #444, #222);
+  border: 2px solid #111; position: relative; border-radius: 8px; }
+.lever-handle { width: 55px; height: 55px; background: radial-gradient(circle at 35% 35%, #ff6666, #cc0000, #880000);
+  border-radius: 50%; position: absolute; left: 50%; transform: translateX(-50%); top: 5px; cursor: grab;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 -8px 15px rgba(0,0,0,0.4), inset 0 8px 15px rgba(255,255,255,0.2);
+  transition: top 0.15s ease-out; border: 3px solid #660000; }
+.lever-handle:active { cursor: grabbing; }
+.lever-handle.pulled { top: 115px; }
+.lever-label { color: #FFD700; font-size: 9px; font-weight: bold; text-align: center; margin-top: 15px; letter-spacing: 1px; }
+.controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; }
+.btn { padding: 8px 20px; background: #C0C0C0; border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080; font-family: "Courier New", monospace;
+  font-size: 12px; cursor: pointer; color: #000; }
+.btn:active { border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF; }
+.btn.spin-btn { background: #008000; color: #FFFFFF; font-size: 16px; padding: 12px 40px; }
+.btn.spin-btn:disabled { background: #808080; }
+.bet-selector { display: flex; gap: 5px; align-items: center; color: #000; }
+.bet-btn { padding: 5px 12px; }
+.bet-btn.active { background: #000080; color: #FFFFFF; }
+.win-display { background: #000000; border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF; padding: 15px; text-align: center; min-height: 60px; }
+.win-display.jackpot { animation: jackpot 0.3s infinite; }
+.win-amount { font-size: 28px; color: #FFD700; }
+.paytable { background: #FFFFFF; border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF; padding: 10px; margin-top: 15px;
+  color: #000; font-size: 11px; }
+.paytable-title { font-weight: bold; margin-bottom: 8px; color: #000080; }
+.paytable-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #CCC; }
+.paytable-row:last-child { border-bottom: none; }
+.paytable-row.secret { color: #228B22; font-style: italic; }
+.status-bar { background: #C0C0C0; border-top: 2px solid #FFFFFF; padding: 4px 8px;
+  display: flex; justify-content: space-between; font-size: 11px; color: #000; }
+.status-section { border-left: 2px solid #808080; border-top: 2px solid #808080;
+  border-right: 2px solid #FFFFFF; border-bottom: 2px solid #FFFFFF; padding: 2px 6px; }
+.hint { font-size: 10px; color: #888; margin-top: 10px; text-align: center; font-style: italic; }
+.video-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: #C0C0C0; border: 2px outset #FFFFFF; box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
+  z-index: 2000; display: none; }
+.video-popup.visible { display: block; }
+.video-popup.glitch video { animation: glitchVideo 0.3s infinite; }
+.video-popup .titlebar { background: linear-gradient(90deg, #000080, #1084d0); color: #fff;
+  padding: 3px 6px; font-weight: bold; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+.video-popup .titlebar-btns { display: flex; gap: 2px; }
+.video-popup .titlebar-btn { width: 16px; height: 14px; background: #C0C0C0; border: 2px outset #fff;
+  font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000; }
+.video-popup .video-content { background: #000; padding: 4px; }
+.video-popup video { width: 450px; display: block; }
+</style>
+</head>
+<body>
+<div class="content">
+  <a href="borne.html" class="logo"><span>:vitalism</span></a>
+  <div class="error-line">*** GAMBLING_MODULE loaded at 0x534C0754 ***</div>
+  <div class="machine-container">
+    <div class="machine-window">
+      <div class="window-title">
+        <span>🎰 VITALISM SLOT MACHINE v2.0</span>
+        <div class="title-btns">
+          <div class="title-btn">_</div><div class="title-btn">□</div>
+          <div class="title-btn" onclick="window.location.href='menu.html'">X</div>
+        </div>
+      </div>
+      <div class="machine-content">
+        <div class="credits-display">
+          <span>CRÉDITS: <span id="credits">1000</span></span>
+          <span>MISE: <span id="currentBet">10</span></span>
+        </div>
+        <div class="reels-container">
+          <div class="reel" id="reel1"><span class="symbol">📚</span></div>
+          <div class="reel" id="reel2"><span class="symbol">✍️</span></div>
+          <div class="reel" id="reel3"><span class="symbol">🏆</span></div>
+        </div>
+        <div class="controls">
+          <div class="bet-selector">
+            <span>MISE:</span>
+            <button class="btn bet-btn active" onclick="setBet(10)">10</button>
+            <button class="btn bet-btn" onclick="setBet(25)">25</button>
+            <button class="btn bet-btn" onclick="setBet(50)">50</button>
+            <button class="btn bet-btn" onclick="setBet(100)">100</button>
+            <button class="btn bet-btn" onclick="setBet(250)">250</button>
+            <button class="btn bet-btn" onclick="setBet(500)">MAX</button>
+          </div>
+        </div>
+        <div class="win-display" id="winDisplay">
+          <div style="color:#808080;font-size:12px;">DERNIER GAIN</div>
+          <div class="win-amount" id="winAmount">0</div>
+        </div>
+        <div class="paytable">
+          <div class="paytable-title">📋 TABLE DES GAINS</div>
+          <div class="paytable-row"><span>🏆🏆🏆 JACKPOT</span><span>x100</span></div>
+          <div class="paytable-row"><span>📚📚📚 Bibliothèque</span><span>x50</span></div>
+          <div class="paytable-row"><span>🌟🌟🌟 Étoiles</span><span>x30</span></div>
+          <div class="paytable-row"><span>✍️✍️✍️ Plume</span><span>x25</span></div>
+          <div class="paytable-row"><span>🔥🔥🔥 Grind</span><span>x10</span></div>
+          <div class="paytable-row"><span>2 identiques</span><span>x2</span></div>
+          <div class="paytable-row secret"><span>🍀🍀🍀 ???</span><span>???</span></div>
+        </div>
+        <div class="hint">Astuce: Faites tourner les roues avec la souris...</div>
+      </div>
+      <div class="status-bar">
+        <span class="status-section">CASINO.SYS</span>
+        <span class="status-section" id="spinsCount">Spins: 0</span>
+        <span class="status-section" id="clock">--:--</span>
+      </div>
+    </div>
+    <div class="lever-container">
+      <div class="lever-track">
+        <div class="lever-handle" id="leverHandle"></div>
+      </div>
+      <div class="lever-label">TIRER<br>POUR<br>JOUER</div>
+    </div>
+  </div>
+</div>
+
+<div class="video-popup" id="videoPopup">
+  <div class="titlebar">
+    <span>🍀 TRÈFLE CHANCEUX</span>
+    <div class="titlebar-btns">
+      <div class="titlebar-btn" onclick="closeVideo()">×</div>
+    </div>
+  </div>
+  <div class="video-content">
+    <video id="secretVideo" controls><source src="trefle.mp4" type="video/mp4"></video>
+  </div>
+</div>
+
+<script>
+const symbols = ['📚', '✍️', '🏆', '🎭', '⚔️', '🔥', '💀', '🌟', '🍀'];
+const payouts = { '📚📚📚': 50, '🏆🏆🏆': 100, '✍️✍️✍️': 25, '🎭🎭🎭': 20, '⚔️⚔️⚔️': 15, '🔥🔥🔥': 10, '💀💀💀': 5, '🌟🌟🌟': 30, '🍀🍀🍀': 777 };
+let credits = 1000, currentBet = 10, isSpinning = false, totalSpins = 0;
+const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+const leverHandle = document.getElementById('leverHandle');
+let reelResults = ['📚', '✍️', '🏆'];
+let manualSpinCount = [0, 0, 0];
+let isDraggingReel = [false, false, false];
+let lastY = [0, 0, 0];
+
+// Audio system
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playLeverSound() {
+  // Son mécanique de tirette
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.value = 150;
+  gain.gain.value = 0.1;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.2);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+  setTimeout(() => osc.stop(), 300);
+}
+
+function playSpinSound() {
+  // Son de rouleaux qui tournent
+  const noise = audioCtx.createBufferSource();
+  const bufferSize = audioCtx.sampleRate * 0.5;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  noise.buffer = buffer;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 800;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.05;
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start();
+}
+
+function playStopSound() {
+  // Son de clic quand un rouleau s'arrête
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 600;
+  gain.gain.value = 0.08;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02);
+  setTimeout(() => osc.stop(), 50);
+}
+
+function playCoinSound(count = 1) {
+  // Son de pièces/argent
+  for (let i = 0; i < Math.min(count, 10); i++) {
+    setTimeout(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 2000 + Math.random() * 1000;
+      gain.gain.value = 0.06;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.frequency.setTargetAtTime(1500, audioCtx.currentTime, 0.05);
+      gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+      setTimeout(() => osc.stop(), 150);
+    }, i * 80);
+  }
+}
+
+function playJackpotSound() {
+  // Fanfare de jackpot
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    setTimeout(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      gain.gain.value = 0.08;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+      setTimeout(() => osc.stop(), 300);
+    }, i * 150);
+  });
+  setTimeout(() => playCoinSound(10), 600);
+}
+
+function playLoseSound() {
+  // Son de perte
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.value = 200;
+  gain.gain.value = 0.04;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+  gain.gain.setTargetAtTime(0, audioCtx.currentTime + 0.1, 0.1);
+  setTimeout(() => osc.stop(), 400);
+}
+
+function setBet(amount) {
+  if (isSpinning) return;
+  currentBet = amount;
+  document.getElementById('currentBet').textContent = amount;
+  document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function getRandomSymbol(allowClover = false) {
+  const pool = allowClover ? symbols : symbols.filter(s => s !== '🍀');
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function spin(useLever = false, manualResults = null) {
+  if (isSpinning || credits < currentBet) {
+    if (credits < currentBet) alert('Crédits insuffisants!');
+    return;
+  }
+  isSpinning = true;
+  credits -= currentBet;
+  totalSpins++;
+  document.getElementById('credits').textContent = credits;
+  document.getElementById('spinsCount').textContent = 'Spins: ' + totalSpins;
+  document.getElementById('winDisplay').classList.remove('jackpot');
+  reels.forEach(r => { r.classList.remove('winner'); r.classList.add('spinning'); });
+  
+  // Sons
+  if (useLever) playLeverSound();
+  playSpinSound();
+  
+  let results;
+  if (manualResults) {
+    results = manualResults;
+  } else {
+    const cloverChance = useLever ? 0.002 : 0.01;
+    results = [
+      Math.random() < cloverChance ? '🍀' : getRandomSymbol(false),
+      Math.random() < cloverChance ? '🍀' : getRandomSymbol(false),
+      Math.random() < cloverChance ? '🍀' : getRandomSymbol(false)
+    ];
+  }
+  
+  setTimeout(() => stopReel(0, results[0]), 600 + Math.random() * 200);
+  setTimeout(() => stopReel(1, results[1]), 1000 + Math.random() * 200);
+  setTimeout(() => stopReel(2, results[2]), 1400 + Math.random() * 200);
+  setTimeout(() => checkWin(results), 1700);
+}
+
+function stopReel(index, symbol) {
+  reels[index].classList.remove('spinning');
+  reels[index].querySelector('.symbol').textContent = symbol;
+  reelResults[index] = symbol;
+  playStopSound();
+}
+
+function countClovers(results) {
+  return results.filter(s => s === '🍀').length;
+}
+
+function checkWin(results) {
+  isSpinning = false;
+  manualSpinCount = [0, 0, 0];
+  
+  const key = results.join('');
+  let win = 0;
+  const clovers = countClovers(results);
+  
+  if (clovers > 0) {
+    handleCloverWin(clovers);
+  }
+  
+  if (payouts[key]) {
+    win = currentBet * payouts[key];
+    reels.forEach(r => r.classList.add('winner'));
+    if (payouts[key] >= 50) {
+      document.getElementById('winDisplay').classList.add('jackpot');
+      playJackpotSound();
+    } else {
+      playCoinSound(Math.min(Math.floor(win / 10), 8));
+    }
+  } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+    win = currentBet * 2;
+    playCoinSound(3);
+    if (results[0] === results[1]) { reels[0].classList.add('winner'); reels[1].classList.add('winner'); }
+    if (results[1] === results[2]) { reels[1].classList.add('winner'); reels[2].classList.add('winner'); }
+    if (results[0] === results[2]) { reels[0].classList.add('winner'); reels[2].classList.add('winner'); }
+  } else {
+    playLoseSound();
+  }
+  
+  if (win > 0) {
+    credits += win;
+    document.getElementById('credits').textContent = credits;
+  }
+  document.getElementById('winAmount').textContent = win > 0 ? '+' + win : '0';
+}
+
+function handleCloverWin(count) {
+  const popup = document.getElementById('videoPopup');
+  const video = document.getElementById('secretVideo');
+  
+  if (count === 1) {
+    video.muted = false;
+    video.currentTime = 0;
+    video.play().catch(()=>{});
+    setTimeout(() => { video.pause(); video.muted = true; }, 500);
+  } else if (count === 2) {
+    popup.classList.add('visible');
+    popup.classList.add('glitch');
+    video.muted = false;
+    video.currentTime = 0;
+    video.play().catch(()=>{});
+    setTimeout(() => { closeVideo(); }, 1500);
+  } else if (count === 3) {
+    popup.classList.add('visible');
+    popup.classList.remove('glitch');
+    video.muted = false;
+    video.currentTime = 0;
+    video.play().catch(()=>{});
+  }
+}
+
+function closeVideo() {
+  const popup = document.getElementById('videoPopup');
+  const video = document.getElementById('secretVideo');
+  popup.classList.remove('visible');
+  popup.classList.remove('glitch');
+  video.pause();
+}
+
+// Lever interaction
+let leverDragging = false, leverStartY = 0;
+leverHandle.addEventListener('mousedown', e => {
+  leverDragging = true;
+  leverStartY = e.clientY;
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e => {
+  if (!leverDragging) return;
+  const diff = e.clientY - leverStartY;
+  if (diff > 80) {
+    leverHandle.classList.add('pulled');
+  }
+});
+document.addEventListener('mouseup', () => {
+  if (leverDragging && leverHandle.classList.contains('pulled')) {
+    leverHandle.classList.remove('pulled');
+    spin(true);
+  }
+  leverDragging = false;
+  leverHandle.classList.remove('pulled');
+});
+
+// Manual reel spin with mouse drag
+reels.forEach((reel, idx) => {
+  reel.addEventListener('mousedown', e => {
+    if (isSpinning) return;
+    isDraggingReel[idx] = true;
+    lastY[idx] = e.clientY;
+    e.preventDefault();
+  });
+});
+document.addEventListener('mousemove', e => {
+  reels.forEach((reel, idx) => {
+    if (!isDraggingReel[idx]) return;
+    const diff = lastY[idx] - e.clientY;
+    if (Math.abs(diff) > 30) {
+      manualSpinCount[idx]++;
+      const currentIdx = symbols.indexOf(reelResults[idx]);
+      const direction = diff > 0 ? 1 : -1;
+      let newIdx = (currentIdx + direction + symbols.length) % symbols.length;
+      reelResults[idx] = symbols[newIdx];
+      reel.querySelector('.symbol').textContent = reelResults[idx];
+      lastY[idx] = e.clientY;
+    }
+  });
+});
+document.addEventListener('mouseup', () => {
+  const wasSpinning = isDraggingReel.some(d => d);
+  isDraggingReel = [false, false, false];
+  
+  // Check if player manually positioned clovers
+  if (wasSpinning && !isSpinning) {
+    const clovers = reelResults.filter(s => s === '🍀').length;
+    if (clovers >= 3) {
+      // All three clovers - trigger secret without betting
+      handleCloverWin(3);
+      reels.forEach(r => r.classList.add('winner'));
+    }
+  }
+});
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = 
+    now.getHours().toString().padStart(2,'0') + ':' + 
+    now.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

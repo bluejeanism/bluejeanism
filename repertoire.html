@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DIR_Σ500</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
 <style>
 @keyframes flicker {
   0%, 100% { opacity: 1; }
@@ -79,6 +81,7 @@ body::after {
 }
 
 .logo {
+
   border: 2px solid #FFFFFF;
   display: inline-block;
   padding: 4px 16px;
@@ -91,9 +94,6 @@ body::after {
   background: #FFFFFF;
 }
 
-.logo:hover span {
-  color: #0000AA;
-}
 
 .logo span {
   background-color: #FFFFFF;
@@ -289,6 +289,7 @@ body::after {
   border: 2px solid #000000;
   background: #FFFFFF;
   overflow: hidden;
+  font-size: 32px;
 }
 
 .profile-icon img {
@@ -322,26 +323,6 @@ body::after {
   text-align: center;
 }
 
-.profile-card.empty {
-  background: #808080;
-  border-top: 3px solid #000000;
-  border-left: 3px solid #000000;
-  border-bottom: 3px solid #FFFFFF;
-  border-right: 3px solid #FFFFFF;
-  box-shadow: inset 2px 2px 3px rgba(0, 0, 0, 0.5);
-  opacity: 0.5;
-}
-
-.profile-card.empty:hover {
-  animation: none;
-  transform: none;
-}
-
-.profile-card.empty .profile-icon {
-  background: #606060;
-  font-size: 32px;
-}
-
 .fake-cursor {
   position: fixed;
   width: 16px;
@@ -361,6 +342,12 @@ body:hover .fake-cursor {
   font-size: 13px;
   color: #AAAAAA;
   margin-top: 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
 }
 
 @media (max-width: 768px) {
@@ -400,7 +387,7 @@ body:hover .fake-cursor {
   <div class="header-section">
     <div class="error-header">*** DIRECTORY ACCESS: ANON_PROFILES</div>
     <div class="system-info">
-      System: DIR_Σ500 | Status: ACTIVE | Entries: <span id="entryCount">23</span> | Access Level: PUBLIC
+      System: DIR_Σ500 | Status: ACTIVE | Entries: <span id="entryCount">--</span> | Access Level: PUBLIC
     </div>
   </div>
 
@@ -408,7 +395,7 @@ body:hover .fake-cursor {
     <input type="text" id="searchBox" class="search-box" placeholder="Rechercher un anone...">
     <select class="sort-select" id="sortBy" onchange="sortProfiles()">
       <option value="name">Trier: Nom</option>
-      <option value="rank">Trier: Classement</option>
+      <option value="score">Trier: Score</option>
       <option value="country">Trier: Pays</option>
       <option value="type">Trier: Spécialité</option>
     </select>
@@ -418,7 +405,7 @@ body:hover .fake-cursor {
   <div class="result-count" id="resultCount"></div>
 
   <div class="profiles-grid" id="profilesGrid">
-    <!-- Les profils seront générés par JavaScript -->
+    <div class="loading">Chargement des profils...</div>
   </div>
 </div>
 
@@ -446,38 +433,93 @@ const countryNames = {
   'RU': 'Russie',
   'EG': 'Égypte',
   'RO': 'Roumanie',
+  'DE': 'Allemagne',
+  'UK': 'Royaume-Uni',
   '--': 'Inconnu'
 };
 
-const profiles = [
-{name: 'Aphoom Zah', type: 'Mythologue', desc: 'Spécialiste des panthéons anciens', avatar: 'aphoom.jpg', url: 'aphoom.html', country: '--', rank: 15},
-{name: 'Callicles', type: 'Philosophe', desc: 'Théoricien de l\'éthique digitale', avatar: 'callicles.jpg', url: 'callicles.html', country: 'FR', rank: 3},
-{name: 'Caverne', type: 'Penseur nordique', desc: 'Spécialiste de la justice sociale', avatar: 'caverne.jpg', url: 'caverne.html', country: 'FR', rank: 12},
-{name: 'Heydon', type: 'Théologue', desc: 'Constructeur de systèmes complexes', avatar: 'heydon.jpg', url: 'heydon.html', country: 'FR', rank: 6},
-{name: 'Lia Vohn Finnak', type: 'Analyste', desc: 'Observatrice des tendances culturelles', avatar: 'lia.jpg', url: 'lia.html', country: 'FR', rank: 8},
-{name: 'Odin', type: 'Archiviste', desc: 'Gardien des mémoires perdues', avatar: 'odin.jpg', url: 'odin.html', country: 'FR', rank: 18},
-{name: 'Oizys', type: 'Critique', desc: 'Analyste des structures de pouvoir', avatar: 'oizys.jpg', url: '#', country: 'GR', rank: 7},
-{name: 'Picarssiette', type: 'Forgeron', desc: 'Créateur d\'outils et de concepts', avatar: 'picarssiette.jpg', url: 'picarssiette.html', country: 'FR', rank: 11},
-{name: 'Raffaello Bellino', type: 'Collectionneur', desc: 'Archiviste des données', avatar: 'raffaello.jpg', url: 'raffaello.html', country: 'IS', rank: 10},
-{name: 'Sedna', type: 'Gardienne', desc: 'Protectrice des espaces liminaux', avatar: 'sedna.jpg', url: '#', country: 'CA', rank: 5},
-{name: 'Tancrède Bastié', type: 'Cosmologue', desc: 'Expert en création et chaos', avatar: 'tancrede.jpg', url: 'tancrede.html', country: 'FR', rank: 2},
-{name: 'Tuchulcha', type: 'Psychopompe', desc: 'Guide des transitions', avatar: 'tuchulcha.jpg', url: '#', country: 'IT', rank: 16},
-{name: 'Ullr', type: 'Tacticien', desc: 'Stratège des mouvements sociaux', avatar: 'ullr.jpg', url: '#', country: 'SE', rank: 9},
-{name: 'Veles', type: 'Trickster', desc: 'Disrupteur de narratifs', avatar: 'veles.jpg', url: '#', country: 'RU', rank: 4},
-{name: 'Venehon', type: 'Océanographe', desc: 'Explorateur des profondeurs', avatar: 'venehon.jpg', url: 'venehon.html', country: 'FR', rank: 14},
-{name: 'Wepwawet', type: 'Éclaireur', desc: 'Ouvreur de voies inexplorées', avatar: 'wepwawet.jpg', url: '#', country: 'EG', rank: 13},
-{name: 'Xolotl', type: 'Transformateur', desc: 'Alchimiste des identités', avatar: 'xolotl.jpg', url: '#', country: 'MX', rank: 17},
-{name: 'Ymir', type: 'Primordial', desc: 'Origine des structures fondamentales', avatar: 'ymir.jpg', url: '#', country: 'IS', rank: 1},
-{name: 'Zalmoxis', type: 'Mystique', desc: 'Théoricien de l\'immortalité', avatar: 'zalmoxis.jpg', url: '#', country: 'RO', rank: 19},
+let allProfiles = [];
+let currentProfiles = [];
+let rankingData = {};
 
-{name: '???', type: 'RESERVED', desc: 'Slot réservé pour futur anone', avatar: null, url: '#', empty: true, country: '--', rank: 99},
-{name: '???', type: 'RESERVED', desc: 'Slot réservé pour futur anone', avatar: null, url: '#', empty: true, country: '--', rank: 99},
-{name: '???', type: 'RESERVED', desc: 'Slot réservé pour futur anone', avatar: null, url: '#', empty: true, country: '--', rank: 99},
-{name: '???', type: 'RESERVED', desc: 'Slot réservé pour futur anone', avatar: null, url: '#', empty: true, country: '--', rank: 99}
+// Formule de score (identique à classement.html)
+function getArticlePagesPerContributor(name) {
+  switch(name) {
+    case "Venehon": return 1;
+    case "Caverne": return 5;
+    case "Raffaello Bellino": return 5;
+    default: return 3;
+  }
+}
 
-];
+function calculateTotalScore(contributor) {
+  let totalScore = 0;
+  
+  for (let y = 2007; y <= 2025; y++) {
+    const yearKey = 'y' + y;
+    const data = contributor[yearKey];
+    if (!data) continue;
+    
+    // Pages livres
+    const yearBooks = (contributor.books || []).filter(b => b.year === y);
+    const bookPages = yearBooks.reduce((sum, b) => sum + (b.pages || 0), 0);
+    
+    // Pages traductions (50%)
+    const yearTrans = (contributor.translations || []).filter(t => t.year === y);
+    const transPages = yearTrans.reduce((sum, t) => sum + (t.pages || 0), 0);
+    
+    // Articles
+    const yearArticles = (contributor.articles || []).filter(a => a.year === y);
+    let articleCount = yearArticles.length || data.articles || 0;
+    const pagesPerArticle = getArticlePagesPerContributor(contributor.name);
+    const articlePages = articleCount * pagesPerArticle;
+    
+    totalScore += (bookPages * 16.275) + (transPages * 8.14) + (articlePages * 16.275) + ((data.videos || 0) * 10);
+  }
+  
+  return Math.round(totalScore);
+}
 
-let currentProfiles = [...profiles];
+// Chargement des données depuis data.json
+async function loadData() {
+  try {
+    const response = await fetch('data.json');
+    const data = await response.json();
+    
+    // Calculer les scores et créer les profils
+    const contributorsWithScores = data.contributors.map(c => ({
+      ...c,
+      score: calculateTotalScore(c)
+    }));
+    
+    // Trier par score pour le rang
+    contributorsWithScores.sort((a, b) => b.score - a.score);
+    
+    // Créer les profils avec le rang
+    allProfiles = contributorsWithScores.map((c, idx) => ({
+      name: c.name,
+      type: c.type,
+      desc: c.description,
+      avatar: c.avatar || null,
+      url: c.file,
+      country: c.country,
+      rank: idx + 1,
+      score: c.score,
+      alias: c.alias
+    }));
+    
+    currentProfiles = [...allProfiles];
+    
+    document.getElementById('entryCount').textContent = allProfiles.length;
+    
+    // Appliquer le tri initial selon le select
+    sortProfiles();
+    
+  } catch (error) {
+    console.error('Erreur de chargement:', error);
+    document.getElementById('profilesGrid').innerHTML = '<div class="loading" style="color: #FF0000;">*** ERREUR DE CHARGEMENT ***</div>';
+  }
+}
 
 function renderProfiles(profilesToRender = currentProfiles) {
   const grid = document.getElementById('profilesGrid');
@@ -487,33 +529,18 @@ function renderProfiles(profilesToRender = currentProfiles) {
   
   profilesToRender.forEach(profile => {
     const card = document.createElement('div');
-    card.className = 'profile-card' + (profile.empty ? ' empty' : '');
-    
-    if (!profile.empty) {
-      card.onclick = () => window.location.href = profile.url;
-    } else {
-      let clickCount = 0;
-      card.onclick = () => {
-        clickCount++;
-        if (clickCount === 3) {
-          alert('*** ERREUR: SLOT RÉSERVÉ POUR FUTUR ANON ***');
-          clickCount = 0;
-        }
-        setTimeout(() => { clickCount = 0; }, 1000);
-      };
-    }
-    
-    const rankBadge = !profile.empty && profile.rank < 99 ? `<div class="profile-rank">#${profile.rank}</div>` : '';
+    card.className = 'profile-card';
+    card.onclick = () => window.location.href = profile.url;
     
     const countryName = countryNames[profile.country] || profile.country;
     
     let avatarContent = '❓';
-    if (!profile.empty && profile.avatar) {
-      avatarContent = `<img src="${profile.avatar}" alt="${profile.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='❓'; this.parentElement.style.fontSize='32px';">`;
+    if (profile.avatar) {
+      avatarContent = `<img src="${profile.avatar}" alt="${profile.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='❓';">`;
     }
     
     card.innerHTML = `
-      ${rankBadge}
+      <div class="profile-rank">#${profile.rank}</div>
       <div class="profile-country" data-country-name="${countryName}">${profile.country}</div>
       <div class="profile-icon">${avatarContent}</div>
       <div class="profile-name">${profile.name}</div>
@@ -524,27 +551,29 @@ function renderProfiles(profilesToRender = currentProfiles) {
     grid.appendChild(card);
   });
   
-  const activeCount = profilesToRender.filter(p => !p.empty).length;
-  resultCount.textContent = `${activeCount} profils actifs trouvés`;
+  resultCount.textContent = `${profilesToRender.length} profils actifs trouvés`;
 }
 
 function sortProfiles() {
   const sortBy = document.getElementById('sortBy').value;
   
-  currentProfiles = [...profiles];
+  currentProfiles = [...allProfiles];
+  
+  // Options pour le tri français (accents, insensible à la casse)
+  const collator = new Intl.Collator('fr', { sensitivity: 'base', numeric: true });
   
   switch(sortBy) {
     case 'name':
-      currentProfiles.sort((a, b) => a.name.localeCompare(b.name));
+      currentProfiles.sort((a, b) => collator.compare(a.name, b.name));
       break;
-    case 'rank':
-      currentProfiles.sort((a, b) => a.rank - b.rank);
+    case 'score':
+      currentProfiles.sort((a, b) => b.score - a.score);
       break;
     case 'country':
-      currentProfiles.sort((a, b) => a.country.localeCompare(b.country));
+      currentProfiles.sort((a, b) => collator.compare(a.country, b.country));
       break;
     case 'type':
-      currentProfiles.sort((a, b) => a.type.localeCompare(b.type));
+      currentProfiles.sort((a, b) => collator.compare(a.type, b.type));
       break;
   }
   
@@ -563,14 +592,15 @@ function searchProfiles() {
     profile.name.toLowerCase().includes(query) ||
     profile.type.toLowerCase().includes(query) ||
     profile.desc.toLowerCase().includes(query) ||
-    profile.country.toLowerCase().includes(query)
+    profile.country.toLowerCase().includes(query) ||
+    (profile.alias && profile.alias.toLowerCase().includes(query))
   );
   
   renderProfiles(filtered);
 }
 
 function randomProfile() {
-  const activeProfiles = profiles.filter(p => !p.empty && p.url !== '#');
+  const activeProfiles = allProfiles.filter(p => p.url && p.url !== '#');
   if (activeProfiles.length > 0) {
     const random = activeProfiles[Math.floor(Math.random() * activeProfiles.length)];
     window.location.href = random.url;
@@ -587,8 +617,9 @@ document.getElementById('searchBox').addEventListener('keypress', (e) => {
   }
 });
 
-renderProfiles();
+// Charger les données au démarrage
+loadData();
 </script>
 
 </body>
-</html
+</html>

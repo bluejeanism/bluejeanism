@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3V3NT.EXE - Calendar System</title>
+<style>
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+@keyframes fire { 0%,100%{text-shadow:0 0 5px #FF6600;}50%{text-shadow:0 0 15px #FF6600, 0 0 25px #FF3300;} }
+
+* { cursor: none !important; box-sizing: border-box; }
+
+body {
+  background-color: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  margin: 0;
+  padding: 40px;
+  min-height: 100vh;
+  animation: flicker 0.15s infinite;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.content { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; }
+.logo {
+ border: 2px solid #FFFFFF; display: inline-block; padding: 4px 16px; margin-bottom: 20px; }
+.logo span { background-color: #FFFFFF; color: #0000AA; padding: 0 4px; font-weight: bold; }
+
+.logo:hover {
+  background: #FFFFFF;
+}
+.error-line { font-size: 12px; color: #AAAAAA; margin: 5px 0; }
+
+
+.event-window {
+  background: #C0C0C0;
+  border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080;
+  box-shadow: 4px 4px 0 #000000;
+  margin-top: 20px;
+}
+
+.window-title {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #FFFFFF; padding: 4px 8px; font-weight: bold; font-size: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.title-btns { display: flex; gap: 2px; }
+.title-btn {
+  width: 16px; height: 14px; background: #C0C0C0;
+  border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080;
+  font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000;
+}
+
+.event-content { padding: 15px; }
+
+.featured-event { background: #000000; border: 3px solid #FF6600; padding: 20px; margin-bottom: 20px; }
+.featured-badge { background: #FF6600; color: #000; padding: 3px 10px; font-size: 10px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+.featured-title { font-size: 28px; color: #FF6600; animation: fire 2s infinite; margin-bottom: 10px; }
+.featured-desc { color: #AAAAAA; font-size: 12px; margin-bottom: 15px; }
+
+.countdown { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+.countdown-item { text-align: center; background: #1a1a1a; padding: 10px 15px; border: 1px solid #FF6600; }
+.countdown-value { font-size: 24px; color: #FF6600; font-weight: bold; }
+.countdown-label { font-size: 9px; color: #888; margin-top: 5px; }
+
+.rules-box { background: #1a1a1a; border-left: 3px solid #FF6600; padding: 10px 15px; margin: 15px 0; }
+.rules-box h4 { color: #FF6600; margin: 0 0 10px 0; font-size: 12px; }
+.rules-box ul { margin: 0; padding-left: 20px; color: #AAA; font-size: 11px; }
+.rules-box li { margin: 5px 0; }
+
+.calendar-section {
+  background: #FFFFFF;
+  border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF;
+  padding: 10px; margin-top: 15px;
+}
+
+.calendar-title { color: #000080; font-weight: bold; margin-bottom: 10px; font-size: 12px; }
+.event-list { display: flex; flex-direction: column; gap: 8px; }
+
+.event-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px;
+  background: #F0F0F0; border: 1px solid #C0C0C0; color: #000; font-size: 11px;
+}
+.event-item:hover { background: #E0E0E0; }
+
+.event-date { background: #000080; color: #FFFFFF; padding: 5px 8px; text-align: center; min-width: 50px; }
+.event-date .month { font-size: 9px; }
+.event-date .day { font-size: 14px; font-weight: bold; }
+
+.event-info { flex: 1; }
+.event-name { font-weight: bold; color: #000080; }
+.event-type { font-size: 10px; color: #666; }
+
+.event-status { padding: 2px 8px; font-size: 9px; font-weight: bold; }
+.status-upcoming { background: #004400; color: #00FF00; }
+.status-active { background: #FF6600; color: #000; }
+
+.status-bar {
+  background: #C0C0C0; border-top: 2px solid #FFFFFF; padding: 4px 8px;
+  display: flex; justify-content: space-between; font-size: 11px; color: #000;
+}
+.status-section {
+  border-left: 2px solid #808080; border-top: 2px solid #808080;
+  border-right: 2px solid #FFFFFF; border-bottom: 2px solid #FFFFFF;
+  padding: 2px 6px;
+}
+
+.custom-cursor { position: fixed; width: 16px; height: 16px; background-color: #FFFFFF; pointer-events: none; z-index: 10000; mix-blend-mode: difference; display: none; }
+body:hover .custom-cursor { display: block; }
+</style>
+</head>
+<body>
+<div class="custom-cursor" id="cursor"></div>
+
+<div class="content">
+  <a href="borne.html" style="text-decoration:none;color:inherit;">
+    <div class="logo"><span>:vitalism</span></div>
+  </a>
+  <div class="error-line">*** CALENDAR_MODULE: 3V3NT.EXE loaded at 0xC4L3ND4R ***</div>
+
+  <div class="event-window">
+    <div class="window-title">
+      <span>📅 VITALISM EVENT MANAGER</span>
+      <div class="title-btns"><div class="title-btn">_</div><div class="title-btn">□</div><div class="title-btn">X</div></div>
+    </div>
+
+    <div class="event-content">
+      <div class="featured-event">
+        <span class="featured-badge">🔥 ÉVÉNEMENT MAJEUR</span>
+        <div class="featured-title">GRIND JANUARY</div>
+        <div class="featured-desc">31 jours. Pas d'excuses. Que du travail. Production intensive pour tous les contributeurs.</div>
+        <div class="countdown">
+          <div class="countdown-item"><div class="countdown-value" id="days">--</div><div class="countdown-label">JOURS</div></div>
+          <div class="countdown-item"><div class="countdown-value" id="hours">--</div><div class="countdown-label">HEURES</div></div>
+          <div class="countdown-item"><div class="countdown-value" id="minutes">--</div><div class="countdown-label">MIN</div></div>
+          <div class="countdown-item"><div class="countdown-value" id="seconds">--</div><div class="countdown-label">SEC</div></div>
+        </div>
+        <div class="rules-box">
+          <h4>RÈGLES DU GRIND & RÉCOMPENSES</h4>
+          <ul>
+            <li>1 page écrite (livre/article) = 15 pts</li>
+            <li>1 page traduite = 7.5 pts</li>
+            <li>1 minute de vidéo = 7 pts</li>
+            <li>1 minute d'audio = 3.5 pts</li>
+            <li>1 retweet = 1 pt | 1 like = 0.3 pt</li>
+            <li>7 jours consécutifs de production = badge 🔥 STREAK</li>
+            <li>31 jours complets = badge 👑 LÉGENDE</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="calendar-section">
+        <div class="calendar-title">📋 CALENDRIER ANNUEL 2025-2026</div>
+        <div class="event-list">
+          <div class="event-item">
+            <div class="event-date"><div class="month">JAN</div><div class="day">01</div></div>
+            <div class="event-info"><div class="event-name">🔥 Grind January</div><div class="event-type">Challenge mensuel</div></div>
+            <span class="event-status status-active">EN COURS</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">FÉV</div><div class="day">14</div></div>
+            <div class="event-info"><div class="event-name">💀 Anti-Valentine</div><div class="event-type">Concours écriture cynique</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">MAR</div><div class="day">21</div></div>
+            <div class="event-info"><div class="event-name">🌱 Équinoxe de Printemps</div><div class="event-type">Traduction collective</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">AVR</div><div class="day">01</div></div>
+            <div class="event-info"><div class="event-name">🃏 Poisson d'Avril</div><div class="event-type">Satire & parodie</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">JUN</div><div class="day">21</div></div>
+            <div class="event-info"><div class="event-name">☀️ Solstice d'Été</div><div class="event-type">Cérémonie semestrielle</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">SEP</div><div class="day">01</div></div>
+            <div class="event-info"><div class="event-name">📚 Rentrée Littéraire</div><div class="event-type">Critiques de livres</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">NOV</div><div class="day">01</div></div>
+            <div class="event-info"><div class="event-name">✍️ NaNoWriMo Vitaliste</div><div class="event-type">50 000 mots</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+          <div class="event-item">
+            <div class="event-date"><div class="month">DÉC</div><div class="day">21</div></div>
+            <div class="event-info"><div class="event-name">🏆 Cérémonie Annuelle</div><div class="event-type">Grand Prix Vitalism</div></div>
+            <span class="event-status status-upcoming">À VENIR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span class="status-section">EVENT.SYS</span>
+      <span class="status-section">8 événements</span>
+      <span class="status-section" style="opacity:0.3;font-size:9px;cursor:pointer" id="secretWord">fenêtre</span>
+      <span class="status-section" id="clock">--:--</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+
+function updateCountdown() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear() + (now.getMonth() === 0 ? 0 : 1), 0, 1);
+  const diff = jan1 - now;
+  
+  if (diff > 0) {
+    document.getElementById('days').textContent = Math.floor(diff / 86400000);
+    document.getElementById('hours').textContent = Math.floor((diff % 86400000) / 3600000);
+    document.getElementById('minutes').textContent = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('seconds').textContent = Math.floor((diff % 60000) / 1000);
+  } else {
+    const jan31 = new Date(now.getFullYear(), 0, 31, 23, 59, 59);
+    const remaining = jan31 - now;
+    if (remaining > 0) {
+      document.getElementById('days').textContent = Math.floor(remaining / 86400000);
+      document.getElementById('hours').textContent = Math.floor((remaining % 86400000) / 3600000);
+      document.getElementById('minutes').textContent = Math.floor((remaining % 3600000) / 60000);
+      document.getElementById('seconds').textContent = Math.floor((remaining % 60000) / 1000);
+    }
+  }
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+
+setInterval(updateCountdown, 1000);
+setInterval(updateClock, 1000);
+updateCountdown();
+updateClock();
+
+// SECRET: fenetre.mp4 - cliquer sur le mot "fenêtre" caché
+document.getElementById('secretWord').onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="fenetre.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+</script>
+</body>
+</html>

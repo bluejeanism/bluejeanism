@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R3M1S3.EXE - Awards Ceremony</title>
+<style>
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+@keyframes glow { 0%,100%{text-shadow:0 0 5px #FFD700;}50%{text-shadow:0 0 20px #FFD700, 0 0 30px #FFA500;} }
+@keyframes confetti { 0%{transform:translateY(-10px) rotate(0deg);}100%{transform:translateY(100vh) rotate(720deg);} }
+
+* { cursor: none !important; box-sizing: border-box; }
+
+body {
+  background-color: #0000AA;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  margin: 0;
+  padding: 40px;
+  min-height: 100vh;
+  animation: flicker 0.15s infinite;
+  text-shadow: 0 0 2px rgba(255,255,255,0.5);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+  z-index: 999;
+}
+
+.content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+.logo {
+ border: 2px solid #FFFFFF; display: inline-block; padding: 4px 16px; margin-bottom: 20px; }
+.logo span { background-color: #FFFFFF; color: #0000AA; padding: 0 4px; font-weight: bold; }
+
+.logo:hover {
+  background: #FFFFFF;
+}
+.error-line { font-size: 12px; color: #AAAAAA; margin: 5px 0; }
+
+
+.awards-window {
+  background: #C0C0C0;
+  border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080;
+  box-shadow: 4px 4px 0 #000000;
+  margin-top: 20px;
+}
+
+.window-title {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: #FFFFFF; padding: 4px 8px; font-weight: bold; font-size: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.title-btns { display: flex; gap: 2px; }
+.title-btn {
+  width: 16px; height: 14px; background: #C0C0C0;
+  border-top: 2px solid #FFFFFF; border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #808080; border-right: 2px solid #808080;
+  font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #000;
+}
+
+.awards-content { padding: 15px; }
+
+.ceremony-header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 2px solid #FFD700;
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ceremony-title {
+  font-size: 28px;
+  color: #FFD700;
+  animation: glow 2s infinite;
+  margin-bottom: 5px;
+}
+
+.ceremony-year { color: #888; font-size: 14px; }
+
+.awards-grid { display: flex; flex-direction: column; gap: 15px; }
+
+.award-category {
+  background: #FFFFFF;
+  border-top: 2px solid #808080; border-left: 2px solid #808080;
+  border-bottom: 2px solid #FFFFFF; border-right: 2px solid #FFFFFF;
+  padding: 15px;
+}
+
+.category-title {
+  color: #000080;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #000080;
+}
+
+.winner-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  background: #F5F5F5;
+  margin-bottom: 8px;
+}
+
+.winner-row:last-child { margin-bottom: 0; }
+
+.trophy { font-size: 30px; }
+.trophy.gold { filter: drop-shadow(0 0 5px #FFD700); }
+.trophy.silver { filter: drop-shadow(0 0 5px #C0C0C0); }
+.trophy.bronze { filter: drop-shadow(0 0 5px #CD7F32); }
+
+.winner-info { flex: 1; }
+.winner-name { font-weight: bold; color: #000080; font-size: 16px; }
+.winner-detail { font-size: 11px; color: #666; margin-top: 3px; }
+
+.winner-score {
+  background: #000080;
+  color: #FFD700;
+  padding: 5px 12px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.special-award {
+  background: linear-gradient(135deg, #2d1b4e, #1a1a2e);
+  border: 2px solid #9B59B6;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.special-title { color: #9B59B6; font-weight: bold; margin-bottom: 10px; }
+.special-winner { color: #FFFFFF; font-size: 16px; }
+
+.status-bar {
+  background: #C0C0C0; border-top: 2px solid #FFFFFF; padding: 4px 8px;
+  display: flex; justify-content: space-between; font-size: 11px; color: #000;
+}
+.status-section {
+  border-left: 2px solid #808080; border-top: 2px solid #808080;
+  border-right: 2px solid #FFFFFF; border-bottom: 2px solid #FFFFFF;
+  padding: 2px 6px;
+}
+
+.custom-cursor { position: fixed; width: 16px; height: 16px; background-color: #FFFFFF; pointer-events: none; z-index: 10000; mix-blend-mode: difference; display: none; }
+body:hover .custom-cursor { display: block; }
+
+.confetti {
+  position: fixed;
+  font-size: 20px;
+  animation: confetti 5s linear infinite;
+  pointer-events: none;
+  z-index: 1001;
+}
+</style>
+</head>
+<body>
+<div class="custom-cursor" id="cursor"></div>
+<div id="confettiContainer"></div>
+
+<div class="content">
+  <a href="borne.html" style="text-decoration:none;color:inherit;">
+    <div class="logo"><span>:vitalism</span></div>
+  </a>
+  <div class="error-line">*** CEREMONY_MODULE: R3M1S3.EXE loaded at 0x4W4RD5 ***</div>
+
+  <div class="awards-window">
+    <div class="window-title">
+      <span>🏆 VITALISM AWARDS CEREMONY</span>
+      <div class="title-btns"><div class="title-btn">_</div><div class="title-btn">□</div><div class="title-btn">X</div></div>
+    </div>
+
+    <div class="awards-content">
+      <div class="ceremony-header">
+        <div class="ceremony-title">🏆 CÉRÉMONIE DE REMISE DES PRIX 🏆</div>
+        <div class="ceremony-year">Édition 2025</div>
+      </div>
+
+      <div class="awards-grid">
+        <div class="award-category">
+          <div class="category-title">📊 CLASSEMENT GÉNÉRAL</div>
+          <div class="winner-row">
+            <span class="trophy gold">🥇</span>
+            <div class="winner-info"><div class="winner-name">Raffaello</div><div class="winner-detail">Champion incontesté • 1292 articles</div></div>
+            <div class="winner-score">36 202 pts</div>
+          </div>
+          <div class="winner-row">
+            <span class="trophy silver">🥈</span>
+            <div class="winner-info"><div class="winner-name">Nimh</div><div class="winner-detail">Performance exceptionnelle</div></div>
+            <div class="winner-score">24 850 pts</div>
+          </div>
+          <div class="winner-row">
+            <span class="trophy bronze">🥉</span>
+            <div class="winner-info"><div class="winner-name">Tancrède</div><div class="winner-detail">Progression fulgurante</div></div>
+            <div class="winner-score">18 420 pts</div>
+          </div>
+        </div>
+
+        <div class="award-category">
+          <div class="category-title">📚 MEILLEUR TRADUCTEUR</div>
+          <div class="winner-row">
+            <span class="trophy gold">🥇</span>
+            <div class="winner-info"><div class="winner-name">Venehon</div><div class="winner-detail">8 traductions majeures</div></div>
+            <div class="winner-score">LAURÉAT</div>
+          </div>
+        </div>
+
+        <div class="award-category">
+          <div class="category-title">🎬 MEILLEUR VIDÉASTE</div>
+          <div class="winner-row">
+            <span class="trophy gold">🥇</span>
+            <div class="winner-info"><div class="winner-name">Venehon</div><div class="winner-detail">23 vidéos • Qualité constante</div></div>
+            <div class="winner-score">LAURÉAT</div>
+          </div>
+        </div>
+
+        <div class="award-category">
+          <div class="category-title">🌟 RÉVÉLATION DE L'ANNÉE</div>
+          <div class="winner-row">
+            <span class="trophy gold">🥇</span>
+            <div class="winner-info"><div class="winner-name">Rambo</div><div class="winner-detail">Nouveau contributeur • Impact majeur</div></div>
+            <div class="winner-score">LAURÉAT</div>
+          </div>
+        </div>
+
+        <div class="special-award">
+          <div class="special-title">⭐ PRIX SPÉCIAL DU JURY</div>
+          <div class="special-winner">Décerné à <strong>Caverne</strong> pour sa contribution philosophique exceptionnelle</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span class="status-section">AWARDS.SYS</span>
+      <span class="status-section">Édition 2025</span>
+      <span class="status-section" id="clock">--:--</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+
+// Confetti
+const confettis = ['🎉', '✨', '🌟', '🏆', '⭐'];
+function createConfetti() {
+  const conf = document.createElement('div');
+  conf.className = 'confetti';
+  conf.textContent = confettis[Math.floor(Math.random() * confettis.length)];
+  conf.style.left = Math.random() * 100 + 'vw';
+  conf.style.animationDuration = (3 + Math.random() * 4) + 's';
+  document.getElementById('confettiContainer').appendChild(conf);
+  setTimeout(() => conf.remove(), 7000);
+}
+setInterval(createConfetti, 500);
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

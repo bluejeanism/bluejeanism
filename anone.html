@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>//AN0NE_01</title>
@@ -8,7 +9,6 @@
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
 @keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
 @keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
-@keyframes errorBlink { 0%,50%{opacity:1;} 51%,100%{opacity:0;} }
 
 * { cursor: none !important; box-sizing: border-box; }
 
@@ -42,87 +42,18 @@ body::after {
   pointer-events:none; z-index:999;
 }
 
-.content { 
-  position: relative; 
-  z-index:1; 
-  max-width:800px; 
-  margin:0 auto;
-}
+.content { position: relative; z-index:1; max-width:800px; margin:0 auto; }
 
-.logo { 
-  border:2px solid #FFFFFF; 
-  display:inline-block; 
-  padding:4px 16px; 
-  margin-bottom:20px;
-  cursor:pointer;
-  transition:all 0.2s;
-}
+.logo { border:2px solid #FFFFFF; display:inline-block; padding:4px 16px; margin-bottom:20px; cursor:pointer; transition:all 0.2s; text-decoration:none; }
+.logo:hover { background:#FFFFFF; }
+.logo:hover span { color:#0000AA; }
+.logo span { background-color:#FFFFFF; color:#0000AA; padding:0 4px; font-weight:bold; font-size:18px; }
 
-.logo:hover {
-  background:#FFFFFF;
-}
+.terminal-boot { margin-bottom:30px; font-size:13px; line-height:1.6; }
+.boot-line { color:#AAAAAA; margin:3px 0; }
+.cursor-blink { animation: blink 1s infinite; }
 
-.logo:hover span {
-  color:#0000AA;
-}
-
-.logo span { 
-  background-color:#FFFFFF; 
-  color:#0000AA; 
-  padding:0 4px; 
-  font-weight:bold;
-  font-size:18px;
-}
-
-.terminal-boot {
-  margin-bottom:30px;
-  font-size:13px;
-  line-height:1.6;
-}
-
-.boot-line {
-  color:#AAAAAA;
-  margin:3px 0;
-}
-
-.cursor-blink {
-  animation: blink 1s infinite;
-}
-
-
-.status-bar {
-  background:#C0C0C0;
-  border-top:2px solid #FFFFFF;
-  border-left:2px solid #FFFFFF;
-  border-bottom:2px solid #808080;
-  border-right:2px solid #808080;
-  padding:6px 12px;
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  color:#000000;
-  box-shadow:2px 2px 0 #000000;
-}
-
-.status-section {
-  border-left:2px solid #808080;
-  border-top:2px solid #808080;
-  border-right:2px solid #FFFFFF;
-  border-bottom:2px solid #FFFFFF;
-  padding:2px 8px;
-}
-
-.custom-cursor { 
-  position: fixed; 
-  width:16px; 
-  height:16px; 
-  background-color:#FFFFFF; 
-  pointer-events:none; 
-  z-index:10000; 
-  mix-blend-mode:difference; 
-  display:none; 
-}
-
+.custom-cursor { position: fixed; width:16px; height:16px; background-color:#FFFFFF; pointer-events:none; z-index:10000; mix-blend-mode:difference; display:none; }
 body:hover .custom-cursor { display:block; }
 
 #typingArea {
@@ -146,16 +77,6 @@ body:hover .custom-cursor { display:block; }
   margin-left:2px;
 }
 
-#typingArea:empty:before {
-  content:'';
-  color:#555599;
-  font-size:14px;
-}
-
-#typingArea::selection {
-  background:rgba(255,255,255,0.3);
-}
-
 #submitBtn {
   position:fixed;
   bottom:80px;
@@ -171,19 +92,24 @@ body:hover .custom-cursor { display:block; }
   font-size:13px;
   cursor:pointer;
   color:#000000;
-  transition:opacity 0.5s;
+  transition:all 0.3s;
   box-shadow:4px 4px 0 #000000;
+  opacity:0;
 }
 
-#submitBtn:hover {
-  background:#DFDFDF;
-}
-
+#submitBtn:hover { background:#DFDFDF; }
 #submitBtn:active {
   border-top:2px solid #000000;
   border-left:2px solid #000000;
   border-bottom:2px solid #FFFFFF;
   border-right:2px solid #FFFFFF;
+}
+
+#submitBtn.secret-mode {
+  background:#000080;
+  color:#fff;
+  border:2px solid #0ff;
+  animation:blink 0.5s 3;
 }
 
 #statusIndicator {
@@ -204,11 +130,7 @@ body:hover .custom-cursor { display:block; }
 
 @media (max-width:768px){
   body { padding:20px; }
-  .content { max-width:100%; }
-  #submitBtn {
-    right:20px;
-    bottom:100px;
-  }
+  #submitBtn { right:20px; bottom:100px; }
 }
 </style>
 </head>
@@ -216,9 +138,7 @@ body:hover .custom-cursor { display:block; }
 <div class="custom-cursor" id="cursor"></div>
 
 <div class="content">
-  <a href="borne.html" style="text-decoration:none;">
-    <div class="logo"><span>:vitalism</span></div>
-  </a>
+  <a href="borne.html" class="logo"><span>:vitalism</span></a>
 
   <div class="terminal-boot">
     <div class="boot-line">VITALISM CONTACT SYSTEM v2.1</div>
@@ -235,10 +155,12 @@ body:hover .custom-cursor { display:block; }
 
   <div id="typingArea" contenteditable="true" spellcheck="false"></div>
   
-  <div id="submitBtn" style="opacity:0;">submit your feedback</div>
+  <div id="submitBtn">submit your feedback</div>
 
   <div id="statusIndicator">LISTENING</div>
 </div>
+
+<audio id="hookSound" src="byhook.mp3"></audio>
 
 <script>
 const cursor = document.getElementById('cursor');
@@ -248,30 +170,23 @@ document.addEventListener('mousemove', e => {
 });
 
 const anones = [
-  "hephaistos@vitalism.net",
-  "athena@vitalism.net",
-  "gaia@vitalism.net",
-  "promethee@vitalism.net",
-  "iris@vitalism.net",
-  "eros@vitalism.net",
-  "chronos@vitalism.net",
-  "nyx@vitalism.net",
-  "hephaestus@vitalism.net",
-  "demeter@vitalism.net",
-  "pan@vitalism.net",
-  "selene@vitalism.net"
+  "hephaistos@vitalism.net","athena@vitalism.net","gaia@vitalism.net","promethee@vitalism.net",
+  "iris@vitalism.net","eros@vitalism.net","chronos@vitalism.net","nyx@vitalism.net",
+  "hephaestus@vitalism.net","demeter@vitalism.net","pan@vitalism.net","selene@vitalism.net"
 ];
 
 const typingArea = document.getElementById('typingArea');
 const submitBtn = document.getElementById('submitBtn');
 const statusIndicator = document.getElementById('statusIndicator');
+const hookSound = document.getElementById('hookSound');
 
 let originalText = '';
 let charCount = 0;
+let secretActivated = false;
 
 const cryptChars = '░▒▓█▀▄═║╔╗╚╝╠╣╦╩╬┌┐└┘├┤┬┴┼─│¤§¶†‡°¢£¥ƒα';
 
-function encryptChar(char, index) {
+function encryptChar(char) {
   if (char === '\n' || char === ' ') return char;
   const intensity = Math.min(charCount / 100, 1);
   if (Math.random() < intensity) {
@@ -281,17 +196,34 @@ function encryptChar(char, index) {
 }
 
 function encryptText(text) {
-  return text.split('').map((char, i) => encryptChar(char, i)).join('');
+  return text.split('').map(char => encryptChar(char)).join('');
+}
+
+// Secret phrase detection
+const secretPhrase = 'i am not a number, i am a free man';
+const secretAlt = 'i am not a number i am a free man';
+
+function checkSecret(text) {
+  const lower = text.toLowerCase().trim();
+  return lower.includes(secretPhrase) || lower.includes(secretAlt);
 }
 
 let typingTimeout;
-typingArea.addEventListener('input', function(e) {
+typingArea.addEventListener('input', function() {
   clearTimeout(typingTimeout);
   
   originalText = typingArea.textContent;
   charCount = originalText.length;
   
   statusIndicator.textContent = charCount > 0 ? 'ENCODING' : 'LISTENING';
+  
+  // Check for secret phrase
+  if (!secretActivated && checkSecret(originalText)) {
+    secretActivated = true;
+    submitBtn.textContent = 'WE WANT INFORMATION';
+    submitBtn.classList.add('secret-mode');
+    statusIndicator.textContent = '// PHRASE RECOGNIZED //';
+  }
   
   if (charCount > 10) {
     submitBtn.style.opacity = '1';
@@ -300,7 +232,7 @@ typingArea.addEventListener('input', function(e) {
   }
   
   typingTimeout = setTimeout(() => {
-    if (charCount > 0) {
+    if (charCount > 0 && !secretActivated) {
       const encrypted = encryptText(originalText);
       const cursorPos = saveCaretPosition(typingArea);
       typingArea.textContent = encrypted;
@@ -310,39 +242,24 @@ typingArea.addEventListener('input', function(e) {
   }, 800);
 });
 
-typingArea.addEventListener('mouseup', function() {
-  const selection = window.getSelection();
-  if (selection.toString().length > 0) {
-    const range = selection.getRangeAt(0);
-    const selectedText = range.toString();
-    
-    let startOffset = 0;
-    let endOffset = 0;
-    const textContent = typingArea.textContent;
-    
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(typingArea);
-    preCaretRange.setEnd(range.startContainer, range.startOffset);
-    startOffset = preCaretRange.toString().length;
-    endOffset = startOffset + selectedText.length;
-    
-    const decrypted = originalText.substring(startOffset, endOffset);
-    
-    if (decrypted !== selectedText) {
-      range.deleteContents();
-      range.insertNode(document.createTextNode(decrypted));
-      
-      setTimeout(() => {
-        const encrypted = encryptText(originalText);
-        typingArea.textContent = encrypted;
-      }, 2000);
-    }
-  }
-});
-
 submitBtn.addEventListener('click', function() {
   if (charCount < 10) return;
   
+  // SECRET PATH - redirect to hook.html
+  if (secretActivated) {
+    hookSound.volume = 0.7;
+    hookSound.play().catch(()=>{});
+    submitBtn.style.opacity = '0.5';
+    submitBtn.style.pointerEvents = 'none';
+    statusIndicator.textContent = '// CONNECTING TO VILLAGE... //';
+    
+    setTimeout(() => {
+      window.location.href = 'hook.html';
+    }, 2500);
+    return;
+  }
+  
+  // Normal path
   submitBtn.style.opacity = '0.5';
   submitBtn.style.pointerEvents = 'none';
   statusIndicator.textContent = 'TRANSMITTING';
@@ -352,8 +269,6 @@ submitBtn.addEventListener('click', function() {
   
   setTimeout(() => {
     statusIndicator.textContent = 'TX_SUCCESS';
-    console.log(`→ 0x${hash} | ${chosen} | ${originalText.substring(0, 100)}...`);
-    
     typingArea.textContent = `TX_SUCCESS | HASH: 0x${hash}\nDEST: ANONE_POOL[HIDDEN]\nPAYLOAD: ${charCount} BYTES\n\nCONNECTION_TERMINATED`;
     
     setTimeout(() => {
@@ -382,13 +297,11 @@ function saveCaretPosition(element) {
 function restoreCaretPosition(element, position) {
   const range = document.createRange();
   const selection = window.getSelection();
-  
   let currentPos = 0;
   let found = false;
   
   function traverse(node) {
     if (found) return;
-    
     if (node.nodeType === Node.TEXT_NODE) {
       const nextPos = currentPos + node.length;
       if (position <= nextPos) {
@@ -407,19 +320,16 @@ function restoreCaretPosition(element, position) {
   }
   
   traverse(element);
-  
   if (found) {
     selection.removeAllRanges();
     selection.addRange(range);
   }
 }
 
-// Hide boot sequence after loading
 setTimeout(() => {
   const bootDiv = document.querySelector('.terminal-boot');
   bootDiv.style.transition = 'opacity 0.5s';
   bootDiv.style.opacity = '0';
-  
   setTimeout(() => {
     bootDiv.innerHTML = '<div class="boot-line" style="color:#00FF00;">SYSTEM_READY</div>';
     bootDiv.style.opacity = '1';

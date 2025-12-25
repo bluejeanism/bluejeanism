@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B01DS.EXE - Artificial Life Simulation</title>
+<style>
+@keyframes scanline { 0%{transform:translateY(-100%);}100%{transform:translateY(100vh);} }
+@keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
+@keyframes flicker { 0%,100%{opacity:1;}92%{opacity:0.95;}96%{opacity:0.98;} }
+
+* { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+
+body {
+  background: #0000AA;
+  overflow: hidden;
+  font-family: "Courier New", monospace;
+  animation: flicker 0.15s infinite;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  animation: scanline 6s linear infinite;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+  z-index: 999;
+}
+
+#canvas {
+  display: block;
+  background: #0000AA;
+}
+
+.cursor {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  background: #FFFF00;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+.hud {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  color: #FFFFFF;
+  font-size: 12px;
+  z-index: 100;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+.hud-row { margin: 3px 0; }
+.hud-label { color: #AAAAFF; }
+.hud-value { color: #FFFFFF; font-weight: bold; }
+
+.logo {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  border: 2px solid #FFFFFF;
+  padding: 4px 12px;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 11px;
+  z-index: 100;
+  transition: all 0.2s;
+}
+
+.logo:hover { background: #FFFFFF; }
+.logo:hover span { color: #0000AA; }
+.logo span { background: #FFFFFF; color: #0000AA; padding: 0 3px; }
+
+.title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255,255,255,0.03);
+  font-size: 120px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 1;
+  letter-spacing: 20px;
+}
+
+.controls {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  color: #AAAAFF;
+  font-size: 10px;
+  z-index: 100;
+}
+
+.controls span { color: #FFFF00; }
+
+.info-panel {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0,0,100,0.8);
+  border: 1px solid #AAAAFF;
+  padding: 10px;
+  color: #FFFFFF;
+  font-size: 10px;
+  z-index: 100;
+  max-width: 200px;
+}
+
+.info-panel h4 {
+  color: #FFFF00;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #AAAAFF;
+  padding-bottom: 3px;
+}
+
+.slider-group {
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider-group label { flex: 1; }
+
+.slider-group input[type="range"] {
+  width: 80px;
+  cursor: pointer !important;
+}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<canvas id="canvas"></canvas>
+
+<a href="borne.html" class="logo"><span>:vitalism</span></a>
+
+<div class="title">BOIDS</div>
+
+<div class="hud">
+  <div class="hud-row"><span class="hud-label">POPULATION:</span> <span class="hud-value" id="population">0</span></div>
+  <div class="hud-row"><span class="hud-label">GENERATION:</span> <span class="hud-value" id="generation">0</span></div>
+  <div class="hud-row"><span class="hud-label">AVG SPEED:</span> <span class="hud-value" id="avgSpeed">0</span></div>
+  <div class="hud-row"><span class="hud-label">FLOCKS:</span> <span class="hud-value" id="flocks">0</span></div>
+  <div class="hud-row"><span class="hud-label">FPS:</span> <span class="hud-value" id="fps">0</span></div>
+</div>
+
+<div class="controls">
+  <span>[SPACE]</span> Pause | 
+  <span>[R]</span> Reset | 
+  <span>[+/-]</span> Population | 
+  <span>[CLICK]</span> Attirer | 
+  <span>[SHIFT+CLICK]</span> Repousser
+</div>
+
+<div class="info-panel">
+  <h4>⚙️ PARAMÈTRES</h4>
+  <div class="slider-group">
+    <label>Séparation:</label>
+    <input type="range" id="separation" min="0" max="5" step="0.1" value="1.5">
+  </div>
+  <div class="slider-group">
+    <label>Alignement:</label>
+    <input type="range" id="alignment" min="0" max="5" step="0.1" value="1">
+  </div>
+  <div class="slider-group">
+    <label>Cohésion:</label>
+    <input type="range" id="cohesion" min="0" max="5" step="0.1" value="1">
+  </div>
+  <div class="slider-group">
+    <label>Vitesse max:</label>
+    <input type="range" id="maxSpeed" min="1" max="10" step="0.5" value="4">
+  </div>
+  <div class="slider-group">
+    <label>Perception:</label>
+    <input type="range" id="perception" min="20" max="150" step="10" value="50">
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const cursor = document.getElementById('cursor');
+
+let W, H;
+let boids = [];
+let paused = false;
+let generation = 0;
+let mouseX = 0, mouseY = 0;
+let mouseAttract = false;
+let mouseRepel = false;
+let lastTime = performance.now();
+let frameCount = 0;
+let fps = 0;
+
+// Parameters
+let params = {
+  separation: 1.5,
+  alignment: 1.0,
+  cohesion: 1.0,
+  maxSpeed: 4,
+  maxForce: 0.2,
+  perceptionRadius: 50
+};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+class Boid {
+  constructor(x, y) {
+    this.pos = { x: x || Math.random() * W, y: y || Math.random() * H };
+    this.vel = { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2 };
+    this.acc = { x: 0, y: 0 };
+    this.size = 3 + Math.random() * 2;
+    this.hue = 200 + Math.random() * 60; // Blue-ish
+  }
+  
+  edges() {
+    if (this.pos.x > W) this.pos.x = 0;
+    if (this.pos.x < 0) this.pos.x = W;
+    if (this.pos.y > H) this.pos.y = 0;
+    if (this.pos.y < 0) this.pos.y = H;
+  }
+  
+  align(boids) {
+    let steering = { x: 0, y: 0 };
+    let total = 0;
+    
+    for (let other of boids) {
+      const d = this.dist(other);
+      if (other !== this && d < params.perceptionRadius) {
+        steering.x += other.vel.x;
+        steering.y += other.vel.y;
+        total++;
+      }
+    }
+    
+    if (total > 0) {
+      steering.x /= total;
+      steering.y /= total;
+      const mag = Math.sqrt(steering.x * steering.x + steering.y * steering.y);
+      if (mag > 0) {
+        steering.x = (steering.x / mag) * params.maxSpeed - this.vel.x;
+        steering.y = (steering.y / mag) * params.maxSpeed - this.vel.y;
+      }
+      this.limit(steering, params.maxForce);
+    }
+    
+    return steering;
+  }
+  
+  cohesion(boids) {
+    let steering = { x: 0, y: 0 };
+    let total = 0;
+    
+    for (let other of boids) {
+      const d = this.dist(other);
+      if (other !== this && d < params.perceptionRadius) {
+        steering.x += other.pos.x;
+        steering.y += other.pos.y;
+        total++;
+      }
+    }
+    
+    if (total > 0) {
+      steering.x /= total;
+      steering.y /= total;
+      steering.x -= this.pos.x;
+      steering.y -= this.pos.y;
+      const mag = Math.sqrt(steering.x * steering.x + steering.y * steering.y);
+      if (mag > 0) {
+        steering.x = (steering.x / mag) * params.maxSpeed - this.vel.x;
+        steering.y = (steering.y / mag) * params.maxSpeed - this.vel.y;
+      }
+      this.limit(steering, params.maxForce);
+    }
+    
+    return steering;
+  }
+  
+  separation(boids) {
+    let steering = { x: 0, y: 0 };
+    let total = 0;
+    
+    for (let other of boids) {
+      const d = this.dist(other);
+      if (other !== this && d < params.perceptionRadius * 0.5) {
+        let diff = { x: this.pos.x - other.pos.x, y: this.pos.y - other.pos.y };
+        if (d > 0) {
+          diff.x /= d * d;
+          diff.y /= d * d;
+        }
+        steering.x += diff.x;
+        steering.y += diff.y;
+        total++;
+      }
+    }
+    
+    if (total > 0) {
+      steering.x /= total;
+      steering.y /= total;
+      const mag = Math.sqrt(steering.x * steering.x + steering.y * steering.y);
+      if (mag > 0) {
+        steering.x = (steering.x / mag) * params.maxSpeed - this.vel.x;
+        steering.y = (steering.y / mag) * params.maxSpeed - this.vel.y;
+      }
+      this.limit(steering, params.maxForce);
+    }
+    
+    return steering;
+  }
+  
+  dist(other) {
+    return Math.sqrt((this.pos.x - other.pos.x) ** 2 + (this.pos.y - other.pos.y) ** 2);
+  }
+  
+  limit(v, max) {
+    const mag = Math.sqrt(v.x * v.x + v.y * v.y);
+    if (mag > max) {
+      v.x = (v.x / mag) * max;
+      v.y = (v.y / mag) * max;
+    }
+  }
+  
+  flock(boids) {
+    const alignment = this.align(boids);
+    const cohesion = this.cohesion(boids);
+    const separation = this.separation(boids);
+    
+    this.acc.x += alignment.x * params.alignment;
+    this.acc.y += alignment.y * params.alignment;
+    this.acc.x += cohesion.x * params.cohesion;
+    this.acc.y += cohesion.y * params.cohesion;
+    this.acc.x += separation.x * params.separation;
+    this.acc.y += separation.y * params.separation;
+    
+    // Mouse interaction
+    if (mouseAttract || mouseRepel) {
+      const dx = mouseX - this.pos.x;
+      const dy = mouseY - this.pos.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 200) {
+        const force = mouseRepel ? -1 : 1;
+        this.acc.x += (dx / d) * 0.5 * force;
+        this.acc.y += (dy / d) * 0.5 * force;
+      }
+    }
+  }
+  
+  update() {
+    this.vel.x += this.acc.x;
+    this.vel.y += this.acc.y;
+    
+    const speed = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
+    if (speed > params.maxSpeed) {
+      this.vel.x = (this.vel.x / speed) * params.maxSpeed;
+      this.vel.y = (this.vel.y / speed) * params.maxSpeed;
+    }
+    
+    this.pos.x += this.vel.x;
+    this.pos.y += this.vel.y;
+    this.acc.x = 0;
+    this.acc.y = 0;
+  }
+  
+  draw() {
+    const angle = Math.atan2(this.vel.y, this.vel.x);
+    const speed = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
+    
+    ctx.save();
+    ctx.translate(this.pos.x, this.pos.y);
+    ctx.rotate(angle);
+    
+    // Triangle shape
+    ctx.beginPath();
+    ctx.moveTo(this.size * 2, 0);
+    ctx.lineTo(-this.size, -this.size);
+    ctx.lineTo(-this.size * 0.5, 0);
+    ctx.lineTo(-this.size, this.size);
+    ctx.closePath();
+    
+    // Color based on speed
+    const brightness = 50 + (speed / params.maxSpeed) * 50;
+    ctx.fillStyle = `hsl(${this.hue}, 80%, ${brightness}%)`;
+    ctx.fill();
+    
+    // Glow effect
+    ctx.shadowColor = `hsl(${this.hue}, 100%, 70%)`;
+    ctx.shadowBlur = 5;
+    ctx.fill();
+    
+    ctx.restore();
+  }
+}
+
+function init(count = 150) {
+  boids = [];
+  for (let i = 0; i < count; i++) {
+    boids.push(new Boid());
+  }
+  generation++;
+}
+
+function countFlocks() {
+  // Simple flock detection based on proximity clustering
+  const visited = new Set();
+  let flockCount = 0;
+  
+  for (let i = 0; i < boids.length; i++) {
+    if (!visited.has(i)) {
+      flockCount++;
+      const queue = [i];
+      while (queue.length > 0) {
+        const current = queue.shift();
+        if (visited.has(current)) continue;
+        visited.add(current);
+        
+        for (let j = 0; j < boids.length; j++) {
+          if (!visited.has(j) && boids[current].dist(boids[j]) < params.perceptionRadius) {
+            queue.push(j);
+          }
+        }
+      }
+    }
+  }
+  
+  return flockCount;
+}
+
+function updateHUD() {
+  document.getElementById('population').textContent = boids.length;
+  document.getElementById('generation').textContent = generation;
+  
+  let totalSpeed = 0;
+  for (let b of boids) {
+    totalSpeed += Math.sqrt(b.vel.x * b.vel.x + b.vel.y * b.vel.y);
+  }
+  document.getElementById('avgSpeed').textContent = (totalSpeed / boids.length).toFixed(2);
+  document.getElementById('flocks').textContent = countFlocks();
+  document.getElementById('fps').textContent = fps;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  
+  if (!paused) {
+    ctx.fillStyle = 'rgba(0, 0, 170, 0.2)';
+    ctx.fillRect(0, 0, W, H);
+    
+    for (let boid of boids) {
+      boid.flock(boids);
+      boid.update();
+      boid.edges();
+      boid.draw();
+    }
+  }
+  
+  // FPS counter
+  frameCount++;
+  const now = performance.now();
+  if (now - lastTime >= 1000) {
+    fps = frameCount;
+    frameCount = 0;
+    lastTime = now;
+    updateHUD();
+  }
+}
+
+// Event listeners
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+document.addEventListener('mousedown', e => {
+  if (e.shiftKey) {
+    mouseRepel = true;
+  } else {
+    mouseAttract = true;
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  mouseAttract = false;
+  mouseRepel = false;
+});
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    paused = !paused;
+    e.preventDefault();
+  }
+  if (e.code === 'KeyR') {
+    init(boids.length);
+  }
+  if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+    for (let i = 0; i < 10; i++) boids.push(new Boid(mouseX, mouseY));
+  }
+  if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+    for (let i = 0; i < 10 && boids.length > 10; i++) boids.pop();
+  }
+});
+
+// Slider listeners
+document.getElementById('separation').addEventListener('input', e => params.separation = parseFloat(e.target.value));
+document.getElementById('alignment').addEventListener('input', e => params.alignment = parseFloat(e.target.value));
+document.getElementById('cohesion').addEventListener('input', e => params.cohesion = parseFloat(e.target.value));
+document.getElementById('maxSpeed').addEventListener('input', e => params.maxSpeed = parseFloat(e.target.value));
+document.getElementById('perception').addEventListener('input', e => params.perceptionRadius = parseFloat(e.target.value));
+
+window.addEventListener('resize', resize);
+
+// Init
+resize();
+init(150);
+
+// SECRET: bird.mp4 - Special Bird (subtil, légèrement plus grand et vole un peu différemment)
+let specialBird = null;
+let birdVideoShown = false;
+
+function spawnSpecialBird() {
+  if (specialBird || birdVideoShown) return;
+  specialBird = {
+    pos: { x: Math.random() * W, y: Math.random() * H },
+    vel: { x: (Math.random() - 0.5) * 3, y: (Math.random() - 0.5) * 3 },
+    size: 5, // Légèrement plus grand que les autres (3-5 vs 5)
+    hue: 220, // Bleu légèrement différent (220 vs 200-260)
+    lifespan: 900 // 15 seconds at 60fps
+  };
+}
+
+// 2% chance every 3 seconds to spawn special bird
+setInterval(() => {
+  if (Math.random() < 0.02 && !specialBird && !birdVideoShown) {
+    spawnSpecialBird();
+  }
+}, 3000);
+
+function drawSpecialBird() {
+  if (!specialBird) return;
+  
+  // Update position (vole légèrement à contre-courant, plus lent)
+  specialBird.pos.x += specialBird.vel.x * 0.8;
+  specialBird.pos.y += specialBird.vel.y * 0.8;
+  
+  // Wrap edges
+  if (specialBird.pos.x > W) specialBird.pos.x = 0;
+  if (specialBird.pos.x < 0) specialBird.pos.x = W;
+  if (specialBird.pos.y > H) specialBird.pos.y = 0;
+  if (specialBird.pos.y < 0) specialBird.pos.y = H;
+  
+  // Draw - ressemble aux autres mais légèrement plus lumineux
+  ctx.save();
+  ctx.translate(specialBird.pos.x, specialBird.pos.y);
+  const angle = Math.atan2(specialBird.vel.y, specialBird.vel.x);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  ctx.moveTo(specialBird.size * 2, 0);
+  ctx.lineTo(-specialBird.size, -specialBird.size);
+  ctx.lineTo(-specialBird.size * 0.5, 0);
+  ctx.lineTo(-specialBird.size, specialBird.size);
+  ctx.closePath();
+  ctx.fillStyle = `hsla(${specialBird.hue}, 80%, 65%, 0.9)`; // Légèrement plus lumineux
+  ctx.fill();
+  ctx.restore();
+  
+  specialBird.lifespan--;
+  if (specialBird.lifespan <= 0) specialBird = null;
+}
+
+canvas.addEventListener('click', e => {
+  if (specialBird && !birdVideoShown) {
+    const dx = e.clientX - specialBird.pos.x;
+    const dy = e.clientY - specialBird.pos.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 25) {
+      birdVideoShown = true;
+      specialBird = null;
+      const popup = document.createElement('div');
+      popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+      popup.innerHTML = '<video src="bird.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+      popup.onclick = () => popup.remove();
+      document.body.appendChild(popup);
+    }
+  }
+});
+
+// Modify animate to draw special bird
+const originalAnimate = animate;
+animate = function() {
+  if (!paused) {
+    ctx.fillStyle = 'rgba(0, 0, 170, 0.2)';
+    ctx.fillRect(0, 0, W, H);
+    
+    for (let boid of boids) {
+      boid.flock(boids);
+      boid.update();
+      boid.edges();
+      boid.draw();
+    }
+    
+    drawSpecialBird();
+    generation++;
+  }
+  
+  frameCount++;
+  const now = performance.now();
+  if (now - lastTime >= 1000) {
+    fps = frameCount;
+    frameCount = 0;
+    lastTime = now;
+    updateHUD();
+  }
+  
+  requestAnimationFrame(animate);
+};
+
+animate();
+</script>
+</body>
+</html>

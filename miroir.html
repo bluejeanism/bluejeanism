@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M1R01R</title>
+<style>
+@keyframes breathe{0%,100%{opacity:0.3}50%{opacity:0.6}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes distort{0%,100%{filter:none}50%{filter:blur(1px) brightness(1.1)}}
+@keyframes glitchHard{0%{transform:translate(0)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-2px)}100%{transform:translate(0)}}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:none;font-family:"Courier New",monospace}
+
+.cursor{position:fixed;width:16px;height:16px;border:2px solid rgba(255,255,255,0.6);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:all 0.15s}
+.cursor.looking{border-color:#fff;transform:translate(-50%,-50%) scale(1.5)}
+
+.room{position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,#1a1a1a 0%,#0a0a0a 50%,#000 100%)}
+
+.logo{position:fixed;top:15px;left:15px;border:2px solid #fff;padding:4px 12px;text-decoration:none;color:#fff;font-size:11px;z-index:100;opacity:0.5}
+.logo:hover{background:#fff;opacity:1}
+.logo:hover span{color:#000}
+.logo span{background:#fff;color:#000;padding:0 3px}
+
+.mirror-frame{position:relative;padding:20px;background:linear-gradient(135deg,#3a3020 0%,#2a2015 50%,#1a1008 100%);border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.8)}
+
+.mirror{width:300px;height:400px;background:linear-gradient(180deg,
+  rgba(180,180,200,0.15) 0%,
+  rgba(200,200,220,0.2) 20%,
+  rgba(220,220,240,0.25) 40%,
+  rgba(200,200,220,0.2) 60%,
+  rgba(180,180,200,0.15) 80%,
+  rgba(160,160,180,0.1) 100%);
+border:2px solid rgba(255,255,255,0.1);
+position:relative;
+overflow:hidden;
+animation:float 6s ease-in-out infinite;
+cursor:pointer}
+
+.mirror::before{content:'';position:absolute;top:5%;left:5%;width:25%;height:15%;background:linear-gradient(135deg,rgba(255,255,255,0.4),transparent);border-radius:50%;filter:blur(8px)}
+
+.mirror::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(100,120,150,0.1) 50%,transparent 100%);pointer-events:none}
+
+.reflection{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:100px;opacity:0;transition:opacity 2s;filter:blur(3px)}
+.reflection.visible{opacity:0.3}
+
+.dark-presence{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 30%,rgba(0,0,0,0.5) 100%);opacity:0;transition:opacity 3s;pointer-events:none}
+
+.cracks{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 3s}
+.crack{position:absolute;background:rgba(255,255,255,0.3);height:1px;transform-origin:left}
+
+.timer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.3);font-size:12px;letter-spacing:2px}
+
+.mirror-message{position:absolute;top:70%;left:50%;transform:translate(-50%,-50%);color:rgba(255,255,255,0);font-size:14px;text-align:center;max-width:250px;line-height:1.6;transition:color 1s;pointer-events:none;text-shadow:0 0 10px currentColor}
+
+.video-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;border:2px solid #aa0000;z-index:2000;display:none;box-shadow:0 0 100px rgba(170,0,0,0.5)}
+.video-popup.visible{display:block}
+.video-popup video{width:500px;display:block}
+.video-popup .close{position:absolute;top:-12px;right:-12px;width:25px;height:25px;background:#aa0000;color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:14px}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="room"></div>
+
+<a href="borne.html" class="logo"><span>:vitalism</span></a>
+
+<div class="mirror-frame">
+  <div class="mirror" id="mirror">
+    <div class="reflection" id="reflection">👤</div>
+    <div class="dark-presence" id="darkPresence"></div>
+    <div class="cracks" id="cracks"></div>
+    <div class="mirror-message" id="mirrorMessage"></div>
+  </div>
+</div>
+
+<div class="timer" id="timer">00:00</div>
+
+<div class="video-popup" id="videoPopup">
+  <button class="close" onclick="closeVideo()">×</button>
+  <video id="secretVideo" controls><source src="bougie.mp4" type="video/mp4"></video>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+const mirror=document.getElementById('mirror');
+const reflection=document.getElementById('reflection');
+const darkPresence=document.getElementById('darkPresence');
+const cracks=document.getElementById('cracks');
+const timerEl=document.getElementById('timer');
+const mirrorMessage=document.getElementById('mirrorMessage');
+
+let pageTime=0;
+let videoShown=false;
+let lastUpdate=Date.now();
+
+const TRIGGER_TIME=120; // 2 minutes
+
+// Messages du miroir qui s'inquiète de plus en plus
+const mirrorMessages=[
+  {time:10, text:"Tu es là...", color:"rgba(255,255,255,0.3)"},
+  {time:25, text:"Qu'est-ce que tu regardes?", color:"rgba(255,255,255,0.4)"},
+  {time:40, text:"Tu restes...", color:"rgba(255,255,255,0.5)"},
+  {time:55, text:"Pourquoi tu me fixes comme ça?", color:"rgba(200,200,255,0.5)"},
+  {time:70, text:"Arrête...", color:"rgba(255,200,200,0.6)"},
+  {time:85, text:"Tu me fais peur.", color:"rgba(255,150,150,0.7)"},
+  {time:95, text:"ARRÊTE DE ME REGARDER", color:"rgba(255,100,100,0.8)"},
+  {time:105, text:"QU'EST-CE QUE TU VEUX?!", color:"rgba(255,50,50,0.9)"},
+  {time:115, text:"NON... NON...", color:"rgba(255,0,0,1)"}
+];
+
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX+'px';
+  cursor.style.top=e.clientY+'px';
+});
+
+mirror.addEventListener('click',()=>{
+  // Messages quand on clique sur le miroir
+  const clickMessages=[
+    "Ne me touche pas.",
+    "Qu'est-ce que tu veux?",
+    "Je ne suis qu'un reflet...",
+    "Ou peut-être pas.",
+    "Tu ne devrais pas être là.",
+    "..."
+  ];
+  mirrorMessage.textContent=clickMessages[Math.floor(Math.random()*clickMessages.length)];
+  mirrorMessage.style.color="rgba(255,255,255,0.8)";
+  setTimeout(()=>mirrorMessage.style.color="rgba(255,255,255,0)",2000);
+});
+
+// Generate cracks
+for(let i=0;i<15;i++){
+  const crack=document.createElement('div');
+  crack.className='crack';
+  crack.style.left=Math.random()*100+'%';
+  crack.style.top=Math.random()*100+'%';
+  crack.style.width=20+Math.random()*80+'px';
+  crack.style.transform=`rotate(${Math.random()*360}deg)`;
+  cracks.appendChild(crack);
+}
+
+function update(){
+  const now=Date.now();
+  const delta=(now-lastUpdate)/1000;
+  lastUpdate=now;
+  
+  if(!videoShown){
+    pageTime+=delta;
+    
+    // Update timer (simple page time)
+    const mins=Math.floor(pageTime/60);
+    const secs=Math.floor(pageTime%60);
+    timerEl.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+    
+    const progress=Math.min(pageTime/TRIGGER_TIME,1);
+    
+    // Show reflection after a few seconds
+    if(pageTime>3)reflection.classList.add('visible');
+    
+    // Dark presence grows
+    darkPresence.style.opacity=progress*0.8;
+    
+    // Cracks appear
+    if(progress>0.4){
+      cracks.style.opacity=(progress-0.4)/0.6;
+    }
+    
+    // Mirror distortion
+    if(progress>0.6){
+      mirror.style.animation=`float 6s ease-in-out infinite, distort ${2-progress}s infinite`;
+    }
+    
+    // Hard glitch near end
+    if(progress>0.9){
+      mirror.style.animation='glitchHard 0.1s infinite';
+    }
+    
+    // Mirror messages based on time
+    for(let i=mirrorMessages.length-1;i>=0;i--){
+      if(pageTime>=mirrorMessages[i].time){
+        mirrorMessage.textContent=mirrorMessages[i].text;
+        mirrorMessage.style.color=mirrorMessages[i].color;
+        break;
+      }
+    }
+    
+    // Trigger video at 2 minutes
+    if(pageTime>=TRIGGER_TIME&&!videoShown){
+      videoShown=true;
+      showVideo();
+    }
+  }
+  
+  requestAnimationFrame(update);
+}
+
+function showVideo(){
+  document.getElementById('videoPopup').classList.add('visible');
+  document.getElementById('secretVideo').play();
+}
+
+function closeVideo(){
+  document.getElementById('videoPopup').classList.remove('visible');
+  document.getElementById('secretVideo').pause();
+}
+
+// SECRET: arriere.mp4 - rester immobile 30 secondes
+let lastMouseMove=Date.now();
+let arriereShown=false;
+document.addEventListener('mousemove',()=>{lastMouseMove=Date.now();});
+setInterval(()=>{
+  if(!arriereShown && Date.now()-lastMouseMove>30000){
+    arriereShown=true;
+    const popup=document.getElementById('videoPopup');
+    const video=document.getElementById('secretVideo');
+    video.src='arriere.mp4';
+    popup.classList.add('visible');
+    video.play();
+  }
+},1000);
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeVideo();
+});
+
+update();
+</script>
+</body>
+</html>

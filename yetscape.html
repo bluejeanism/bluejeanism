@@ -20,6 +20,11 @@
   100% { transform: rotate(360deg); }
 }
 
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
 * {
   cursor: none !important;
   box-sizing: border-box;
@@ -95,6 +100,15 @@ body:not(.video-playing) {
 
 body:hover .fake-cursor {
   display: block;
+}
+
+/* Cacher le curseur personnalisé dans les modals */
+.modal-dialog *, .modal-overlay {
+  cursor: auto !important;
+}
+
+body:has(.modal-dialog[style*="display: block"]) .fake-cursor {
+  display: none !important;
 }
 
 .logo {
@@ -182,6 +196,7 @@ body:hover .fake-cursor {
   color: black;
   font-weight: bold;
   font-size: 12px;
+  cursor: pointer;
 }
 
 .title-bar .buttons span:active {
@@ -203,6 +218,7 @@ body:hover .fake-cursor {
   padding: 3px 10px;
   display: inline-block;
   position: relative;
+  cursor: pointer;
 }
 
 .menu-bar span:hover {
@@ -228,6 +244,7 @@ body:hover .fake-cursor {
   display: block;
   color: #000000;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .dropdown-item:hover {
@@ -274,6 +291,7 @@ body:hover .fake-cursor {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .toolbar-btn:active {
@@ -404,6 +422,7 @@ body:hover .fake-cursor {
   background: #C0C0C0;
   font-weight: bold;
   margin-left: 5px;
+  cursor: pointer;
 }
 
 .search-form button:active {
@@ -456,6 +475,13 @@ body:hover .fake-cursor {
   font-size: 13px;
   line-height: 1.5;
   color: #000000;
+}
+
+.result-tags {
+  font-size: 10px;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
 }
 
 .status-bar {
@@ -615,6 +641,251 @@ body:hover .fake-cursor {
   font-size: 14px;
 }
 
+/* Modal dialog */
+.modal-dialog {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #FFFFFF #000000 #000000 #FFFFFF;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  z-index: 10005;
+  min-width: 400px;
+  max-width: 80vw;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 10004;
+}
+
+.modal-title-bar {
+  background: linear-gradient(90deg, #000080, #1084d0);
+  color: white;
+  padding: 3px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.modal-title-bar .buttons span {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 2px solid #FFFFFF;
+  border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #000000;
+  border-right: 2px solid #000000;
+  background: #C0C0C0;
+  color: black;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+  color: #000000;
+}
+
+.modal-buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  padding: 4px 20px;
+  border-top: 2px solid #FFFFFF;
+  border-left: 2px solid #FFFFFF;
+  border-bottom: 2px solid #000000;
+  border-right: 2px solid #000000;
+  background: #C0C0C0;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.modal-buttons button:active {
+  border-top: 2px solid #000000;
+  border-left: 2px solid #000000;
+  border-bottom: 2px solid #FFFFFF;
+  border-right: 2px solid #FFFFFF;
+}
+
+/* Bluescreen pour l'impression */
+.bsod-print {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0000AA;
+  z-index: 20001;
+  color: #FFFFFF;
+  font-family: "Courier New", monospace;
+  padding: 40px;
+  overflow: auto;
+  font-size: 16px;
+  line-height: 1.8;
+  animation: flicker 0.15s infinite;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.bsod-print::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 20002;
+}
+
+.bsod-print::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 20002;
+}
+
+.bsod-print-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.bsod-print-content h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: #FFFFFF;
+}
+
+.bsod-print-qr {
+  width: 300px;
+  height: 300px;
+  margin: 30px auto;
+  background: #FFFFFF;
+  padding: 20px;
+  border: 3px solid #FFFFFF;
+}
+
+/* Page d'impression */
+@media print {
+  body * {
+    display: none !important;
+  }
+  
+  body::before, body::after {
+    display: none !important;
+  }
+  
+  .print-content {
+    display: block !important;
+  }
+}
+
+.print-content {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  z-index: 20000;
+}
+
+@page {
+  size: A4;
+  margin: 2cm;
+}
+
+.print-page {
+  width: 21cm;
+  min-height: 29.7cm;
+  padding: 2cm;
+  margin: 0 auto;
+  background: white;
+  color: black;
+  font-family: Arial, sans-serif;
+}
+
+.print-header {
+  text-align: center;
+  border-bottom: 3px solid #000080;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.print-header h1 {
+  color: #000080;
+  font-size: 32px;
+  margin: 0 0 10px 0;
+}
+
+.print-qr-section {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.print-qr-code {
+  width: 200px;
+  height: 200px;
+  margin: 20px auto;
+  border: 3px solid #000080;
+  padding: 10px;
+  background: white;
+}
+
+.print-info {
+  margin: 30px 0;
+  line-height: 2;
+}
+
+.print-info strong {
+  color: #000080;
+}
+
+.print-footer {
+  position: absolute;
+  bottom: 2cm;
+  left: 2cm;
+  right: 2cm;
+  text-align: center;
+  border-top: 2px solid #000080;
+  padding-top: 10px;
+  font-size: 10px;
+  color: #666;
+}
+
 @media (max-width: 768px) {
   .netscape-window {
     width: 95vw;
@@ -626,7 +897,7 @@ body:hover .fake-cursor {
 <body>
 
 <div class="fake-cursor" id="fakeCursor"></div>
-<a href="borne.html" style="text-decoration:none;">
+<a href="index.html" style="text-decoration:none;">
   <div class="logo"><span>:vitalism</span></div>
 </a>
 
@@ -647,13 +918,13 @@ body:hover .fake-cursor {
     <span class="menu-item">
       <u>F</u>ile
       <div class="dropdown">
-        <div class="dropdown-item">New Window</div>
-        <div class="dropdown-item">Open Location...</div>
-        <div class="dropdown-item">Open File...</div>
+        <div class="dropdown-item" onclick="newWindow()">New Window</div>
+        <div class="dropdown-item" onclick="openLocation()">Open Location...</div>
+        <div class="dropdown-item" onclick="openFile()">Open File...</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Save As...</div>
+        <div class="dropdown-item" onclick="saveAs()">Save As...</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Print...</div>
+        <div class="dropdown-item" onclick="printPage()">Print...</div>
         <div class="dropdown-separator"></div>
         <div class="dropdown-item" onclick="closeWindow()">Exit</div>
       </div>
@@ -661,58 +932,58 @@ body:hover .fake-cursor {
     <span class="menu-item">
       <u>E</u>dit
       <div class="dropdown">
-        <div class="dropdown-item">Cut</div>
-        <div class="dropdown-item">Copy</div>
-        <div class="dropdown-item">Paste</div>
+        <div class="dropdown-item" onclick="cutText()">Cut</div>
+        <div class="dropdown-item" onclick="copyText()">Copy</div>
+        <div class="dropdown-item" onclick="pasteText()">Paste</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Find in Page...</div>
+        <div class="dropdown-item" onclick="findInPage()">Find in Page...</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Preferences...</div>
+        <div class="dropdown-item" onclick="preferences()">Preferences...</div>
       </div>
     </span>
     <span class="menu-item">
       <u>V</u>iew
       <div class="dropdown">
         <div class="dropdown-item" onclick="performSearch()">Reload</div>
-        <div class="dropdown-item">Stop</div>
+        <div class="dropdown-item" onclick="stopLoading()">Stop</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">View Source</div>
-        <div class="dropdown-item">Page Info</div>
+        <div class="dropdown-item" onclick="viewSource()">View Source</div>
+        <div class="dropdown-item" onclick="pageInfo()">Page Info</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Increase Font</div>
-        <div class="dropdown-item">Decrease Font</div>
+        <div class="dropdown-item" onclick="increaseFont()">Increase Font</div>
+        <div class="dropdown-item" onclick="decreaseFont()">Decrease Font</div>
       </div>
     </span>
     <span class="menu-item">
       <u>G</u>o
       <div class="dropdown">
-        <div class="dropdown-item">Back</div>
-        <div class="dropdown-item">Forward</div>
-        <div class="dropdown-item">Home</div>
+        <div class="dropdown-item" onclick="goBack()">Back</div>
+        <div class="dropdown-item" onclick="goForward()">Forward</div>
+        <div class="dropdown-item" onclick="goHome()">Home</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Search Internet</div>
+        <div class="dropdown-item" onclick="performSearch()">Search Internet</div>
       </div>
     </span>
     <span class="menu-item">
       <u>B</u>ookmarks
       <div class="dropdown">
-        <div class="dropdown-item">Add Bookmark...</div>
-        <div class="dropdown-item">Edit Bookmarks...</div>
+        <div class="dropdown-item" onclick="addBookmark()">Add Bookmark...</div>
+        <div class="dropdown-item" onclick="editBookmarks()">Edit Bookmarks...</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Vitalism Network</div>
-        <div class="dropdown-item">YETSCAPE Home</div>
-        <div class="dropdown-item">Codex</div>
-        <div class="dropdown-item">Chat</div>
+        <div class="dropdown-item" onclick="goToPage('index.html')">Vitalism Network</div>
+        <div class="dropdown-item" onclick="goToPage('codex.html')">Codex</div>
+        <div class="dropdown-item" onclick="goToPage('classement.html')">Classement</div>
+        <div class="dropdown-item" onclick="goToPage('repertoire.html')">Répertoire</div>
       </div>
     </span>
     <span class="menu-item">
       <u>H</u>elp
       <div class="dropdown">
-        <div class="dropdown-item">About YETSCAPE</div>
-        <div class="dropdown-item">Help Contents</div>
+        <div class="dropdown-item" onclick="aboutYetscape()">About YETSCAPE</div>
+        <div class="dropdown-item" onclick="helpContents()">Help Contents</div>
         <div class="dropdown-separator"></div>
-        <div class="dropdown-item">Check for Updates</div>
-        <div class="dropdown-item">Release Notes</div>
+        <div class="dropdown-item" onclick="checkUpdates()">Check for Updates</div>
+        <div class="dropdown-item" onclick="releaseNotes()">Release Notes</div>
         <div class="dropdown-separator"></div>
         <div class="dropdown-item" onclick="launchMentel()">Mentel - KLondike 5-4385</div>
       </div>
@@ -720,14 +991,14 @@ body:hover .fake-cursor {
   </div>
   
   <div class="toolbar">
-    <button class="toolbar-btn" title="Back">◄</button>
-    <button class="toolbar-btn" title="Forward">►</button>
-    <button class="toolbar-btn" title="Home">🏠</button>
+    <button class="toolbar-btn" onclick="goBack()" title="Back">◄</button>
+    <button class="toolbar-btn" onclick="goForward()" title="Forward">►</button>
+    <button class="toolbar-btn" onclick="goHome()" title="Home">🏠</button>
     <button class="toolbar-btn" onclick="performSearch()" title="Reload">⟳</button>
     <div class="toolbar-separator"></div>
-    <button class="toolbar-btn" title="Print">🖨</button>
-    <button class="toolbar-btn" title="Find">🔍</button>
-    <button class="toolbar-btn" title="Stop">⛔</button>
+    <button class="toolbar-btn" onclick="printPage()" title="Print">🖨</button>
+    <button class="toolbar-btn" onclick="findInPage()" title="Find">🔍</button>
+    <button class="toolbar-btn" onclick="stopLoading()" title="Stop">⛔</button>
     <div class="netscape-logo" id="netscapeLogo">Y</div>
   </div>
   
@@ -736,7 +1007,7 @@ body:hover .fake-cursor {
     <input type="text" id="locationBar" value="yetscape://vitalism.search" readonly>
   </div>
   
-  <div class="page-content">
+  <div class="page-content" id="pageContent">
     <div class="web-page">
       <h1>🔍 YETSCAPE Search Engine</h1>
       <center><i>Your Gateway to the Vitalism Network</i></center>
@@ -761,9 +1032,9 @@ body:hover .fake-cursor {
         <p style="font-size: 11px; color: #666;">
           <b>YETSCAPE</b> - Powered by Vitalism Network<br>
           Best viewed with YETSCAPE Navigator 1.0<br>
-          <a href="#" style="color: #0000EE;">Webmaster</a> | 
-          <a href="#" style="color: #0000EE;">Contact</a> | 
-          <a href="#" style="color: #0000EE;">About</a>
+          <a href="#" style="color: #0000EE;" onclick="showModal('Contact', 'Pour contacter le webmaster: webmaster@vitalism.net'); return false;">Webmaster</a> | 
+          <a href="#" style="color: #0000EE;" onclick="showModal('Contact', 'Vitalism Network<br>Email: contact@vitalism.net'); return false;">Contact</a> | 
+          <a href="#" style="color: #0000EE;" onclick="aboutYetscape(); return false;">About</a>
         </p>
       </center>
     </div>
@@ -775,6 +1046,22 @@ body:hover .fake-cursor {
   </div>
 </div>
 
+<!-- Modal Dialog -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal-dialog" id="modalDialog">
+  <div class="modal-title-bar">
+    <span id="modalTitleText">Dialog</span>
+    <div class="buttons">
+      <span onclick="closeModal()">X</span>
+    </div>
+  </div>
+  <div class="modal-body" id="modalBodyText">
+  </div>
+  <div class="modal-buttons">
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
+
 <div class="fullscreen-video" id="videoScreen">
   <video id="mentelVideo" src="mentel2.mp4"></video>
 </div>
@@ -783,7 +1070,74 @@ body:hover .fake-cursor {
   <div id="bsodLines"></div>
 </div>
 
+<!-- Bluescreen pour l'impression -->
+<div class="bsod-print" id="bsodPrint">
+  <div class="bsod-print-content">
+    <h1>*** PRINT SYSTEM INITIALIZING ***</h1>
+    <p style="font-size: 18px; margin: 20px 0;">
+      A print exception 0xPRINT has occurred at 0028:C00DE
+    </p>
+    <div style="margin: 30px 0; font-size: 14px; line-height: 2;">
+      * Loading print driver...<br>
+      * Preparing document...<br>
+      * Generating QR access code...<br>
+    </div>
+    
+    <div class="bsod-print-qr">
+      <svg id="qrcodeBluescreen" width="100%" height="100%" viewBox="0 0 300 300"></svg>
+    </div>
+    
+    <p style="font-size: 16px; margin-top: 20px;">
+      SCAN TO ACCESS VITALISM NETWORK<br>
+      <span style="font-size: 12px; color: #AAAAAA;">System will continue in a moment...</span>
+    </p>
+  </div>
+</div>
+
 <div class="fire-overlay" id="fireOverlay"></div>
+
+<!-- Contenu d'impression personnalisé -->
+<div class="print-content">
+  <div class="print-page">
+    <div class="print-header">
+      <h1>🌐 YETSCAPE Navigator</h1>
+      <p style="font-size: 14px; color: #666;">Printed from: yetscape://vitalism.search</p>
+    </div>
+    
+    <div class="print-qr-section">
+      <h2 style="color: #000080;">Accédez au réseau Vitalism</h2>
+      <p>Scannez ce QR code pour visiter le site</p>
+      <div class="print-qr-code">
+        <!-- QR Code généré dynamiquement -->
+        <svg id="qrcode" width="100%" height="100%" viewBox="0 0 200 200"></svg>
+      </div>
+      <p style="font-weight: bold; color: #000080; font-size: 18px;" id="printUrl">vitalism.network</p>
+    </div>
+    
+    <div class="print-info">
+      <h3 style="color: #000080; border-bottom: 2px solid #000080; padding-bottom: 5px;">Informations</h3>
+      <p><strong>Document:</strong> YETSCAPE Search Engine</p>
+      <p><strong>Date d'impression:</strong> <span id="printDate"></span></p>
+      <p><strong>Heure:</strong> <span id="printTime"></span></p>
+      <p><strong>Navigateur:</strong> YETSCAPE Navigator 1.0</p>
+      <p><strong>Réseau:</strong> Vitalism Network</p>
+    </div>
+    
+    <div class="print-info">
+      <h3 style="color: #000080; border-bottom: 2px solid #000080; padding-bottom: 5px;">À propos du Vitalism Network</h3>
+      <p>Le Vitalism Network est un réseau de philosophes et penseurs contemporains explorant les idées vitalistes, néo-nietzschéennes et post-modernes.</p>
+      <p><strong>Contributeurs principaux:</strong> Calliclès, Raffaello Bellino, Venehon, Yamnaya, Anone</p>
+      <p><strong>Thématiques:</strong> Philosophie, Éthique numérique, Métaphysique, Esthétique</p>
+    </div>
+    
+    <div class="print-footer">
+      <p>© 2025 Vitalism Network - Tous droits réservés</p>
+      <p>Document généré par YETSCAPE Navigator - Best viewed with YETSCAPE 1.0</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 
 <script>
 const fakeCursor = document.getElementById('fakeCursor');
@@ -792,26 +1146,269 @@ document.addEventListener('mousemove', (e) => {
   fakeCursor.style.top = e.clientY + 'px';
 });
 
-const siteData = [
-  {type:'page', title:'Introduction to Vitalism', url:'intro.html', snippet:'Discover the vitalist philosophy and its fundamental principles.'},
-  {type:'page', title:'Vitalist Manifesto', url:'manifesto.html', snippet:'The founding text of the contemporary vitalist movement.'},
-  {type:'page', title:'Anon Directory', url:'repertoire.html', snippet:'Complete list of contributors and thinkers in the network.'},
-  {type:'anon', title:'Calliclès', url:'Callicles.html', snippet:'Philosopher and theorist, specialist in digital ethics.'},
-  {type:'anon', title:'Aegipan', url:'aegipan.html', snippet:'Active contributor, expert in metaphysics.'},
-  {type:'anon', title:'Echidna', url:'echidna.html', snippet:'Cultural analyst and trend observer.'},
-  {type:'page', title:'YETSCAPE Search', url:'yetscape.html', snippet:'The internal search engine of the Vitalism network.'},
-  {type:'page', title:'Codex', url:'codex.html', snippet:'Encyclopedia of concepts and references from the movement.'},
-  {type:'page', title:'Dictionary', url:'dictionary.html', snippet:'Glossary of philosophical and technical terms.'},
-  {type:'anon', title:'Forseti', url:'forseti.html', snippet:'Nordic thinker, specialist in social justice.'},
-  {type:'anon', title:'Nüwa', url:'nuwa.html', snippet:'Asian contributor, expert in cosmology.'},
-  {type:'page', title:'Bluejeanism Chat', url:'chat.html', snippet:'Discussion forum and philosophical exchanges.'}
-];
+// Base de données exhaustive avec TOUS les mots du site
+const siteDatabase = {
+  words: [
+    // Tous les mots importants de votre site
+    'vitalism', 'vitalisme', 'philosophie', 'philosophy', 'contributeur', 'contributor',
+    'calliclès', 'callicles', 'raffaello', 'bellino', 'venehon', 'yamnaya', 'anone',
+    'nietzsche', 'néo-nietzschéen', 'éthique', 'ethics', 'numérique', 'digital',
+    'classement', 'ranking', 'score', 'points', 'statistiques', 'statistics',
+    'répertoire', 'repertoire', 'directory', 'liste', 'list', 'fichiers', 'files',
+    'codex', 'encyclopédie', 'encyclopedia', 'référence', 'reference',
+    'livre', 'book', 'article', 'vidéo', 'video', 'audio', 'musique', 'music',
+    'mentel', 'myosotis', 'vivre', 'live', 'existence',
+    'métaphysique', 'metaphysics', 'esthétique', 'aesthetic', 'logique', 'logic',
+    'raisonnement', 'reasoning', 'sociologie', 'sociology',
+    'réseau', 'network', 'communauté', 'community', 'forum', 'chat', 'discussion',
+    'mondial', 'world', 'international', 'global', 'frontière', 'frontier', 'border',
+    'rouge', 'red', 'couleur', 'color', 'vie', 'life', 'tuyau', 'pipe',
+    'cocktail', 'mix', 'mélange', 'bug', 'erreur', 'error',
+    'menu', 'navigation', 'accueil', 'home', 'index',
+    'auteur', 'author', 'écrivain', 'writer', 'penseur', 'thinker',
+    'théorie', 'theory', 'concept', 'idée', 'idea', 'pensée', 'thought',
+    'culture', 'cultural', 'analyse', 'analysis', 'critique', 'critical',
+    'moderne', 'modern', 'contemporain', 'contemporary', 'futur', 'future',
+    'histoire', 'history', 'temps', 'time', 'espace', 'space',
+    'humain', 'human', 'humanité', 'humanity', 'sujet', 'subject',
+    'pouvoir', 'power', 'force', 'morale', 'moral', 'valeur', 'value',
+    'liberté', 'freedom', 'démocratie', 'democracy', 'politique', 'politics',
+    'technologie', 'technology', 'intelligence', 'artificielle', 'artificial', 'ia', 'ai',
+    'conscience', 'consciousness', 'esprit', 'mind', 'âme', 'soul',
+    'corps', 'body', 'nature', 'réel', 'real', 'réalité', 'reality',
+    'vérité', 'truth', 'savoir', 'knowledge', 'science',
+    'art', 'beauté', 'beauty', 'création', 'creation', 'créateur', 'creator',
+    'manifeste', 'manifesto', 'mouvement', 'movement', 'révolution', 'revolution',
+    'recherche', 'search', 'explorer', 'explore', 'découvrir', 'discover',
+    'portrait', 'photo', 'image', 'picture', 'vidéo', 'film',
+    'podcast', 'audio', 'enregistrement', 'recording',
+    'fondements', 'foundations', 'principes', 'principles', 'bases',
+    'néo', 'neo', 'nouveau', 'new', 'post', 'trans',
+    'cyber', 'numérique', 'digital', 'virtuel', 'virtual',
+    'système', 'system', 'structure', 'organisation', 'organization',
+    'membre', 'member', 'participant', 'actif', 'active',
+    'publication', 'publish', 'publier', 'édition', 'edition',
+    'tweet', 'twitter', 'retweet', 'like', 'social',
+    'badge', 'médaille', 'medal', 'récompense', 'reward',
+    'top', 'classé', 'ranked', 'premier', 'first', 'deuxième', 'second', 'troisième', 'third',
+    'suisse', 'switzerland', 'france', 'french', 'français'
+  ],
+  
+  pages: [
+    {
+      type:'page', 
+      title:'Vitalism - Accueil', 
+      url:'index.html', 
+      snippet:'Page d\'accueil du réseau Vitalism. Découvrez la philosophie vitaliste et ses contributeurs. Le vitalisme est un mouvement philosophique qui place la vie au centre de la réflexion.', 
+      keywords: 'vitalism vitalisme philosophie philosophy accueil home index réseau network mouvement movement vie life contributeurs contributors découvrir discover'
+    },
+    {
+      type:'page', 
+      title:'Répertoire des Contributeurs', 
+      url:'repertoire.html', 
+      snippet:'Explorateur de fichiers listant tous les contributeurs, documents et ressources du réseau Vitalism. Interface de type Windows Explorer pour naviguer dans les contenus.', 
+      keywords: 'répertoire repertoire directory liste list contributeurs contributors fichiers files documents resources explorer windows navigation browse'
+    },
+    {
+      type:'page', 
+      title:'Classement des Contributeurs', 
+      url:'classement.html', 
+      snippet:'Tableau de classement des contributeurs basé sur leurs publications, articles, vidéos et engagement. Scores calculés selon les livres, articles, vidéos, retweets et likes.', 
+      keywords: 'classement ranking scores statistiques statistics publications articles vidéos videos livres books points engagement retweets likes top premier deuxième troisième badges'
+    },
+    {
+      type:'page', 
+      title:'Codex Vitaliste', 
+      url:'codex.html', 
+      snippet:'Encyclopédie et référence des concepts, théories et principes du mouvement vitaliste. Documentation complète des idées et philosophies.', 
+      keywords: 'codex encyclopédie encyclopedia référence reference concepts théories theories principes principles documentation philosophie philosophy idées ideas'
+    },
+    {
+      type:'page', 
+      title:'Menu Principal', 
+      url:'menu.html', 
+      snippet:'Menu de navigation principal pour accéder aux différentes sections du site Vitalism.', 
+      keywords: 'menu navigation sections accès access principal main'
+    },
+    {
+      type:'page', 
+      title:'Mondial', 
+      url:'mondial.html', 
+      snippet:'Vue mondiale et internationale du mouvement vitaliste à travers différents pays et cultures. Perspective globale sur le vitalisme.', 
+      keywords: 'mondial world international global pays countries cultures perspective planète earth'
+    },
+    {
+      type:'page', 
+      title:'Frontière', 
+      url:'frontiere.html', 
+      snippet:'Exploration des frontières conceptuelles et géographiques dans la pensée vitaliste. Limites et dépassements.', 
+      keywords: 'frontière frontier border limites limits exploration géographique geographic conceptuel conceptual dépassement transcendence'
+    },
+    {
+      type:'page', 
+      title:'Rouge', 
+      url:'rouge.html', 
+      snippet:'Thématiques rouges et leur symbolique dans la philosophie vitaliste. Couleur, passion et intensité.', 
+      keywords: 'rouge red couleur color symbolique symbolic passion intensité intensity thématique theme'
+    },
+    {
+      type:'page', 
+      title:'Vie', 
+      url:'vie.html', 
+      snippet:'Réflexions philosophiques sur la vie, l\'existence et le vitalisme. Essence même du mouvement.', 
+      keywords: 'vie life existence être being réflexions reflections philosophie philosophy essence vitalisme vitalism vivre living'
+    },
+    {
+      type:'page', 
+      title:'Tuyau', 
+      url:'tuyau.html', 
+      snippet:'Canaux de communication et transmission d\'idées au sein du réseau. Conduits d\'information.', 
+      keywords: 'tuyau pipe canal channel communication transmission idées ideas réseau network information conduit'
+    },
+    {
+      type:'page', 
+      title:'Cocktail', 
+      url:'cocktail.html', 
+      snippet:'Mélange d\'idées, concepts et influences dans la pensée vitaliste contemporaine. Fusion créative.', 
+      keywords: 'cocktail mélange mix idées ideas concepts influences fusion créative creative contemporain contemporary'
+    },
+    {
+      type:'page', 
+      title:'Bug', 
+      url:'bug.html', 
+      snippet:'Analyse des erreurs, dysfonctionnements et anomalies dans les systèmes philosophiques. Critique des failles.', 
+      keywords: 'bug erreur error dysfonctionnement malfunction anomalie anomaly analyse analysis critique criticism faille flaw système system'
+    },
+    {
+      type:'page', 
+      title:'Anone', 
+      url:'anone.html', 
+      snippet:'Profil et contributions d\'Anone au réseau Vitalism. Membre actif de la communauté.', 
+      keywords: 'anone profil profile contributeur contributor contributions membre member actif active communauté community'
+    },
+    {
+      type:'page', 
+      title:'Chatbox', 
+      url:'https://faunism.forumactif.com/chatbox/', 
+      snippet:'Espace de discussion et d\'échanges en temps réel pour la communauté vitaliste. Forum de dialogue.', 
+      keywords: 'chatbox chat discussion forum échanges exchanges temps réel real time communauté community dialogue conversation'
+    },
+    
+    // Contributeurs détaillés
+    {
+      type:'contributeur', 
+      title:'Calliclès', 
+      url:'Callicles.html', 
+      snippet:'Philosophe et théoricien néo-nietzschéen, spécialiste de l\'éthique numérique. Auteur de "Fondements du Vitalisme" (2020), "Manifeste Néo-Nietzschéen" (2021) et "Philosophie de l\'IA" (2022). Expert en philosophie de la technologie et pensée contemporaine. Articles sur Nietzsche au XXIe siècle, démocratie numérique et nihilisme.', 
+      keywords: 'calliclès callicles philosophe philosopher théoricien theorist nietzsche néo-nietzschéen neo-nietzschean éthique ethics numérique digital auteur author fondements foundations vitalisme vitalism manifeste manifesto philosophie philosophy ia ai intelligence artificielle artificial technologie technology contemporain contemporary articles démocratie democracy nihilisme nihilism'
+    },
+    {
+      type:'contributeur', 
+      title:'Raffaello Bellino', 
+      url:'Raffaello Bellino.html', 
+      snippet:'Contributeur actif et penseur vitaliste, expert en métaphysique et esthétique contemporaine. Travaux sur la beauté, l\'art et la théorie de la connaissance.', 
+      keywords: 'raffaello bellino contributeur contributor penseur thinker vitaliste vitalist métaphysique metaphysics esthétique aesthetic contemporain contemporary beauté beauty art théorie theory connaissance knowledge'
+    },
+    {
+      type:'contributeur', 
+      title:'Venehon', 
+      url:'Venehon.html', 
+      snippet:'Analyste culturel et observateur des tendances philosophiques émergentes. Spécialiste des mouvements intellectuels et de l\'évolution des idées.', 
+      keywords: 'venehon analyste analyst culturel cultural observateur observer tendances trends philosophiques philosophical émergent emerging mouvements movements intellectuel intellectual évolution evolution idées ideas'
+    },
+    {
+      type:'contributeur', 
+      title:'Yamnaya', 
+      url:'Yamnaya.html', 
+      snippet:'Penseur et contributeur majeur, spécialiste de l\'histoire des idées et de l\'anthropologie philosophique. Recherches sur les origines de la pensée et l\'évolution culturelle.', 
+      keywords: 'yamnaya penseur thinker contributeur contributor histoire history idées ideas anthropologie anthropology philosophique philosophical origines origins pensée thought évolution evolution culturelle cultural recherches research'
+    },
+    
+    // Médias
+    {
+      type:'audio', 
+      title:'Mentel - Audio', 
+      url:'mentel.mp3', 
+      snippet:'Enregistrement audio de la série Mentel, exploration sonore de concepts vitalistes. Méditation philosophique en format audio.', 
+      keywords: 'mentel audio enregistrement recording série series exploration sonore sound vitaliste vitalist concepts méditation meditation philosophique philosophical musique music'
+    },
+    {
+      type:'audio', 
+      title:'Myosotis - Audio', 
+      url:'myosotis.mp3', 
+      snippet:'Pièce audio Myosotis, méditation sonore sur la mémoire et l\'oubli. Réflexion sur le temps qui passe.', 
+      keywords: 'myosotis audio pièce piece méditation meditation sonore sound mémoire memory oubli forgetting temps time passe passing réflexion reflection'
+    },
+    {
+      type:'audio', 
+      title:'Vivre - Audio', 
+      url:'vivre.mp3', 
+      snippet:'Enregistrement audio "Vivre", réflexion sonore sur l\'existence et la vie quotidienne.', 
+      keywords: 'vivre live living audio enregistrement recording réflexion reflection sonore sound existence vie life quotidienne daily'
+    },
+    {
+      type:'video', 
+      title:'Mentel 2 - Vidéo', 
+      url:'mentel2.mp4', 
+      snippet:'Deuxième épisode vidéo de la série Mentel. Exploration visuelle et narrative des thèmes vitalistes.', 
+      keywords: 'mentel vidéo video épisode episode série series deuxième second exploration visuelle visual narrative thèmes themes vitaliste vitalist film'
+    },
+    {
+      type:'video', 
+      title:'Mentel 3 - Vidéo', 
+      url:'mentel3.mp4', 
+      snippet:'Troisième épisode vidéo de la série Mentel. Suite de l\'exploration philosophique en format vidéo.', 
+      keywords: 'mentel vidéo video épisode episode série series troisième third exploration philosophique philosophical format film'
+    },
+    
+    // Images
+    {
+      type:'image', 
+      title:'Portrait Calliclès', 
+      url:'calli.jpg', 
+      snippet:'Portrait photographique de Calliclès, philosophe vitaliste.', 
+      keywords: 'photo portrait photographique photographic calliclès image picture philosophe philosopher vitaliste vitalist'
+    },
+    {
+      type:'image', 
+      title:'Portrait Raffaello', 
+      url:'raffaelo.jpg', 
+      snippet:'Portrait photographique de Raffaello Bellino.', 
+      keywords: 'photo portrait photographique photographic raffaello bellino image picture'
+    },
+    {
+      type:'image', 
+      title:'Portrait Venehon', 
+      url:'venehon.jpg', 
+      snippet:'Portrait photographique de Venehon, analyste culturel.', 
+      keywords: 'photo portrait photographique photographic venehon image picture analyste analyst'
+    },
+    {
+      type:'image', 
+      title:'Portrait Yamnaya', 
+      url:'yamnaya.jpg', 
+      snippet:'Portrait photographique de Yamnaya, penseur vitaliste.', 
+      keywords: 'photo portrait photographique photographic yamnaya image picture penseur thinker'
+    },
+    {
+      type:'image', 
+      title:'Sydney', 
+      url:'sydney.png', 
+      snippet:'Image Sydney, représentation visuelle.', 
+      keywords: 'sydney image photo picture png visuelle visual représentation representation'
+    }
+  ]
+};
 
 let isMinimized = false;
 let isMaximized = false;
+let history = [];
+let historyIndex = -1;
+let currentFontSize = 13;
 
+// Recherche exhaustive
 function performSearch(){
-  const query = document.getElementById('searchInput').value.toLowerCase();
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
   const resultsDiv = document.getElementById('results');
   const statsDiv = document.getElementById('searchStats');
   const statusText = document.getElementById('statusText');
@@ -825,11 +1422,32 @@ function performSearch(){
     logo.classList.remove('loading');
     resultsDiv.innerHTML = '';
     
-    let filtered = siteData.filter(item => {
-      if(!query) return true;
-      return item.title.toLowerCase().includes(query) || 
-             (item.snippet && item.snippet.toLowerCase().includes(query));
-    });
+    let filtered = siteDatabase.pages;
+    
+    if(query) {
+      const queryWords = query.split(' ').filter(w => w.length > 0);
+      
+      filtered = siteDatabase.pages.filter(item => {
+        const searchText = (item.title + ' ' + item.snippet + ' ' + item.keywords).toLowerCase();
+        // Chaque mot de la recherche doit être trouvé
+        return queryWords.every(word => searchText.includes(word));
+      });
+      
+      // Trier par pertinence
+      filtered.sort((a, b) => {
+        let scoreA = 0, scoreB = 0;
+        queryWords.forEach(word => {
+          if(a.title.toLowerCase().includes(word)) scoreA += 10;
+          if(a.keywords.toLowerCase().includes(word)) scoreA += 5;
+          if(a.snippet.toLowerCase().includes(word)) scoreA += 1;
+          
+          if(b.title.toLowerCase().includes(word)) scoreB += 10;
+          if(b.keywords.toLowerCase().includes(word)) scoreB += 5;
+          if(b.snippet.toLowerCase().includes(word)) scoreB += 1;
+        });
+        return scoreB - scoreA;
+      });
+    }
     
     const time = (Math.random() * 0.5 + 0.1).toFixed(2);
     statsDiv.innerHTML = '<b>Search Results:</b> Found ' + filtered.length + ' matches in ' + time + ' seconds';
@@ -837,7 +1455,7 @@ function performSearch(){
     statusText.textContent = 'Document: Done';
     
     if(filtered.length === 0){
-      resultsDiv.innerHTML = '<div class="result"><p><b>No results found.</b></p></div>';
+      resultsDiv.innerHTML = '<div class="result"><p><b>No results found for "' + query + '".</b></p><p>Try different keywords or browse the <a href="repertoire.html">directory</a>.</p></div>';
       return;
     }
     
@@ -845,7 +1463,12 @@ function performSearch(){
       const div = document.createElement('div');
       div.className = 'result';
       
-      const icon = item.type === 'anon' ? '👤' : '📄';
+      let icon = '📄';
+      if(item.type === 'contributeur') icon = '👤';
+      else if(item.type === 'audio') icon = '🔊';
+      else if(item.type === 'video') icon = '🎥';
+      else if(item.type === 'image') icon = '🖼️';
+      
       div.innerHTML = '<div class="result-title">' + icon + ' <a href="' + item.url + '">' + (index + 1) + '. ' + item.title + '</a></div>' +
         '<div class="result-url">yetscape://vitalism/' + item.url + '</div>' +
         '<div class="result-snippet">' + item.snippet + '</div>';
@@ -863,6 +1486,263 @@ function clearSearch(){
   performSearch();
 }
 
+// Fonctions interactives du menu File
+function newWindow(){
+  window.open('yetscape.html', '_blank', 'width=850,height=650');
+}
+
+function openLocation(){
+  const url = prompt('Enter the URL to open:', 'yetscape://');
+  if(url && url.trim()) {
+    if(url.startsWith('yetscape://')) {
+      const page = url.replace('yetscape://', '').replace('vitalism/', '');
+      if(page) window.location.href = page;
+    } else {
+      window.open(url, '_blank');
+    }
+  }
+}
+
+function openFile(){
+  showModal('Open File', 'This feature would open a local file.<br>In a real browser, you would see a file picker dialog.');
+}
+
+function saveAs(){
+  showModal('Save As', 'Saving current page...<br>File: vitalism-search.html<br>Location: Downloads/');
+}
+
+function printPage(){
+  // Afficher d'abord le bluescreen avec le premier QR code
+  showPrintBluescreen();
+}
+
+function showPrintBluescreen(){
+  const bsodPrint = document.getElementById('bsodPrint');
+  bsodPrint.style.display = 'block';
+  
+  // Générer le premier QR code (bluescreen)
+  generateQRCodeBluescreen('https://example.com/fake'); // Remplace par ton URL
+  
+  // Après 2 secondes, cacher le bluescreen et lancer l'impression réelle
+  setTimeout(() => {
+    bsodPrint.style.display = 'none';
+    launchRealPrint();
+  }, 2000);
+}
+
+function launchRealPrint(){
+  // Préparer la page d'impression réelle
+  const printDate = new Date().toLocaleDateString('fr-FR');
+  const printTime = new Date().toLocaleTimeString('fr-FR');
+  
+  document.getElementById('printDate').textContent = printDate;
+  document.getElementById('printTime').textContent = printTime;
+  
+  // Générer le deuxième QR code (impression)
+  generateQRCode('https://vitalism.network'); // Ton vrai QR code
+  
+  // Afficher la page d'impression
+  document.querySelector('.print-content').style.display = 'block';
+  
+  // Petit délai pour que le QR code soit bien généré
+  setTimeout(() => {
+    window.print();
+    // Cacher la page d'impression après l'impression
+    setTimeout(() => {
+      document.querySelector('.print-content').style.display = 'none';
+    }, 100);
+  }, 300);
+}
+
+// Fonction pour générer le QR code du bluescreen
+function generateQRCodeBluescreen(url) {
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    
+    const svg = document.getElementById('qrcodeBluescreen');
+    svg.innerHTML = '';
+    
+    const cellSize = 300 / qr.getModuleCount();
+    svg.setAttribute('viewBox', `0 0 ${qr.getModuleCount() * cellSize} ${qr.getModuleCount() * cellSize}`);
+    
+    for (let row = 0; row < qr.getModuleCount(); row++) {
+      for (let col = 0; col < qr.getModuleCount(); col++) {
+        if (qr.isDark(row, col)) {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', col * cellSize);
+          rect.setAttribute('y', row * cellSize);
+          rect.setAttribute('width', cellSize);
+          rect.setAttribute('height', cellSize);
+          rect.setAttribute('fill', '#FFFFFF');
+          svg.appendChild(rect);
+        }
+      }
+    }
+  } catch(e) {
+    const svg = document.getElementById('qrcodeBluescreen');
+    svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#FFFFFF" font-size="20">QR CODE</text>';
+  }
+}
+
+// Fonction pour générer le QR code d'impression
+function generateQRCode(url) {
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    
+    const svg = document.getElementById('qrcode');
+    svg.innerHTML = '';
+    
+    const cellSize = 200 / qr.getModuleCount();
+    svg.setAttribute('viewBox', `0 0 ${qr.getModuleCount() * cellSize} ${qr.getModuleCount() * cellSize}`);
+    
+    for (let row = 0; row < qr.getModuleCount(); row++) {
+      for (let col = 0; col < qr.getModuleCount(); col++) {
+        if (qr.isDark(row, col)) {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', col * cellSize);
+          rect.setAttribute('y', row * cellSize);
+          rect.setAttribute('width', cellSize);
+          rect.setAttribute('height', cellSize);
+          rect.setAttribute('fill', '#000000');
+          svg.appendChild(rect);
+        }
+      }
+    }
+  } catch(e) {
+    const svg = document.getElementById('qrcode');
+    svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#000080" font-size="12">QR CODE</text>';
+  }
+}
+
+// Fonctions Edit
+function cutText(){
+  document.execCommand('cut');
+  showModal('Cut', 'Selected text has been cut to clipboard.');
+}
+
+function copyText(){
+  document.execCommand('copy');
+  showModal('Copy', 'Selected text has been copied to clipboard.');
+}
+
+function pasteText(){
+  showModal('Paste', 'Paste is not available in this context.');
+}
+
+function findInPage(){
+  const searchTerm = prompt('Find in page:', '');
+  if(searchTerm) {
+    if(window.find) {
+      window.find(searchTerm);
+    } else {
+      showModal('Find', 'Searching for: "' + searchTerm + '"');
+    }
+  }
+}
+
+function preferences(){
+  showModal('Preferences', 'YETSCAPE Navigator Preferences<br><br>- Font Size: ' + currentFontSize + 'px<br>- Search Engine: Vitalism Search<br>- Homepage: yetscape://vitalism.search<br>- Cache: Enabled');
+}
+
+// Fonctions View
+function stopLoading(){
+  showModal('Stop', 'Page loading stopped.');
+}
+
+function viewSource(){
+  const sourceWindow = window.open('', '_blank');
+  sourceWindow.document.write('<pre>' + document.documentElement.outerHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>');
+}
+
+function pageInfo(){
+  showModal('Page Information', 'Title: YETSCAPE Search Engine<br>URL: yetscape://vitalism.search<br>Type: text/html<br>Size: ~45KB<br>Modified: Today<br>Encoding: UTF-8');
+}
+
+function increaseFont(){
+  currentFontSize += 2;
+  document.getElementById('pageContent').style.fontSize = currentFontSize + 'px';
+  showModal('Font Size', 'Font increased to ' + currentFontSize + 'px');
+}
+
+function decreaseFont(){
+  if(currentFontSize > 10) {
+    currentFontSize -= 2;
+    document.getElementById('pageContent').style.fontSize = currentFontSize + 'px';
+    showModal('Font Size', 'Font decreased to ' + currentFontSize + 'px');
+  }
+}
+
+// Fonctions Go
+function goBack(){
+  if(history.length > 0 && historyIndex > 0) {
+    historyIndex--;
+    window.location.href = history[historyIndex];
+  } else {
+    showModal('Back', 'No previous page in history.');
+  }
+}
+
+function goForward(){
+  if(historyIndex < history.length - 1) {
+    historyIndex++;
+    window.location.href = history[historyIndex];
+  } else {
+    showModal('Forward', 'No next page in history.');
+  }
+}
+
+function goHome(){
+  window.location.href = 'index.html';
+}
+
+function goToPage(url){
+  window.location.href = url;
+}
+
+// Fonctions Bookmarks
+function addBookmark(){
+  showModal('Add Bookmark', 'Bookmark added:<br>"YETSCAPE Search Engine"<br>yetscape://vitalism.search');
+}
+
+function editBookmarks(){
+  showModal('Edit Bookmarks', 'Bookmarks:<br>• Vitalism Network<br>• Codex<br>• Classement<br>• Répertoire<br>• YETSCAPE Search');
+}
+
+// Fonctions Help
+function aboutYetscape(){
+  showModal('About YETSCAPE', '<b>YETSCAPE Navigator 1.0</b><br><br>© 2025 Vitalism Network<br>All rights reserved.<br><br>A retro-style browser interface<br>for exploring the vitalist philosophy network.<br><br>Powered by: HTML, CSS, JavaScript<br>Design: Windows 95 inspired');
+}
+
+function helpContents(){
+  showModal('Help Contents', '<b>YETSCAPE Help</b><br><br>Navigation:<br>• Use the search bar to find content<br>• Click links to navigate<br>• Use bookmarks for quick access<br><br>Keyboard shortcuts:<br>• Ctrl+F: Find in page<br>• Ctrl+P: Print<br>• Ctrl+W: Close window');
+}
+
+function checkUpdates(){
+  showModal('Check for Updates', 'Checking for updates...<br><br>You are running the latest version:<br>YETSCAPE Navigator 1.0<br><br>No updates available.');
+}
+
+function releaseNotes(){
+  showModal('Release Notes', '<b>YETSCAPE Navigator 1.0</b><br>Release Date: 2025-11-13<br><br>Features:<br>• Full-text search engine<br>• Bookmarks system<br>• Retro Windows 95 UI<br>• Interactive menus<br>• Video easter egg');
+}
+
+// Modal system
+function showModal(title, content){
+  document.getElementById('modalTitleText').textContent = title;
+  document.getElementById('modalBodyText').innerHTML = content;
+  document.getElementById('modalOverlay').style.display = 'block';
+  document.getElementById('modalDialog').style.display = 'block';
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.getElementById('modalDialog').style.display = 'none';
+}
+
+// Window functions
 function minimizeWindow(){
   const w = document.querySelector('.netscape-window');
   if(!isMinimized){
@@ -889,10 +1769,11 @@ function maximizeWindow(){
 
 function closeWindow(){
   if(confirm('Are you sure you want to close YETSCAPE Navigator?')){
-    document.querySelector('.netscape-window').style.display = 'none';
+    window.location.href = 'index.html';
   }
 }
 
+// Easter egg Mentel
 function launchMentel(){
   const videoScreen = document.getElementById('videoScreen');
   const video = document.getElementById('mentelVideo');
@@ -973,7 +1854,7 @@ function startFirePhase() {
   function addFireLine() {
     if (count >= maxCount) {
       setTimeout(() => {
-        window.location.href = 'about:blank';
+        window.location.href = 'index.html';
       }, 1000);
       return;
     }
@@ -985,7 +1866,6 @@ function startFirePhase() {
     typeWriter(fireDiv, 'le feu que dieu m\'a donné pour brûler', 20, () => {
       count++;
       
-      // Accélération progressive
       if (count > 20) speed = 200;
       if (count > 50) speed = 100;
       if (count > 80) speed = 50;
@@ -993,8 +1873,6 @@ function startFirePhase() {
       if (count > 160) speed = 5;
       
       setTimeout(addFireLine, speed);
-      
-      // Auto-scroll to bottom
       fireOverlay.scrollTop = fireOverlay.scrollHeight;
     });
   }
@@ -1002,7 +1880,14 @@ function startFirePhase() {
   addFireLine();
 }
 
+// Initialize
 performSearch();
+
+// Save to history
+if(window.location.href) {
+  history.push(window.location.href);
+  historyIndex = history.length - 1;
+}
 </script>
 
 </body>

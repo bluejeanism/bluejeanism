@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXTRACTION_PROTOCOL</title>
+<style>
+@keyframes scanline{0%{top:-100%}100%{top:100%}}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+@keyframes warning{0%,100%{color:#f00}50%{color:#ff0}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:none}
+body{background:#000;color:#0f0;font-family:"Courier New",monospace;font-size:11px;min-height:100vh;padding:20px;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:rgba(0,255,0,0.1);animation:scanline 4s linear infinite;pointer-events:none;z-index:1000}
+
+.cursor{position:fixed;width:12px;height:12px;border:1px solid #0f0;pointer-events:none;z-index:10000}
+
+.container{max-width:900px;margin:0 auto}
+
+.sys-header{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #030;margin-bottom:20px;background:#000}
+.sys-title{color:#0f0;font-size:10px;letter-spacing:3px}
+.sys-status{color:#f00;animation:warning 1s infinite;font-size:10px}
+
+.main-grid{display:grid;grid-template-columns:250px 1fr;gap:15px}
+
+.panel{border:1px solid #030;background:rgba(0,10,0,0.5)}
+.panel-header{background:#020;padding:8px 12px;border-bottom:1px solid #030;font-size:10px;color:#0a0;letter-spacing:1px}
+
+.vitals{padding:10px}
+.vital-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #020}
+.vital-label{color:#060}
+.vital-value{color:#0f0;font-weight:bold}
+.vital-value.critical{color:#f00;animation:pulse 0.5s infinite}
+.vital-value.warning{color:#f80}
+
+.progress-section{padding:10px}
+.progress-bar{height:6px;background:#020;margin:10px 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f0,#0a0);transition:width 0.3s}
+
+.log-panel{height:400px;overflow:hidden}
+.log-content{padding:10px;height:100%;overflow-y:auto}
+.log-entry{padding:5px 0;border-bottom:1px solid #010;font-size:10px}
+.log-time{color:#040;margin-right:10px}
+.log-msg{color:#0a0}
+.log-msg.ok{color:#0f0}
+.log-msg.warn{color:#f80}
+.log-msg.err{color:#f00}
+
+.result-panel{display:none;margin-top:20px;padding:20px;border:2px solid #f00;background:rgba(50,0,0,0.3)}
+.result-panel.visible{display:block}
+.result-title{color:#f00;font-size:14px;margin-bottom:15px;letter-spacing:2px}
+.result-text{color:#f80;line-height:1.8}
+
+.hidden-link{display:none;margin-top:20px;padding:10px 20px;border:1px solid #0f0;color:#0f0;text-decoration:none;font-size:10px}
+.hidden-link.visible{display:inline-block}
+.hidden-link:hover{background:#0f0;color:#000}
+
+.logo{position:fixed;top:15px;left:15px;border:1px solid #0f0;padding:4px 12px;text-decoration:none;color:#0f0;font-size:10px;z-index:100}
+.logo:hover{background:#0f0;color:#000}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<a href="borne.html" class="logo">:vitalism</a>
+
+<div class="container">
+  <div class="sys-header">
+    <span class="sys-title">EXTRACTION PROTOCOL v3.7.1</span>
+    <span class="sys-status" id="sysStatus">● INITIALIZING</span>
+  </div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-header">► SUBJECT VITALS</div>
+      <div class="vitals">
+        <div class="vital-row"><span class="vital-label">HEART RATE</span><span class="vital-value" id="hr">72 BPM</span></div>
+        <div class="vital-row"><span class="vital-label">BLOOD PRESSURE</span><span class="vital-value" id="bp">120/80</span></div>
+        <div class="vital-row"><span class="vital-label">NEURAL RESISTANCE</span><span class="vital-value" id="nr">94%</span></div>
+        <div class="vital-row"><span class="vital-label">COOPERATION</span><span class="vital-value" id="coop">3%</span></div>
+        <div class="vital-row"><span class="vital-label">MENTAL INTEGRITY</span><span class="vital-value" id="mi">STABLE</span></div>
+      </div>
+      <div class="progress-section">
+        <div style="color:#060;font-size:9px">EXTRACTION PROGRESS</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div style="color:#0f0;text-align:center" id="progressPct">0%</div>
+      </div>
+    </div>
+
+    <div class="panel log-panel">
+      <div class="panel-header">► SYSTEM LOG</div>
+      <div class="log-content" id="logContent"></div>
+    </div>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="result-title">/// EXTRACTION FAILED ///</div>
+    <div class="result-text">
+      Subject resistance exceeded operational parameters.<br>
+      Neural pathways remain encrypted.<br>
+      Information retrieval: UNSUCCESSFUL.<br><br>
+      <span style="color:#0a0">NOTE: Subject mentioned recurring imagery during procedure.</span><br>
+      <span style="color:#060">Pattern analysis suggests spatial construct.</span><br>
+      <span style="color:#040">Further investigation recommended.</span><br>
+      <span id="secretRest" style="color:#010;font-size:8px;cursor:pointer">rest</span>
+    </div>
+  </div>
+
+  <a href="labyrinth.html" class="hidden-link" id="hiddenLink">► ACCESS REFERENCED CONSTRUCT</a>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+
+const logContent=document.getElementById('logContent');
+const progressFill=document.getElementById('progressFill');
+const progressPct=document.getElementById('progressPct');
+const sysStatus=document.getElementById('sysStatus');
+
+const logMessages=[
+  {t:500,msg:'Initializing extraction protocol...',type:'ok'},
+  {t:1200,msg:'Loading neural interface drivers...',type:'ok'},
+  {t:1800,msg:'Calibrating synaptic scanners...',type:'ok'},
+  {t:2500,msg:'Establishing baseline readings...',type:'ok'},
+  {t:3200,msg:'Subject resistance detected',type:'warn'},
+  {t:4000,msg:'Increasing signal amplitude...',type:'ok'},
+  {t:4800,msg:'WARNING: Neural firewall active',type:'warn'},
+  {t:5500,msg:'Bypassing primary defenses...',type:'ok'},
+  {t:6200,msg:'Secondary encryption encountered',type:'warn'},
+  {t:7000,msg:'Deploying advanced decryption...',type:'ok'},
+  {t:7800,msg:'ERROR: Resistance threshold exceeded',type:'err'},
+  {t:8500,msg:'Recalibrating extraction parameters...',type:'ok'},
+  {t:9200,msg:'Subject exhibiting anomalous imagery',type:'warn'},
+  {t:10000,msg:'Spatial construct detected in neural pattern',type:'warn'},
+  {t:10800,msg:'Attempting final extraction sequence...',type:'ok'},
+  {t:11500,msg:'CRITICAL: System overload imminent',type:'err'},
+  {t:12200,msg:'Emergency shutdown initiated',type:'err'},
+  {t:13000,msg:'Extraction protocol terminated',type:'err'}
+];
+
+let logIndex=0;
+let progress=0;
+
+// Audio context for ambient sounds
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+let ambientStarted=false;
+
+function startAmbient(){
+  if(ambientStarted)return;
+  ambientStarted=true;
+  
+  // Base electrical hum
+  const hum=audioCtx.createOscillator();
+  const humGain=audioCtx.createGain();
+  hum.type='sawtooth';
+  hum.frequency.value=50;
+  humGain.gain.value=0.015;
+  hum.connect(humGain);
+  humGain.connect(audioCtx.destination);
+  hum.start();
+  
+  // Heartbeat monitor beeps
+  setInterval(()=>{
+    const bpm=72+Math.floor(progress*0.5);
+    const beep=audioCtx.createOscillator();
+    const beepGain=audioCtx.createGain();
+    beep.type='sine';
+    beep.frequency.value=1000;
+    beepGain.gain.value=0.05;
+    beep.connect(beepGain);
+    beepGain.connect(audioCtx.destination);
+    beep.start();
+    beepGain.gain.setTargetAtTime(0,audioCtx.currentTime,0.03);
+    setTimeout(()=>beep.stop(),50);
+  },800);
+  
+  // Data processing sounds
+  setInterval(()=>{
+    if(Math.random()<0.4){
+      const proc=audioCtx.createOscillator();
+      const procGain=audioCtx.createGain();
+      proc.type='square';
+      proc.frequency.value=200+Math.random()*600;
+      procGain.gain.value=0.01;
+      proc.connect(procGain);
+      procGain.connect(audioCtx.destination);
+      proc.start();
+      procGain.gain.setTargetAtTime(0,audioCtx.currentTime,0.02);
+      setTimeout(()=>proc.stop(),30);
+    }
+  },300);
+  
+  // Warning alarm when critical
+  setInterval(()=>{
+    if(progress>80){
+      const alarm=audioCtx.createOscillator();
+      const alarmGain=audioCtx.createGain();
+      alarm.type='square';
+      alarm.frequency.value=440;
+      alarmGain.gain.value=0.03;
+      alarm.connect(alarmGain);
+      alarmGain.connect(audioCtx.destination);
+      alarm.start();
+      alarm.frequency.setValueAtTime(880,audioCtx.currentTime+0.1);
+      alarmGain.gain.setTargetAtTime(0,audioCtx.currentTime+0.15,0.02);
+      setTimeout(()=>alarm.stop(),200);
+    }
+  },1500);
+}
+
+document.addEventListener('click',startAmbient,{once:true});
+document.addEventListener('mousemove',startAmbient,{once:true});
+document.addEventListener('keydown',startAmbient,{once:true});
+
+function addLog(msg,type){
+  const entry=document.createElement('div');
+  entry.className='log-entry';
+  const time=new Date().toTimeString().split(' ')[0];
+  entry.innerHTML=`<span class="log-time">[${time}]</span><span class="log-msg ${type}">${msg}</span>`;
+  logContent.appendChild(entry);
+  logContent.scrollTop=logContent.scrollHeight;
+}
+
+function updateVitals(p){
+  document.getElementById('hr').textContent=(72+Math.floor(p*50))+' BPM';
+  document.getElementById('hr').className='vital-value'+(p>0.7?' critical':p>0.4?' warning':'');
+  document.getElementById('bp').textContent=`${120+Math.floor(p*40)}/${80+Math.floor(p*20)}`;
+  document.getElementById('nr').textContent=Math.max(10,94-Math.floor(p*60))+'%';
+  document.getElementById('coop').textContent=Math.min(15,3+Math.floor(p*12))+'%';
+  if(p>0.8)document.getElementById('mi').textContent='UNSTABLE';
+  if(p>0.9)document.getElementById('mi').className='vital-value critical';
+}
+
+function runProtocol(){
+  if(logIndex<logMessages.length){
+    const l=logMessages[logIndex];
+    setTimeout(()=>{
+      addLog(l.msg,l.type);
+      progress=Math.min(100,(logIndex+1)/logMessages.length*100);
+      progressFill.style.width=progress+'%';
+      progressPct.textContent=Math.floor(progress)+'%';
+      updateVitals(progress/100);
+      
+      if(progress>30)sysStatus.textContent='● ACTIVE';
+      if(progress>70)sysStatus.textContent='● WARNING';
+      if(progress>90)sysStatus.textContent='● CRITICAL';
+      
+      logIndex++;
+      runProtocol();
+    },l.t-(logIndex>0?logMessages[logIndex-1].t:0));
+  }else{
+    setTimeout(()=>{
+      document.getElementById('resultPanel').classList.add('visible');
+      sysStatus.textContent='● TERMINATED';
+      setTimeout(()=>{
+        document.getElementById('hiddenLink').classList.add('visible');
+      },2000);
+    },1500);
+  }
+}
+
+setTimeout(runProtocol,1000);
+
+// SECRET: lit.mp4 - cliquer sur le mot "rest" caché
+document.getElementById('secretRest').onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="lit.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+</script>
+</body>
+</html>

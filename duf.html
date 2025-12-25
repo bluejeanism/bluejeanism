@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D_VIEWER.EXE</title>
+<style>
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.96}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:crosshair}
+body{
+  background:#0000AA;
+  color:#fff;
+  font-family:"Courier New",monospace;
+  font-size:14px;
+  min-height:100vh;
+  padding:20px;
+  animation:flicker 0.15s infinite;
+}
+
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(transparent,rgba(255,255,255,0.1),transparent);animation:scanline 8s linear infinite;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15),rgba(0,0,0,0.15) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:999}
+
+.content{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.logo{border:2px solid #fff;display:inline-block;padding:4px 16px;text-decoration:none;color:#fff}
+.logo span{background:#fff;color:#0000AA;padding:0 4px;font-weight:bold}
+.title{font-size:11px;color:#aaa}
+
+.main{display:grid;grid-template-columns:1fr 200px;gap:15px;height:calc(100vh - 130px)}
+
+.viewer-panel{
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-bottom:2px solid #808080;border-right:2px solid #808080;
+  box-shadow:3px 3px 0 #000;
+  display:flex;flex-direction:column;
+}
+
+.panel-title{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:4px 8px;font-size:12px;font-weight:bold;display:flex;justify-content:space-between}
+.title-btns{display:flex;gap:2px}
+.title-btn{width:16px;height:14px;background:#c0c0c0;border:2px outset #fff;font-size:10px;display:flex;align-items:center;justify-content:center;color:#000}
+
+.canvas-wrap{flex:1;background:#000;margin:6px;border:2px inset #808080;position:relative;overflow:hidden}
+#canvas{width:100%;height:100%;display:block}
+
+.viewer-controls{padding:6px;background:#c0c0c0;display:flex;gap:4px;flex-wrap:wrap}
+.btn{padding:4px 10px;background:#c0c0c0;border:2px outset #fff;font-family:inherit;font-size:10px;cursor:pointer;color:#000}
+.btn:active{border:2px inset #808080}
+.btn.active{background:#000080;color:#fff}
+
+.sidebar{display:flex;flex-direction:column;gap:10px}
+
+.info-panel{
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-bottom:2px solid #808080;border-right:2px solid #808080;
+  box-shadow:2px 2px 0 #000;
+}
+.info-panel .panel-title{font-size:10px;padding:3px 6px}
+.info-content{padding:8px;color:#000;font-size:10px}
+.info-row{display:flex;justify-content:space-between;margin:4px 0}
+.info-val{font-weight:bold}
+
+.status-bar{background:#c0c0c0;padding:4px 8px;margin-top:10px;border:2px outset #fff;font-size:10px;color:#000;display:flex;justify-content:space-between}
+.status-section{border:2px inset #808080;padding:1px 6px}
+</style>
+</head>
+<body>
+
+<div class="content">
+  <div class="header">
+    <a href="borne.html" class="logo"><span>:vitalism</span></a>
+    <span class="title">3D_VIEWER.EXE | WIREFRAME MODE</span>
+  </div>
+
+  <div class="main">
+    <div class="viewer-panel">
+      <div class="panel-title">
+        <span>VIEWPORT</span>
+        <div class="title-btns"><div class="title-btn">_</div><div class="title-btn">□</div><div class="title-btn">×</div></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div class="viewer-controls">
+        <button class="btn active" onclick="setShape('cube')">CUBE</button>
+        <button class="btn" onclick="setShape('pyramid')">PYRAMIDE</button>
+        <button class="btn" onclick="setShape('octahedron')">OCTAÈDRE</button>
+        <button class="btn" onclick="setShape('prism')">PRISME</button>
+        <button class="btn" onclick="toggleSpin()">AUTO SPIN</button>
+        <button class="btn" onclick="resetView()">RESET</button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="info-panel">
+        <div class="panel-title">OBJET</div>
+        <div class="info-content">
+          <div class="info-row"><span>Type:</span><span class="info-val" id="objType">CUBE</span></div>
+          <div class="info-row"><span>Vertices:</span><span class="info-val" id="verts">8</span></div>
+          <div class="info-row"><span>Edges:</span><span class="info-val" id="edges">12</span></div>
+          <div class="info-row"><span>Faces:</span><span class="info-val" id="faces">6</span></div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <div class="panel-title">ROTATION</div>
+        <div class="info-content">
+          <div class="info-row"><span>X:</span><span class="info-val" id="rotX">0°</span></div>
+          <div class="info-row"><span>Y:</span><span class="info-val" id="rotY">0°</span></div>
+          <div class="info-row"><span>Zoom:</span><span class="info-val" id="zoom">1.0x</span></div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <div class="panel-title">CONTRÔLES</div>
+        <div class="info-content" style="font-size:9px;line-height:1.6">
+          • Drag: Rotation<br>
+          • Molette: Zoom<br>
+          • Clic boutons: Forme
+        </div>
+      </div>
+      <div class="info-panel">
+        <div class="panel-title">STATS</div>
+        <div class="info-content">
+          <div class="info-row"><span>FPS:</span><span class="info-val" id="fps">--</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span><span class="status-section">DRAG: Rotate</span> <span class="status-section">SCROLL: Zoom</span></span>
+    <span><span class="status-section" id="clock">--:--:--</span></span>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+
+let width,height,cx,cy;
+let rotX=0.3,rotY=0.5,scale=120;
+let autoSpin=false,dragging=false,lastX,lastY;
+let shape='cube';
+let frames=0,lastFps=performance.now();
+
+const shapes={
+  cube:{v:[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]],e:[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]],f:6},
+  pyramid:{v:[[0,1,0],[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]],e:[[0,1],[0,2],[0,3],[0,4],[1,2],[2,3],[3,4],[4,1]],f:5},
+  octahedron:{v:[[0,1,0],[0,-1,0],[1,0,0],[-1,0,0],[0,0,1],[0,0,-1]],e:[[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[4,3],[3,5],[5,2]],f:8},
+  prism:{v:[[0,1,0],[-1,-1,-0.5],[1,-1,-0.5],[0,1,1],[-1,-1,1.5],[1,-1,1.5]],e:[[0,1],[1,2],[2,0],[3,4],[4,5],[5,3],[0,3],[1,4],[2,5]],f:5}
+};
+
+function resize(){
+  const wrap=canvas.parentElement;
+  width=wrap.clientWidth;height=wrap.clientHeight;
+  canvas.width=width;canvas.height=height;
+  cx=width/2;cy=height/2;
+}
+
+function project(p){
+  let x=p[0],y=p[1],z=p[2];
+  let y1=y*Math.cos(rotX)-z*Math.sin(rotX);let z1=y*Math.sin(rotX)+z*Math.cos(rotX);y=y1;z=z1;
+  let x1=x*Math.cos(rotY)+z*Math.sin(rotY);z1=-x*Math.sin(rotY)+z*Math.cos(rotY);x=x1;z=z1;
+  const fov=4,zo=fov+z;
+  return[cx+(x*scale*fov)/zo,cy-(y*scale*fov)/zo,z];
+}
+
+function draw(){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,width,height);
+  
+  // Grid
+  ctx.strokeStyle='#0a0a30';ctx.lineWidth=1;
+  for(let i=0;i<width;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,height);ctx.stroke();}
+  for(let i=0;i<height;i+=40){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(width,i);ctx.stroke();}
+  
+  // Axes
+  const o=project([0,0,0]),ax=project([1.5,0,0]),ay=project([0,1.5,0]),az=project([0,0,1.5]);
+  ctx.lineWidth=1;
+  ctx.strokeStyle='#f00';ctx.beginPath();ctx.moveTo(o[0],o[1]);ctx.lineTo(ax[0],ax[1]);ctx.stroke();
+  ctx.strokeStyle='#0f0';ctx.beginPath();ctx.moveTo(o[0],o[1]);ctx.lineTo(ay[0],ay[1]);ctx.stroke();
+  ctx.strokeStyle='#00f';ctx.beginPath();ctx.moveTo(o[0],o[1]);ctx.lineTo(az[0],az[1]);ctx.stroke();
+  
+  // Shape
+  const s=shapes[shape];
+  const pts=s.v.map(v=>project(v));
+  
+  ctx.strokeStyle='#0ff';ctx.lineWidth=2;
+  s.e.forEach(e=>{ctx.beginPath();ctx.moveTo(pts[e[0]][0],pts[e[0]][1]);ctx.lineTo(pts[e[1]][0],pts[e[1]][1]);ctx.stroke();});
+  
+  ctx.fillStyle='#0ff';
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fill();});
+  
+  // Update info
+  document.getElementById('rotX').textContent=Math.round(rotX*180/Math.PI)+'°';
+  document.getElementById('rotY').textContent=Math.round(rotY*180/Math.PI)+'°';
+  document.getElementById('zoom').textContent=(scale/120).toFixed(1)+'x';
+  document.getElementById('objType').textContent=shape.toUpperCase();
+  document.getElementById('verts').textContent=s.v.length;
+  document.getElementById('edges').textContent=s.e.length;
+  document.getElementById('faces').textContent=s.f;
+  
+  frames++;
+  const now=performance.now();
+  if(now-lastFps>=1000){document.getElementById('fps').textContent=frames;frames=0;lastFps=now;}
+  
+  if(autoSpin){rotY+=0.01;rotX+=0.005;}
+  requestAnimationFrame(draw);
+}
+
+function setShape(n){
+  shape=n;
+  document.querySelectorAll('.viewer-controls .btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function toggleSpin(){autoSpin=!autoSpin}
+function resetView(){rotX=0.3;rotY=0.5;scale=120}
+
+canvas.addEventListener('mousedown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY});
+canvas.addEventListener('mouseup',()=>dragging=false);
+canvas.addEventListener('mouseleave',()=>dragging=false);
+canvas.addEventListener('mousemove',e=>{
+  if(dragging){rotY+=(e.clientX-lastX)*0.01;rotX+=(e.clientY-lastY)*0.01;lastX=e.clientX;lastY=e.clientY;}
+});
+canvas.addEventListener('wheel',e=>{e.preventDefault();scale*=e.deltaY>0?0.9:1.1;scale=Math.max(40,Math.min(300,scale));});
+
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toTimeString().split(' ')[0]},1000);
+
+window.addEventListener('resize',resize);
+resize();draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<title>Test JSON</title>
+<style>
+body{background:#0000AA;color:#fff;font-family:monospace;padding:20px}
+.ok{color:#0f0}.err{color:#f00}
+pre{background:#000;padding:10px;overflow:auto;max-height:300px}
+</style>
+</head>
+<body>
+<h1>Test de chargement data.json</h1>
+<div id="result">Chargement...</div>
+<h2>Contributeurs recherchés :</h2>
+<div id="contribs"></div>
+<pre id="log"></pre>
+
+<script>
+const log = document.getElementById('log');
+const result = document.getElementById('result');
+const contribs = document.getElementById('contribs');
+
+function addLog(msg, isError = false) {
+  log.innerHTML += `<span class="${isError ? 'err' : ''}">${msg}</span>\n`;
+}
+
+const namesToFind = [
+  "Ancobalt", "Aphoom Zah", "Callicles", "Caverne", "J.J Heydon",
+  "St-Jünger", "Lia Vohn Finnak", "Marquis de Turgolibéralie",
+  "Nimh", "Odin", "Picarssiette", "Tancrède Bastié", "Venehon"
+];
+
+async function test() {
+  addLog('Tentative de fetch data.json...');
+  
+  try {
+    const response = await fetch('data.json');
+    addLog(`Response status: ${response.status}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    addLog(`JSON parsé OK. ${data.contributors.length} contributeurs trouvés.`);
+    
+    result.innerHTML = '<span class="ok">✓ data.json chargé avec succès!</span>';
+    
+    // Tester chaque nom
+    let html = '';
+    namesToFind.forEach(name => {
+      const found = data.contributors.find(c => c.name === name);
+      if (found) {
+        html += `<div class="ok">✓ "${name}" trouvé</div>`;
+        addLog(`✓ "${name}" trouvé (file: ${found.file})`);
+      } else {
+        html += `<div class="err">✗ "${name}" NON TROUVÉ</div>`;
+        addLog(`✗ "${name}" NON TROUVÉ`, true);
+      }
+    });
+    contribs.innerHTML = html;
+    
+  } catch (error) {
+    result.innerHTML = `<span class="err">✗ Erreur: ${error.message}</span>`;
+    addLog(`ERREUR: ${error.message}`, true);
+    addLog('');
+    addLog('SOLUTION: Lancez un serveur web local:', true);
+    addLog('  cd dossier_vitalism', true);
+    addLog('  python3 -m http.server 8000', true);
+    addLog('Puis ouvrez http://localhost:8000', true);
+  }
+}
+
+test();
+</script>
+</body>
+</html>

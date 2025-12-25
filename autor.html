@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@UT0R.EXE</title>
+<style>
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:0.96}}
+@keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+*{margin:0;padding:0;box-sizing:border-box;cursor:none}
+body{
+  background:#0000AA;
+  color:#fff;
+  font-family:"Courier New",monospace;
+  font-size:14px;
+  min-height:100vh;
+  padding:30px;
+  animation:flicker 0.15s infinite;
+}
+
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:2px;background:linear-gradient(transparent,rgba(255,255,255,0.1),transparent);animation:scanline 8s linear infinite;pointer-events:none;z-index:1000}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15),rgba(0,0,0,0.15) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:999}
+
+.content{max-width:1200px;margin:0 auto;position:relative;z-index:1}
+
+.logo{border:2px solid #fff;display:inline-block;padding:4px 16px;margin-bottom:15px;text-decoration:none;color:#fff}
+.logo span{background:#fff;color:#0000AA;padding:0 4px;font-weight:bold}
+
+.warning{background:#AA0000;color:#fff;padding:8px 15px;margin-bottom:15px;font-weight:bold;letter-spacing:2px;animation:blink 2s infinite}
+
+.error-block{border:2px solid #ff0;padding:12px;margin-bottom:15px;background:rgba(255,255,0,0.1)}
+.error-block .code{color:#aaa;font-size:11px;margin-top:8px}
+
+.main{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+
+.panel{background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-bottom:2px solid #808080;border-right:2px solid #808080;box-shadow:3px 3px 0 #000}
+.panel-title{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:4px 8px;font-size:12px;font-weight:bold;display:flex;justify-content:space-between}
+.title-btns{display:flex;gap:2px}
+.title-btn{width:16px;height:14px;background:#c0c0c0;border:2px outset #fff;font-size:10px;display:flex;align-items:center;justify-content:center;color:#000}
+
+.panel-inner{background:#000;margin:6px;border:2px inset #808080;padding:12px;min-height:280px;color:#0f0;font-size:13px;line-height:1.7;overflow-y:auto;max-height:320px}
+
+.panel-inner .warn{color:#ff0}
+.panel-inner .err{color:#f00}
+.panel-inner .dim{opacity:0.5}
+.panel-inner .hidden{color:#000;background:#000}.panel-inner .hidden:hover{color:#f00;background:transparent}
+
+.cursor-blink{display:inline-block;width:8px;height:14px;background:#0f0;animation:blink 0.7s infinite;vertical-align:middle}
+
+.video-area{display:flex;align-items:center;justify-content:center;background:#111;position:relative}
+.video-area video{max-width:100%;max-height:100%;display:none}
+.no-signal{text-align:center;color:#0f0}
+.no-signal .icon{font-size:50px;margin-bottom:10px}
+.rec{position:absolute;top:8px;left:8px;color:#f00;font-size:10px;animation:blink 1s infinite}
+.timecode{position:absolute;bottom:8px;right:8px;color:#0f0;font-size:10px}
+
+.controls{padding:6px;background:#c0c0c0;display:flex;gap:4px;flex-wrap:wrap}
+.btn{padding:4px 12px;background:#c0c0c0;border:2px outset #fff;font-family:inherit;font-size:11px;cursor:pointer;color:#000}
+.btn:active{border:2px inset #808080}
+.btn.active{background:#000080;color:#fff}
+input[type="file"]{display:none}
+
+.status-bar{background:#c0c0c0;padding:4px 8px;margin-top:15px;border:2px outset #fff;font-size:11px;color:#000;display:flex;justify-content:space-between}
+.status-section{border:2px inset #808080;padding:1px 8px}
+.status-alert{background:#AA0000;color:#fff;animation:blink 1s infinite}
+
+.cursor{position:fixed;width:14px;height:14px;background:#fff;pointer-events:none;z-index:10000;mix-blend-mode:difference;display:none}
+body:hover .cursor{display:block}
+
+::-webkit-scrollbar{width:16px}::-webkit-scrollbar-track{background:#c0c0c0}::-webkit-scrollbar-thumb{background:#808080;border:2px outset #c0c0c0}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+
+<div class="content">
+  <a href="borne.html" class="logo"><span>:vitalism</span></a>
+  
+  <div class="warning">⚠ TRANSMISSION INTERCEPTÉE - SIGNAL NON AUTORISÉ ⚠</div>
+  
+  <div class="error-block">
+    <div>*** STOP: 0xDEAD0001 (TRANSMISSION_HIJACK)</div>
+    <div>Signal détecté sur fréquence 0x@UT0R | Origine: [CLASSIFIÉ]</div>
+    <div class="code">KERNEL_PANIC: Source introuvable | Contenu potentiellement perturbant</div>
+  </div>
+
+  <div class="main">
+    <div class="panel">
+      <div class="panel-title">
+        <span>📹 SIGNAL_INTERCEPT.exe</span>
+        <div class="title-btns"><div class="title-btn">_</div><div class="title-btn">□</div><div class="title-btn">×</div></div>
+      </div>
+      <div class="panel-inner video-area" id="videoArea">
+        <video id="video"></video>
+        <div class="no-signal" id="noSignal">
+          <div class="icon">📡</div>
+          <div>NO SIGNAL</div>
+          <div style="font-size:10px;margin-top:8px;opacity:0.6">Charger un fichier vidéo</div>
+        </div>
+        <span class="rec">● REC</span>
+        <span class="timecode" id="timecode">00:00:00</span>
+      </div>
+      <div class="controls">
+        <button class="btn" onclick="video.play()">▶ PLAY</button>
+        <button class="btn" onclick="video.pause()">❚❚ PAUSE</button>
+        <input type="file" id="fileIn" accept="video/*" onchange="loadVideo(this)">
+        <label for="fileIn" class="btn">📁 CHARGER</label>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <span>📜 DECODED_MESSAGE.txt</span>
+        <div class="title-btns"><div class="title-btn">_</div><div class="title-btn">□</div><div class="title-btn">×</div></div>
+      </div>
+      <div class="panel-inner" id="terminal"></div>
+      <div class="controls">
+        <button class="btn" onclick="loadBlock(0)">BLOC 1</button>
+        <button class="btn" onclick="loadBlock(1)">BLOC 2</button>
+        <button class="btn" onclick="loadBlock(2)">BLOC 3</button>
+        <button class="btn" onclick="loadBlock(3)">BLOC 4</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <span><span class="status-section status-alert">● INTERCEPT ACTIF</span> <span class="status-section">FREQ: 0x@UT0R</span></span>
+    <span><span class="status-section" id="status">EN ATTENTE</span> <span class="status-section" id="clock">--:--:--</span></span>
+  </div>
+</div>
+
+<script>
+const cursor=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+
+const blocks=[
+`[TRANSMISSION INTERCEPTÉE - 03:47:22 UTC]
+
+<span class="warn">ATTENTION: Signal capturé sur fréquence non répertoriée.</span>
+
+Origine: ████████████
+Classification: NIVEAU 7 - DÉCODAGE PARTIEL
+
+---
+
+Le signal a commencé il y a 72 heures.
+Nous ne savons pas qui l'émet.
+Nous ne savons pas pourquoi.
+
+<span class="err">Votre connexion a été enregistrée.</span>
+
+<span class="hidden">[SURVOLER POUR RÉVÉLER]</span>`,
+
+`[DÉCODAGE EN COURS... Intégrité: 67%]
+
+Fragment récupéré:
+
+"Vous pensiez être seul devant votre écran.
+Vous pensiez que personne ne regardait.
+
+<span class="err">VOUS AVIEZ TORT.</span>
+
+Chaque clic. Chaque pause. Chaque hésitation.
+Tout est enregistré. Tout est analysé.
+
+Le système vous connaît mieux que vous-même.
+Il sait ce que vous <span class="warn">CRAIGNEZ</span>."
+
+---
+[FRAGMENTS MANQUANTS: 33%]`,
+
+`<span class="err">*** AVERTISSEMENT DE SÉCURITÉ ***</span>
+
+Ce terminal a été compromis.
+
+Analyse des menaces:
+- Intrusion: <span class="err">CONFIRMÉE</span>
+- Niveau de risque: <span class="err">CRITIQUE</span>
+- Recommandation: <span class="warn">DÉCONNEXION IMMÉDIATE</span>
+
+---
+
+Nous avons essayé de vous prévenir.
+Les autres n'ont pas écouté.
+
+Vous êtes encore là?
+
+Soit vous êtes courageux.
+Soit vous êtes <span class="warn">exactement ce que nous cherchions</span>.`,
+
+`[ACCÈS RESTREINT]
+[NIVEAU D'HABILITATION: ████████]
+
+---
+
+<span class="warn">V O U S   Ê T E S   P R Ê T</span>
+
+---
+
+Les mots que vous lisez ne sont pas des mots.
+Ce sont des <span class="err">INSTRUCTIONS</span>.
+
+Votre cerveau les décode sans que vous le sachiez.
+Chaque lettre modifie votre perception.
+
+<span class="err">[PROCESSUS: IRRÉVERSIBLE]</span>
+
+La transformation a commencé il y a longtemps.
+Bientôt vous vous souviendrez de tout.
+
+---
+[TRANSMISSION TERMINÉE]
+
+<span class="hidden">run:vitalism//protocol_7</span>`
+];
+
+let currentBlock=0,typeInterval=null,charIdx=0;
+const terminal=document.getElementById('terminal');
+const video=document.getElementById('video');
+
+function loadBlock(n){
+  currentBlock=n;
+  document.querySelectorAll('.controls .btn').forEach((b,i)=>b.classList.toggle('active',i===n));
+  document.getElementById('status').textContent='DÉCODAGE...';
+  typeText(blocks[n]);
+}
+
+function typeText(html,speed=20){
+  if(typeInterval)clearInterval(typeInterval);
+  terminal.innerHTML='';charIdx=0;let buffer='';
+  typeInterval=setInterval(()=>{
+    if(charIdx<html.length){
+      if(html[charIdx]==='<'){const end=html.indexOf('>',charIdx);buffer+=html.substring(charIdx,end+1);charIdx=end+1;}
+      else{buffer+=html[charIdx];charIdx++;}
+      terminal.innerHTML=buffer+'<span class="cursor-blink"></span>';
+      terminal.scrollTop=terminal.scrollHeight;
+    }else{clearInterval(typeInterval);typeInterval=null;document.getElementById('status').textContent='COMPLET';}
+  },speed);
+}
+
+terminal.addEventListener('click',()=>{
+  if(typeInterval){clearInterval(typeInterval);typeInterval=null;terminal.innerHTML=blocks[currentBlock];document.getElementById('status').textContent='COMPLET';}
+});
+
+function loadVideo(input){
+  if(input.files[0]){
+    video.src=URL.createObjectURL(input.files[0]);
+    video.style.display='block';
+    document.getElementById('noSignal').style.display='none';
+  }
+}
+
+setInterval(()=>{
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toTimeString().split(' ')[0];
+  document.getElementById('timecode').textContent=now.toTimeString().split(' ')[0];
+},1000);
+
+loadBlock(0);
+</script>
+</body>
+</html>

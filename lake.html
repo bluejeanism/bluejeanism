@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>recovered_file.txt</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  background:#c0c0c0;
+  font-family:"Courier New",monospace;
+  min-height:100vh;
+  cursor:default;
+  padding:20px;
+}
+
+.notepad{
+  max-width:900px;
+  margin:0 auto;
+  background:#fff;
+  box-shadow:2px 2px 0 #000;
+}
+
+.titlebar{
+  background:linear-gradient(90deg,#000080,#1084d0);
+  color:#fff;
+  padding:3px 5px;
+  font-size:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.titlebar-btns{display:flex;gap:2px}
+
+.titlebar-btn{
+  width:16px;height:14px;
+  background:#c0c0c0;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-bottom:2px solid #808080;border-right:2px solid #808080;
+  font-size:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.menubar{
+  background:#c0c0c0;
+  padding:2px 5px;
+  font-size:12px;
+  border-bottom:1px solid #808080;
+}
+
+.menubar span{
+  padding:2px 8px;
+  cursor:pointer;
+}
+
+.menubar span:hover{background:#000080;color:#fff}
+
+.content{
+  padding:10px;
+  min-height:600px;
+  font-size:13px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  background:#fff;
+  color:#000;
+}
+
+.corrupted{
+  background:#000;
+  color:#000;
+}
+
+.corrupted:hover{
+  color:#ff0000;
+}
+
+.redacted{
+  background:#000;
+  color:#000;
+  padding:0 3px;
+}
+
+.comment{color:#008000}
+.keyword{color:#0000ff}
+.string{color:#a31515}
+.number{color:#098658}
+
+.statusbar{
+  background:#c0c0c0;
+  padding:3px 10px;
+  font-size:11px;
+  border-top:2px solid #fff;
+  display:flex;
+  justify-content:space-between;
+}
+
+.statusbar-item{
+  border-left:2px solid #808080;border-top:2px solid #808080;
+  border-right:2px solid #fff;border-bottom:2px solid #fff;
+  padding:1px 8px;
+}
+
+.home-link{
+  position:fixed;
+  top:10px;left:10px;
+  background:#c0c0c0;
+  padding:5px 10px;
+  font-size:11px;
+  text-decoration:none;
+  color:#000;
+  border-top:2px solid #fff;border-left:2px solid #fff;
+  border-bottom:2px solid #808080;border-right:2px solid #808080;
+}
+
+.home-link:active{
+  border-top:2px solid #808080;border-left:2px solid #808080;
+  border-bottom:2px solid #fff;border-right:2px solid #fff;
+}
+
+.warning{
+  background:#ff0;
+  padding:5px 10px;
+  font-size:11px;
+  text-align:center;
+  color:#000;
+}
+</style>
+</head>
+<body>
+
+<a href="borne.html" style="text-decoration:none;position:fixed;top:20px;left:20px;z-index:100;border:2px solid #fff;padding:4px 16px;color:#fff;font-family:'Courier New',monospace;"><span style="background:#fff;color:#0000AA;padding:0 4px;font-weight:bold;">:vitalism</span></a>
+
+<div class="notepad">
+  <div class="titlebar">
+    <span>recovered_file.txt - Notepad</span>
+    <div class="titlebar-btns">
+      <div class="titlebar-btn">_</div>
+      <div class="titlebar-btn">□</div>
+      <div class="titlebar-btn">×</div>
+    </div>
+  </div>
+  
+  <div class="menubar">
+    <span>File</span>
+    <span>Edit</span>
+    <span>Search</span>
+    <span>Help</span>
+  </div>
+  
+  <div class="warning">⚠ FILE RECOVERY: 47% - Some data may be corrupted or missing</div>
+  
+  <div class="content"><span class="comment">/**
+ * LAKE CITY QUIET PILLS
+ * =====================
+ * 
+ * Classification: <span class="redacted">LEVEL_9</span>
+ * Author: <span class="redacted">████████</span>
+ * Date: <span class="redacted">██/██/████</span>
+ * 
+ * WARNING: Unauthorized access is punishable 
+ * under Federal Code <span class="redacted">██-███</span>
+ * 
+ * "We take care of old folks."
+ */</span>
+
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdlib.h&gt;</span>
+<span class="keyword">#include</span> <span class="string">"<span class="redacted">████████</span>.h"</span>
+
+<span class="keyword">#define</span> STATUS_ACTIVE    <span class="number">1</span>
+<span class="keyword">#define</span> STATUS_RETIRED   <span class="number">0</span>
+<span class="keyword">#define</span> MAX_OPERATORS    <span class="redacted">██</span>
+
+<span class="keyword">typedef struct</span> {
+    <span class="keyword">char</span>    codename[<span class="number">32</span>];
+    <span class="keyword">int</span>     status;
+    <span class="keyword">double</span>  coords[<span class="number">2</span>];
+    <span class="keyword">char</span>    specialty[<span class="number">64</span>];
+    <span class="keyword">int</span>     completed;
+} Operator;
+
+<span class="comment">// OPERATOR DATABASE - CLASSIFIED</span>
+<span class="keyword">static</span> Operator db[] = {
+    {<span class="string">"MILO"</span>,    <span class="number">0</span>, {<span class="redacted">██.██</span>, <span class="redacted">-██.██</span>}, <span class="string">"<span class="redacted">██████████</span>"</span>, <span class="number">47</span>},
+    {<span class="string">"ANGEL"</span>,   <span class="number">1</span>, {<span class="redacted">██.██</span>, <span class="redacted">-██.██</span>}, <span class="string">"recon"</span>,      <span class="number">23</span>},
+    {<span class="string">"<span class="redacted">████</span>"</span>,   <span class="number">1</span>, {<span class="redacted">██.██</span>, <span class="redacted">-██.██</span>}, <span class="string">"<span class="redacted">██████</span>"</span>,     <span class="redacted">██</span>},
+<span class="corrupted">    {"WOLF",   1, {43.21, -89.34}, "extraction",  31},
+    {"GHOST",  0, {51.50, -0.127}, "surveillance", 18},</span>
+};
+
+<span class="keyword">int</span> verify(<span class="keyword">const char</span>* code) {
+    <span class="comment">// Verification algorithm</span>
+<span class="corrupted">    if (strcmp(code, ACCESS_KEY) == 0) {
+        log_access(get_ip(), timestamp());
+        return 1;
+    }</span>
+    <span class="keyword">return</span> <span class="redacted">████████</span>;
+}
+
+<span class="keyword">void</span> initiate(<span class="keyword">int</span> protocol) {
+    <span class="keyword">switch</span>(protocol) {
+        <span class="keyword">case</span> <span class="number">1</span>: <span class="comment">// QUIET EXTRACTION</span>
+<span class="corrupted">            deploy_team(selected_operators, target_coords);
+            await_confirmation();
+            cleanup_evidence();</span>
+            <span class="keyword">break</span>;
+            
+        <span class="keyword">case</span> <span class="number">2</span>: <span class="comment">// RELOCATION</span>
+            <span class="redacted">████████████████████████████████████</span>
+            <span class="keyword">break</span>;
+            
+        <span class="keyword">case</span> <span class="number">7</span>: <span class="comment">// [REDACTED]</span>
+            <span class="redacted">████████████████████████████████████</span>
+            <span class="redacted">████████████████████████████████████</span>
+            <span class="keyword">break</span>;
+    }
+}
+
+<span class="keyword">int</span> main(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv) {
+    printf(<span class="string">"LCQP System v<span class="redacted">█.█</span>\n"</span>);
+    printf(<span class="string">"Status: OPERATIONAL\n"</span>);
+    printf(<span class="string">"Active: <span class="redacted">██</span>\n"</span>);
+    
+    <span class="keyword">if</span> (!verify(argv[<span class="number">1</span>])) {
+        printf(<span class="string">"ACCESS DENIED\n"</span>);
+<span class="corrupted">        log_intrusion_attempt();
+        alert_security();</span>
+        <span class="keyword">return</span> -<span class="number">1</span>;
+    }
+    
+    <span class="comment">// Awaiting orders...</span>
+    <span class="keyword">while</span>(<span class="number">1</span>) {
+        <span class="redacted">████████████████████████████████</span>
+    }
+    
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+
+<span class="comment">/* 
+ * === END OF RECOVERED FILE ===
+ * 
+ * RECOVERY NOTES:
+ * - File found on damaged hard drive
+ * - Origin: Unknown server, Eastern US
+ * - Last modified: <span class="redacted">████████</span>
+ * - Additional fragments: UNRECOVERABLE
+ * 
+ * INVESTIGATOR NOTE:
+ * "The subreddit was a front. The photo 
+ * hosting was a dead drop. Who were they?"
+ * 
+ *                    - Case File <span class="redacted">██-████</span>
+ */</span>
+</div>
+  
+  <div class="statusbar">
+    <span class="statusbar-item">Recovered: 47%</span>
+    <span class="statusbar-item">Ln 1, Col 1</span>
+    <span class="statusbar-item" id="secretEden" style="opacity:0.2;cursor:pointer">eden</span>
+    <span class="statusbar-item">ANSI</span>
+  </div>
+</div>
+
+<script>
+document.getElementById('secretEden').onclick=()=>{
+  const popup=document.createElement('div');
+  popup.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:10000';
+  popup.innerHTML='<video src="paradiso.mp4" controls autoplay style="max-width:80%;max-height:80%"></video>';
+  popup.onclick=()=>popup.remove();
+  document.body.appendChild(popup);
+};
+</script>
+</body>
+</html>
