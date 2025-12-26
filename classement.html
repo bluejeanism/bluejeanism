@@ -46,14 +46,16 @@ body::after {
 .content { position: relative; z-index:1; max-width:1400px; margin:0 auto; }
 
 .logo {
-
   border: 2px solid #FFFFFF;
   display: inline-block;
   padding: 4px 16px;
   margin-bottom: 30px;
   cursor: pointer;
   transition: all 0.2s;
+  text-decoration: none;
+  color: #FFFFFF;
 }
+.logo span { background: #FFFFFF; color: #0000AA; padding: 0 4px; font-weight: bold; }
 .logo:hover { background: #FFFFFF; }
 
 .tabs-container {
@@ -321,7 +323,7 @@ body:hover .custom-cursor { display: block; }
 
 <div class="content">
   <a href="borne.html" style="text-decoration:none;">
-    <div class="logo"><span>:vitalism</span></div>
+    <a href="borne.html" class="logo"><span>:vitalism</span></a>
   </a>
 
   <div style="font-size:12px; color:#AAAAAA; margin-bottom:20px;">
