@@ -652,7 +652,7 @@
           "pages": 253,
           "pdf": "livres/sorbonnes-pour-labruti.pdf",
           "epub": "livres/sorbonnes-pour-labruti.epub",
-          "cover": "sorbonnes_pour_l_abruti.jpg"
+          "cover": "sorbonne.jpg"
         },
         {
           "title": "La plus grande présence des fêlons",
@@ -660,7 +660,7 @@
           "pages": 145,
           "pdf": "livres/la-plus-grande-presence.pdf",
           "epub": "livres/la-plus-grande-presence.epub",
-          "cover": "la_plus_grande_pr_sence_des_f_.jpg"
+          "cover": "felons.jpg"
         },
         {
           "title": "Confinements aux sites sublimes",
@@ -676,7 +676,7 @@
           "pages": 49,
           "pdf": "livres/lettre-morte.pdf",
           "epub": "livres/lettre-morte.epub",
-          "cover": "lettre_morte___la_france.jpg"
+          "cover": "lettre.jpg"
         },
         {
           "title": "***-*****",
@@ -684,7 +684,7 @@
           "pages": 325,
           "pdf": "livres/2022-livre.pdf",
           "epub": "livres/2022-livre.epub",
-          "cover": "_________.jpg"
+          "cover": "lieux.jpg"
         },
         {
           "title": "Maximes et maximes",
@@ -692,7 +692,7 @@
           "pages": 442,
           "pdf": "livres/maximes-et-maximes.pdf",
           "epub": "livres/maximes-et-maximes.epub",
-          "cover": "maximes_et_maximes.jpg"
+          "cover": "maxime.jpg"
         }
       ],
       "articles": [
@@ -3011,13 +3011,13 @@
           "title": "Traité Néoréactionnaire",
           "year": 2024,
           "pages": 313,
-          "cover": "trait__n_or_actionnaire.jpg"
+          "cover": "traiteneoreactionnaire.jpg"
         },
         {
           "title": "Chevaucher le Minotaure",
           "year": 2025,
           "pages": 250,
-          "cover": "chevaucher_le_minotaure.jpg"
+          "cover": "minotaure.jpg"
         }
       ],
       "articles": [],
@@ -10932,7 +10932,7 @@
           "title": "Penser l'Homme nouveau: Pourquoi la droite perd la bataille des idées",
           "year": 2018,
           "pages": 250,
-          "cover": "penser_l_homme_nouveau__pourqu.jpg"
+          "cover": "hommenouveau.jpg"
         }
       ],
       "articles": [],
@@ -12723,13 +12723,13 @@
           "title": "Bronze Age Mindset",
           "year": 2018,
           "pages": 200,
-          "cover": "bronze_age_mindset.jpg"
+          "cover": "bronzeagemindset.jpg"
         },
         {
           "title": "Selective Breeding and the Birth of Philosophy",
           "year": 2023,
           "pages": 150,
-          "cover": "selective_breeding_and_the_bir.jpg"
+          "cover": "selective.jpg"
         }
       ],
       "articles": [],
@@ -13136,7 +13136,7 @@
           "title": "Hollywood Samizdat: Notes From Below the Line",
           "year": 2025,
           "pages": 248,
-          "cover": "hollywood_samizdat__notes_from.jpg"
+          "cover": "samizdat.jpg"
         }
       ],
       "articles": [],
@@ -13343,7 +13343,7 @@
           "title": "Libertine Dissolves",
           "year": 2025,
           "pages": 143,
-          "cover": "libertine_dissolves.jpg"
+          "cover": "libertine.jpg"
         }
       ],
       "articles": [],
@@ -14563,13 +14563,13 @@
           "title": "No Return",
           "year": 2023,
           "pages": 154,
-          "cover": "no_return.jpg"
+          "cover": "noreturn.jpg"
         },
         {
           "title": "Quarterlives",
           "year": 2024,
           "pages": 178,
-          "cover": "quarterlives.jpg"
+          "cover": "quarter.jpg"
         },
         {
           "title": "Komodo",
@@ -14581,7 +14581,7 @@
           "title": "Calinitia Dreaming",
           "year": 2025,
           "pages": 493,
-          "cover": "calinitia_dreaming.jpg"
+          "cover": "calinitia.jpg"
         },
         {
           "title": "Scenebux",
