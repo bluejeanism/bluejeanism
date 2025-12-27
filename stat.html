@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STAT.SYS - Central Database</title>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
 @keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
@@ -121,6 +122,72 @@
 }
 
 .main-content { display: none; }
+
+.admin-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+.admin-tab {
+  padding: 10px 20px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #fff #808080 #808080 #fff;
+  color: #000;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 12px;
+}
+.admin-tab:hover { background: #d4d4d4; }
+.admin-tab.active { background: #000080; color: #fff; }
+
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+
+.message-card {
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #fff #808080 #808080 #fff;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #808080;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  color: #000;
+  font-size: 11px;
+}
+.message-content {
+  color: #000;
+  font-size: 12px;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  padding: 10px;
+  border: 1px inset #808080;
+}
+.message-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 5px;
+}
+.message-actions button {
+  padding: 4px 10px;
+  font-size: 11px;
+  background: #C0C0C0;
+  border: 2px solid;
+  border-color: #fff #808080 #808080 #fff;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+}
+.message-actions button:hover { background: #d4d4d4; }
+.message-actions button.danger { background: #ff6666; }
+.message-unread { border-left: 4px solid #00ff00; }
 
 body {
   background-color: #0000AA;
@@ -335,7 +402,7 @@ td.name-cell { text-align: left; font-weight: bold; white-space: nowrap; }
 <!-- Main Content -->
 <div class="main-content" id="mainContent">
   <div class="content">
-    <a href="borne.html" class="logo"><span>:vitalism</span></a>
+    <a href="menu.html" class="logo"><span>:vitalism</span></a>
     
     <div class="header">
       📊 STAT.SYS - BASE DE DONNÉES CENTRALE<br>
@@ -344,6 +411,15 @@ td.name-cell { text-align: left; font-weight: bold; white-space: nowrap; }
     
     <div id="status"></div>
     
+    <!-- Onglets Admin -->
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="showAdminTab('stats')">📊 STATISTIQUES</div>
+      <div class="admin-tab" onclick="showAdminTab('candidatures')">📝 CANDIDATURES <span id="candCount"></span></div>
+      <div class="admin-tab" onclick="showAdminTab('anone')">✉️ MESSAGES ANONE <span id="anoneCount"></span></div>
+    </div>
+    
+    <!-- Section Statistiques -->
+    <div class="admin-section active" id="sectionStats">
     <div class="controls">
       <div class="control-group">
         <span class="control-label">PÉRIODE:</span>
@@ -398,6 +474,24 @@ td.name-cell { text-align: left; font-weight: bold; white-space: nowrap; }
     </div>
     
     <pre id="jsonOutput"></pre>
+    </div><!-- Fin sectionStats -->
+    
+    <!-- Section Candidatures -->
+    <div class="admin-section" id="sectionCandidatures">
+      <div class="header" style="margin-bottom:15px;">📝 CANDIDATURES REÇUES</div>
+      <div id="candidaturesList">
+        <div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>
+      </div>
+    </div>
+    
+    <!-- Section Messages Anone -->
+    <div class="admin-section" id="sectionAnone">
+      <div class="header" style="margin-bottom:15px;">✉️ MESSAGES ANONYMES</div>
+      <div id="anoneList">
+        <div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>
+      </div>
+    </div>
+    
   </div>
 </div>
 
@@ -631,6 +725,298 @@ function showStatus(message, type) {
   status.style.background = type === 'success' ? '#00FF00' : type === 'warning' ? '#FFD700' : '#FF6666';
   setTimeout(() => status.style.display = 'none', 3000);
 }
+
+// =============== ADMIN SECTIONS ===============
+const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
+const candidaturesDb = gun.get('vitalism-candidatures-v1');
+const anoneDb = gun.get('vitalism-anone-v1');
+
+function showAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  document.getElementById('section' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  
+  if (tab === 'candidatures') loadCandidatures();
+  if (tab === 'anone') loadAnoneMessages();
+}
+
+function loadCandidatures() {
+  const container = document.getElementById('candidaturesList');
+  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>';
+  
+  const items = [];
+  candidaturesDb.map().once((data, key) => {
+    if (data && data.name) {
+      items.push({ id: key, ...data });
+    }
+  });
+  
+  setTimeout(() => {
+    if (items.length === 0) {
+      container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucune candidature</div>';
+      return;
+    }
+    
+    items.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+    
+    container.innerHTML = items.map(c => `
+      <div class="message-card ${c.status === 'pending' ? 'message-unread' : ''}" id="cand-${c.id}">
+        <div class="message-header">
+          <strong style="color:#000080;">${escapeHtml(c.name)} ${c.alias ? '("' + escapeHtml(c.alias) + '")' : ''}</strong>
+          <span>${new Date(c.submittedAt).toLocaleString('fr-FR')} | ${c.status || 'pending'}</span>
+        </div>
+        <div style="color:#000;font-size:11px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+          <div>📧 ${escapeHtml(c.email || 'N/A')}</div>
+          <div>🌍 ${escapeHtml(c.country || 'N/A')}</div>
+          <div>🐦 ${escapeHtml(c.socials?.twitter || 'N/A')}</div>
+          <div>📅 Depuis ${c.startYear || 'N/A'}</div>
+          <div>📚 ${c.production?.books || 0} livres</div>
+          <div>📝 ${c.production?.articles || 0} articles</div>
+        </div>
+        <div class="message-content">${escapeHtml(c.motivation || 'Pas de motivation')}</div>
+        ${c.quote ? '<div style="color:#666;font-style:italic;margin-top:5px;font-size:11px;">"' + escapeHtml(c.quote) + '"</div>' : ''}
+        <div class="message-actions" style="flex-wrap:wrap;">
+          <button onclick="viewCandidature('${c.id}')" style="background:#cce5ff;">👁️ JSON</button>
+          <button onclick="acceptCandidature('${c.id}')" style="background:#90EE90;">✅ ACCEPTER</button>
+          <button onclick="refuseCandidature('${c.id}')" style="background:#FFB6C1;">❌ REFUSER</button>
+          <button onclick="mailCandidature('${c.id}', 'accept')">📧 Mail Acceptation</button>
+          <button onclick="mailCandidature('${c.id}', 'refuse')">📧 Mail Refus</button>
+          <button class="danger" onclick="deleteCandidature('${c.id}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('candCount').textContent = '(' + items.filter(i => i.status === 'pending').length + ')';
+  }, 1500);
+}
+
+function loadAnoneMessages() {
+  const container = document.getElementById('anoneList');
+  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>';
+  
+  const items = [];
+  anoneDb.map().once((data, key) => {
+    if (data && data.message) {
+      items.push({ id: key, ...data });
+    }
+  });
+  
+  setTimeout(() => {
+    if (items.length === 0) {
+      container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucun message</div>';
+      return;
+    }
+    
+    items.sort((a, b) => b.timestamp - a.timestamp);
+    
+    container.innerHTML = items.map(m => `
+      <div class="message-card ${m.status === 'unread' ? 'message-unread' : ''}">
+        <div class="message-header">
+          <strong style="color:#000080;">HASH: ${m.hash || 'N/A'}</strong>
+          <span>${new Date(m.timestamp).toLocaleString('fr-FR')}</span>
+        </div>
+        <div class="message-content">${escapeHtml(m.message)}</div>
+        <div class="message-actions">
+          <button onclick="markAnoneRead('${m.id}')">✓ Lu</button>
+          <button class="danger" onclick="deleteAnone('${m.id}')">🗑️ Supprimer</button>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('anoneCount').textContent = '(' + items.filter(i => i.status === 'unread').length + ')';
+  }, 1500);
+}
+
+function viewCandidature(id) {
+  candidaturesDb.get(id).once((data) => {
+    if (!data) return;
+    const json = JSON.stringify(data, null, 2);
+    const el = document.getElementById('jsonOutput');
+    el.textContent = json;
+    el.style.display = 'block';
+    showAdminTab('stats');
+  });
+}
+
+// Stocker temporairement les candidatures chargées
+let loadedCandidatures = {};
+
+// Charger une candidature par ID
+function getCandidature(id, callback) {
+  if (loadedCandidatures[id]) {
+    callback(loadedCandidatures[id]);
+    return;
+  }
+  candidaturesDb.get(id).once((data) => {
+    if (data) {
+      loadedCandidatures[id] = data;
+      callback(data);
+    }
+  });
+}
+
+// Accepter une candidature et l'importer dans les contributeurs
+function acceptCandidature(id) {
+  getCandidature(id, (data) => {
+    if (!data) return;
+    
+    if (!confirm(`Accepter ${data.name} et l'ajouter aux contributeurs ?`)) return;
+    
+    // Créer le nouveau contributeur avec la structure attendue
+    const newContributor = {
+      name: data.name,
+      file: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.html',
+      avatar: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.jpg',
+      startYear: data.startYear || new Date().getFullYear(),
+      country: data.country || 'FR',
+      type: 'Contributeur',
+      description: '',
+      alias: data.alias || '',
+      socials: {
+        twitter: data.socials?.twitter || null,
+        substack: data.socials?.substack || null,
+        website: data.socials?.website || null
+      },
+      radar: data.radar || {
+        raisonnement: 50,
+        ethique: 50,
+        logique: 50,
+        esthetique: 50,
+        metaphysique: 50,
+        sociologie: 50
+      },
+      quotes: data.quote ? [data.quote] : [],
+      books: [],
+      articles: [],
+      videos: [],
+      audio: [],
+      translations: [],
+      y2018: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2019: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2020: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2021: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2022: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2023: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2024: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2025: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+      y2026: { books: data.production?.books || 0, articles: data.production?.articles || 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 }
+    };
+    
+    // Ajouter aux contributeurs
+    contributors.push(newContributor);
+    
+    // Mettre à jour le statut de la candidature
+    candidaturesDb.get(id).get('status').put('accepted');
+    
+    // Rafraîchir l'interface
+    initContributorSelect();
+    renderTable();
+    showStatus(`✅ ${data.name} ajouté aux contributeurs ! N'oubliez pas de sauvegarder et exporter le JSON.`, 'success');
+    
+    // Rafraîchir la liste des candidatures
+    setTimeout(loadCandidatures, 500);
+  });
+}
+
+// Refuser une candidature
+function refuseCandidature(id) {
+  getCandidature(id, (data) => {
+    if (!data) return;
+    
+    const reason = prompt(`Raison du refus pour ${data.name} (optionnel):`);
+    if (reason === null) return; // Annulé
+    
+    candidaturesDb.get(id).get('status').put('refused');
+    candidaturesDb.get(id).get('refuseReason').put(reason || 'Non spécifiée');
+    
+    showStatus(`❌ Candidature de ${data.name} refusée`, 'warning');
+    setTimeout(loadCandidatures, 500);
+  });
+}
+
+// Envoyer un mail
+function mailCandidature(id, type) {
+  getCandidature(id, (data) => {
+    if (!data || !data.email) {
+      alert('Pas d\'email pour ce candidat');
+      return;
+    }
+    
+    let subject, body;
+    
+    if (type === 'accept') {
+      subject = encodeURIComponent('Vitalism - Candidature acceptée');
+      body = encodeURIComponent(`Bonjour ${data.name},
+
+Nous avons le plaisir de vous informer que votre candidature pour rejoindre Vitalism a été acceptée !
+
+Bienvenue dans la communauté.
+
+Vous pouvez désormais accéder à votre fiche contributeur et commencer à enrichir votre profil.
+
+À très bientôt,
+L'équipe Vitalism`);
+    } else {
+      subject = encodeURIComponent('Vitalism - Candidature');
+      body = encodeURIComponent(`Bonjour ${data.name},
+
+Nous vous remercions de l'intérêt que vous portez à Vitalism.
+
+Après examen de votre candidature, nous ne sommes malheureusement pas en mesure de l'accepter pour le moment.
+
+N'hésitez pas à renouveler votre demande ultérieurement si vous le souhaitez.
+
+Cordialement,
+L'équipe Vitalism`);
+    }
+    
+    window.open(`mailto:${data.email}?subject=${subject}&body=${body}`, '_blank');
+  });
+}
+
+function markCandidatureRead(id) {
+  candidaturesDb.get(id).get('status').put('read');
+  setTimeout(loadCandidatures, 500);
+}
+
+function deleteCandidature(id) {
+  if (confirm('Supprimer cette candidature ?')) {
+    candidaturesDb.get(id).put(null);
+    setTimeout(loadCandidatures, 500);
+  }
+}
+
+function markAnoneRead(id) {
+  anoneDb.get(id).get('status').put('read');
+  setTimeout(loadAnoneMessages, 500);
+}
+
+function deleteAnone(id) {
+  if (confirm('Supprimer ce message ?')) {
+    anoneDb.get(id).put(null);
+    setTimeout(loadAnoneMessages, 500);
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Charger les compteurs au démarrage
+setTimeout(() => {
+  let candCount = 0, anoneCount = 0;
+  candidaturesDb.map().once((d) => { if (d && d.status === 'pending') candCount++; });
+  anoneDb.map().once((d) => { if (d && d.status === 'unread') anoneCount++; });
+  setTimeout(() => {
+    document.getElementById('candCount').textContent = candCount > 0 ? '(' + candCount + ')' : '';
+    document.getElementById('anoneCount').textContent = anoneCount > 0 ? '(' + anoneCount + ')' : '';
+  }, 1000);
+}, 1000);
 </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>//AN0NE_01</title>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
 @keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
@@ -138,7 +139,7 @@ body:hover .custom-cursor { display:block; }
 <div class="custom-cursor" id="cursor"></div>
 
 <div class="content">
-  <a href="borne.html" class="logo"><span>:vitalism</span></a>
+  <a href="menu.html" class="logo"><span>:vitalism</span></a>
 
   <div class="terminal-boot">
     <div class="boot-line">VITALISM CONTACT SYSTEM v2.1</div>
@@ -242,6 +243,10 @@ typingArea.addEventListener('input', function() {
   }, 800);
 });
 
+// Gun.js pour messages
+const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
+const anoneMessages = gun.get('vitalism-anone-v1');
+
 submitBtn.addEventListener('click', function() {
   if (charCount < 10) return;
   
@@ -259,17 +264,28 @@ submitBtn.addEventListener('click', function() {
     return;
   }
   
-  // Normal path
+  // Normal path - envoyer à Gun.js
   submitBtn.style.opacity = '0.5';
   submitBtn.style.pointerEvents = 'none';
   statusIndicator.textContent = 'TRANSMITTING';
   
-  const chosen = anones[Math.floor(Math.random() * anones.length)];
   const hash = Math.random().toString(16).substring(2, 10).toUpperCase();
+  const msgId = 'anone_' + Date.now() + '_' + hash;
+  
+  // Sauvegarder le message
+  anoneMessages.get(msgId).put({
+    id: msgId,
+    message: typingArea.textContent,
+    hash: '0x' + hash,
+    charCount: charCount,
+    timestamp: Date.now(),
+    date: new Date().toISOString(),
+    status: 'unread'
+  });
   
   setTimeout(() => {
     statusIndicator.textContent = 'TX_SUCCESS';
-    typingArea.textContent = `TX_SUCCESS | HASH: 0x${hash}\nDEST: ANONE_POOL[HIDDEN]\nPAYLOAD: ${charCount} BYTES\n\nCONNECTION_TERMINATED`;
+    typingArea.textContent = `TX_SUCCESS | HASH: 0x${hash}\nDEST: ANONE_POOL[HIDDEN]\nPAYLOAD: ${charCount} BYTES\n\nMESSAGE ENREGISTRÉ\nCONNECTION_TERMINATED`;
     
     setTimeout(() => {
       typingArea.textContent = '';

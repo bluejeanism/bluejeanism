@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C@NDID@TURE_V1T4L // Formulaire d'admission</title>
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
@@ -687,8 +688,8 @@ body::before {
         </div>
 
         <div class="actions">
+          <button type="button" class="btn primary" onclick="submitCandidature()" style="background:#006400;">📤 SOUMETTRE CANDIDATURE</button>
           <button type="button" class="btn primary" onclick="previewData()">👁️ Prévisualiser</button>
-          <button type="button" class="btn primary" onclick="exportJSON()">💾 Exporter JSON</button>
           <button type="button" class="btn" onclick="saveDraft()">📋 Sauvegarder brouillon</button>
           <button type="button" class="btn" onclick="loadDraft()">📂 Charger brouillon</button>
           <button type="button" class="btn danger" onclick="resetForm()">🗑️ Effacer</button>
@@ -961,6 +962,34 @@ function showToothVideo() {
 
 motivationField.addEventListener('input', checkToothSecret);
 console.log('%c🦷 Il y a quelque chose dans le formulaire...', 'color: #888; font-size: 9px;');
+
+// Gun.js pour soumission
+const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
+const candidatures = gun.get('vitalism-candidatures-v1');
+
+function submitCandidature() {
+  const data = collectData();
+  const error = validate(data);
+  
+  if (error) {
+    showError(error);
+    return;
+  }
+  
+  const candidatureId = 'cand_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  data.id = candidatureId;
+  data.status = 'pending';
+  
+  candidatures.get(candidatureId).put(data);
+  
+  // Message de confirmation
+  const modal = document.getElementById('previewModal');
+  modal.style.display = 'flex';
+  document.getElementById('jsonOutput').textContent = '✅ CANDIDATURE ENVOYÉE !\n\nVotre candidature a été soumise avec succès.\nElle sera examinée par l\'équipe Vitalism.\n\nID: ' + candidatureId + '\n\nMerci de votre intérêt !';
+  
+  // Effacer le formulaire
+  resetForm();
+}
 </script>
 </body>
 </html>

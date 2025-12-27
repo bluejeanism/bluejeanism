@@ -97,6 +97,7 @@ body:hover .fake-cursor{display:block}
   <a href="yetscape.html" class="nav-tab">🌐 YETSCAPE</a>
   <a href="chatbox.html" class="nav-tab">💬 CHATBOX</a>
   <a href="forum.html" class="nav-tab">📋 FORUM</a>
+  <a href="anone.html" class="nav-tab">✉️ ANONE</a>
   <button class="close-all-btn" onclick="closeAllPopups()">✕ FERMER TOUT</button>
 </nav>
 
@@ -104,7 +105,7 @@ body:hover .fake-cursor{display:block}
 <div class="depth-indicator"><div class="depth-fill" id="depthFill" style="height:0%"></div></div>
 
 <div class="main-content" id="mainContent" style="padding-top:40px">
-<a href="borne.html" style="text-decoration:none"><a href="borne.html" class="logo"><span>:vitalism</span></a></a>
+<a href="borne.html" style="text-decoration:none"><a href="menu.html" class="logo"><span>:vitalism</span></a></a>
 <div class="error-code" id="errorCode">0xDEADBEEF</div>
 <img id="mainImage" src="sydney.png" alt="Image" onerror="this.style.display='none'">
 <div class="buttons">
@@ -612,22 +613,7 @@ function closeAllPopups() {
   document.querySelectorAll('div[style*="z-index:3001"]').forEach(b => b.remove());
 }
 
-// Ouvrir la chatbox dans une popup style Windows
-function openChatbox() {
-  const popup = document.createElement('div');
-  popup.className = 'popup';
-  popup.style.cssText = 'display:block;width:400px;height:500px;left:50%;top:50%;transform:translate(-50%,-50%);';
-  popup.innerHTML = `
-    <div class="popupTitle">
-      <span>💬 Chatbox Vitalism</span>
-      <div class="closeBtn" onclick="this.closest('.popup').remove()">×</div>
-    </div>
-    <div style="height:calc(100% - 30px);background:#fff;">
-      <iframe src="https://vitalism.forumactif.com/chatbox/" style="width:100%;height:100%;border:none;"></iframe>
-    </div>
-  `;
-  document.body.appendChild(popup);
-}
 </script>
+<a href="stat.html" style="position:fixed;bottom:3px;right:3px;width:6px;height:6px;opacity:0.05;z-index:9999;" title="."></a>
 </body>
 </html>

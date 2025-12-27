@@ -271,7 +271,7 @@ body::before {
 <body>
 
 <div class="container">
-  <a href="borne.html" class="logo"><span>:vitalism</span></a>
+  <a href="menu.html" class="logo"><span>:vitalism</span></a>
   
   <div class="auth-window">
     <div class="auth-header">
@@ -319,6 +319,13 @@ body::before {
         </form>
         
         <div class="info-box">
+          <h4>⚠️ Important</h4>
+          <p>Votre mot de passe est <strong>irrécupérable</strong>.<br>
+          Aucun serveur ne le stocke. Notez-le précieusement.<br>
+          En cas d'oubli, vous devrez créer un nouveau compte.</p>
+        </div>
+        
+        <div class="info-box">
           <h4>🔒 Authentification décentralisée</h4>
           <p>Votre compte est sécurisé par cryptographie.<br>
           Aucun serveur ne stocke votre mot de passe.<br>
@@ -342,7 +349,8 @@ body::before {
             <a href="forum.html">📋 Forum</a>
           </div>
           
-          <button class="btn" style="margin-top:15px;" onclick="logout()">Déconnexion</button>
+          <button class="btn" style="margin-top:15px;" onclick="exportKey()">📥 Exporter ma clé</button>
+          <button class="btn" style="margin-top:10px;" onclick="logout()">Déconnexion</button>
         </div>
       </div>
     </div>
@@ -465,6 +473,42 @@ function showLoggedIn() {
     username: username,
     pub: pubKey
   }));
+}
+
+function exportKey() {
+  if (!user.is) return;
+  
+  const keyData = {
+    username: user.is.alias,
+    pub: user.is.pub,
+    exportDate: new Date().toISOString(),
+    warning: "GARDEZ CE FICHIER EN SÉCURITÉ. Ne le partagez jamais. Cette clé permet d'accéder à votre compte."
+  };
+  
+  const content = `=== VITALISM - CLÉ DE RÉCUPÉRATION ===
+
+Pseudo: ${keyData.username}
+Date d'export: ${keyData.exportDate}
+
+Clé publique:
+${keyData.pub}
+
+⚠️ ATTENTION:
+- Gardez ce fichier en lieu sûr
+- Ne le partagez JAMAIS
+- Cette clé est votre identité sur le réseau
+
+Note: Cette clé publique permet de vérifier votre identité.
+Pour vous reconnecter, vous aurez toujours besoin de votre mot de passe.
+`;
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vitalism-key-' + keyData.username + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function logout() {
