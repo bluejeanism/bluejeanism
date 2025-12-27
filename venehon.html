@@ -546,9 +546,10 @@ body::after {
 }
 
 .book-cover img {
+  background: #1a1a1a;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .book-title {
@@ -1225,7 +1226,7 @@ function updateBooks() {
     return `
     <div class="book-card" onclick="openBookModal('${book.title.replace(/'/g, "\'")}', ${book.year}, ${book.pages}, '${book.pdf || ''}', '${book.epub || ''}')">
       <div class="book-cover">
-        <img src="${coverSrc}" alt="${book.title}" onerror="this.style.display='none'">
+        <img src="${coverSrc}" alt="${book.title}" onerror="console.log('Image not found:', this.src)">
       </div>
       <div class="book-info-text">
         <div class="book-title">${book.title}</div>
