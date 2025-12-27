@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <title>Forum Vitalism</title>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
@@ -370,6 +371,9 @@ const categories = [
 // Modérateurs (clés publiques)
 const moderators = [];
 
+// Clé de chiffrement groupe (partagée entre tous les membres)
+const GROUP_KEY = 'vitalism-members-group-key-2024';
+
 gun.on('auth', () => initForum());
 setTimeout(() => { if (user.is) initForum(); }, 500);
 
@@ -475,7 +479,7 @@ function renderTopics(topics, container) {
   });
 }
 
-function showTopic(categoryId, topicId) {
+async function showTopic(categoryId, topicId) {
   hideAllViews();
   document.getElementById('viewTopic').style.display = 'block';
   currentCategory = categoryId;
@@ -485,48 +489,57 @@ function showTopic(categoryId, topicId) {
   document.getElementById('breadcrumbCategory').textContent = cat ? cat.name : categoryId;
   
   const container = document.getElementById('postsList');
-  container.innerHTML = '<div class="empty-message">Chargement...</div>';
+  container.innerHTML = '<div class="empty-message">🔓 Déchiffrement...</div>';
   
   // Charger le topic original
-  forum.get('topics').get(categoryId).get(topicId).once((data) => {
+  forum.get('topics').get(categoryId).get(topicId).once(async (data) => {
     if (data && data.signed) {
-      SEA.verify(data.signed, data.pub).then(verified => {
-        if (verified) {
-          document.getElementById('currentTopicTitle').textContent = verified.title;
-          document.getElementById('topicHeader').textContent = verified.title;
-          
-          container.innerHTML = `
-            <div class="post">
-              <div class="post-header">
-                <div>
-                  <span class="post-author">${escapeHtml(verified.author)}</span>
-                  <span class="post-verified">✓ vérifié</span>
-                  ${moderators.includes(data.pub) ? '<span class="mod-badge">MOD</span>' : ''}
-                </div>
-                <span class="post-date">${new Date(verified.time).toLocaleString('fr-FR')}</span>
-              </div>
-              <div class="post-content">${escapeHtml(verified.content)}</div>
-            </div>
-          `;
-          
-          loadReplies(topicId, container);
+      const verified = await SEA.verify(data.signed, data.pub);
+      if (verified) {
+        document.getElementById('currentTopicTitle').textContent = verified.title;
+        document.getElementById('topicHeader').textContent = verified.title;
+        
+        // Déchiffrer le contenu
+        let content = verified.content; // Ancien format
+        if (verified.encryptedContent) {
+          content = await SEA.decrypt(verified.encryptedContent, GROUP_KEY);
         }
-      });
+        
+        container.innerHTML = `
+          <div class="post">
+            <div class="post-header">
+              <div>
+                <span class="post-author">${escapeHtml(verified.author)}</span>
+                <span class="post-verified">✓ vérifié 🔒</span>
+                ${moderators.includes(data.pub) ? '<span class="mod-badge">MOD</span>' : ''}
+              </div>
+              <span class="post-date">${new Date(verified.time).toLocaleString('fr-FR')}</span>
+            </div>
+            <div class="post-content">${escapeHtml(content)}</div>
+          </div>
+        `;
+        
+        loadReplies(topicId, container);
+      }
     }
   });
 }
 
-function loadReplies(topicId, container) {
+async function loadReplies(topicId, container) {
   const replies = [];
   
-  forum.get('posts').get(topicId).map().once((data, key) => {
+  forum.get('posts').get(topicId).map().once(async (data, key) => {
     if (data && data.signed) {
-      SEA.verify(data.signed, data.pub).then(verified => {
-        if (verified) {
-          replies.push({ id: key, ...verified, pub: data.pub });
-          renderReplies(replies, container);
+      const verified = await SEA.verify(data.signed, data.pub);
+      if (verified) {
+        // Déchiffrer le contenu
+        let content = verified.content; // Ancien format
+        if (verified.encryptedContent) {
+          content = await SEA.decrypt(verified.encryptedContent, GROUP_KEY);
         }
-      });
+        replies.push({ id: key, ...verified, content, pub: data.pub });
+        renderReplies(replies, container);
+      }
     }
   });
 }
@@ -564,7 +577,7 @@ function showNewTopic() {
   }
 }
 
-function submitNewTopic() {
+async function submitNewTopic() {
   const categoryId = document.getElementById('newTopicCategory').value;
   const title = document.getElementById('newTopicTitle').value.trim();
   const content = document.getElementById('newTopicContent').value.trim();
@@ -574,9 +587,12 @@ function submitNewTopic() {
     return;
   }
   
+  // Chiffrer le contenu
+  const encryptedContent = await SEA.encrypt(content, GROUP_KEY);
+  
   const topicData = {
     title,
-    content,
+    encryptedContent,
     author: myUsername,
     pub: myPub,
     time: Date.now(),
@@ -594,7 +610,7 @@ function submitNewTopic() {
   });
 }
 
-function submitReply() {
+async function submitReply() {
   const content = document.getElementById('replyContent').value.trim();
   
   if (!content) {
@@ -602,8 +618,11 @@ function submitReply() {
     return;
   }
   
+  // Chiffrer le contenu
+  const encryptedContent = await SEA.encrypt(content, GROUP_KEY);
+  
   const replyData = {
-    content,
+    encryptedContent,
     author: myUsername,
     pub: myPub,
     time: Date.now(),

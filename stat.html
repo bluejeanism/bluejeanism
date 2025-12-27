@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STAT.SYS - Central Database</title>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
 @keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
@@ -728,8 +729,21 @@ function showStatus(message, type) {
 
 // =============== ADMIN SECTIONS ===============
 const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
-const candidaturesDb = gun.get('vitalism-candidatures-v1');
-const anoneDb = gun.get('vitalism-anone-v1');
+const candidaturesDb = gun.get('vitalism-candidatures-v2');
+const anoneDb = gun.get('vitalism-anone-v2');
+
+// Clé de chiffrement admin (même que dans candidature.html et anone.html)
+const ADMIN_SECRET = 'vitalism-admin-key-2024-secure';
+
+async function decryptData(encrypted) {
+  try {
+    const decrypted = await SEA.decrypt(encrypted, ADMIN_SECRET);
+    return JSON.parse(decrypted);
+  } catch (e) {
+    console.error('Erreur déchiffrement:', e);
+    return null;
+  }
+}
 
 function showAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -742,97 +756,124 @@ function showAdminTab(tab) {
   if (tab === 'anone') loadAnoneMessages();
 }
 
-function loadCandidatures() {
+async function loadCandidatures() {
   const container = document.getElementById('candidaturesList');
-  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>';
+  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">🔓 Déchiffrement en cours...</div>';
   
   const items = [];
+  const rawItems = [];
+  
   candidaturesDb.map().once((data, key) => {
-    if (data && data.name) {
-      items.push({ id: key, ...data });
+    if (data && data.encrypted) {
+      rawItems.push({ id: key, encrypted: data.encrypted, timestamp: data.timestamp });
     }
   });
   
-  setTimeout(() => {
-    if (items.length === 0) {
-      container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucune candidature</div>';
-      return;
+  // Attendre que les données soient chargées
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Déchiffrer chaque candidature
+  for (const raw of rawItems) {
+    const decrypted = await decryptData(raw.encrypted);
+    if (decrypted) {
+      items.push({ ...decrypted, id: raw.id });
     }
-    
-    items.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-    
-    container.innerHTML = items.map(c => `
-      <div class="message-card ${c.status === 'pending' ? 'message-unread' : ''}" id="cand-${c.id}">
-        <div class="message-header">
-          <strong style="color:#000080;">${escapeHtml(c.name)} ${c.alias ? '("' + escapeHtml(c.alias) + '")' : ''}</strong>
-          <span>${new Date(c.submittedAt).toLocaleString('fr-FR')} | ${c.status || 'pending'}</span>
-        </div>
-        <div style="color:#000;font-size:11px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-          <div>📧 ${escapeHtml(c.email || 'N/A')}</div>
-          <div>🌍 ${escapeHtml(c.country || 'N/A')}</div>
-          <div>🐦 ${escapeHtml(c.socials?.twitter || 'N/A')}</div>
-          <div>📅 Depuis ${c.startYear || 'N/A'}</div>
-          <div>📚 ${c.production?.books || 0} livres</div>
-          <div>📝 ${c.production?.articles || 0} articles</div>
-        </div>
-        <div class="message-content">${escapeHtml(c.motivation || 'Pas de motivation')}</div>
-        ${c.quote ? '<div style="color:#666;font-style:italic;margin-top:5px;font-size:11px;">"' + escapeHtml(c.quote) + '"</div>' : ''}
-        <div class="message-actions" style="flex-wrap:wrap;">
-          <button onclick="viewCandidature('${c.id}')" style="background:#cce5ff;">👁️ JSON</button>
-          <button onclick="acceptCandidature('${c.id}')" style="background:#90EE90;">✅ ACCEPTER</button>
-          <button onclick="refuseCandidature('${c.id}')" style="background:#FFB6C1;">❌ REFUSER</button>
-          <button onclick="mailCandidature('${c.id}', 'accept')">📧 Mail Acceptation</button>
-          <button onclick="mailCandidature('${c.id}', 'refuse')">📧 Mail Refus</button>
-          <button class="danger" onclick="deleteCandidature('${c.id}')">🗑️</button>
-        </div>
+  }
+  
+  if (items.length === 0) {
+    container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucune candidature</div>';
+    return;
+  }
+  
+  items.sort((a, b) => new Date(b.submittedAt || b.timestamp) - new Date(a.submittedAt || a.timestamp));
+  
+  container.innerHTML = items.map(c => `
+    <div class="message-card ${c.status === 'pending' ? 'message-unread' : ''}" id="cand-${c.id}">
+      <div class="message-header">
+        <strong style="color:#000080;">${escapeHtml(c.name)} ${c.alias ? '("' + escapeHtml(c.alias) + '")' : ''}</strong>
+        <span>${new Date(c.submittedAt).toLocaleString('fr-FR')} | ${c.status || 'pending'}</span>
       </div>
-    `).join('');
+      <div style="color:#000;font-size:11px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+        <div>📧 ${escapeHtml(c.email || 'N/A')}</div>
+        <div>🌍 ${escapeHtml(c.country || 'N/A')}</div>
+        <div>🐦 ${escapeHtml(c.socials?.twitter || 'N/A')}</div>
+        <div>📅 Depuis ${c.startYear || 'N/A'}</div>
+        <div>📚 ${c.production?.books || 0} livres</div>
+        <div>📝 ${c.production?.articles || 0} articles</div>
+        <div>🔐 Login: ${escapeHtml(c.login?.pseudo || 'N/A')}</div>
+      </div>
+      <div class="message-content">${escapeHtml(c.motivation || 'Pas de motivation')}</div>
+      ${c.quote ? '<div style="color:#666;font-style:italic;margin-top:5px;font-size:11px;">"' + escapeHtml(c.quote) + '"</div>' : ''}
+      <div class="message-actions" style="flex-wrap:wrap;">
+        <button onclick="viewCandidature('${c.id}')" style="background:#cce5ff;">👁️ JSON</button>
+        <button onclick="acceptCandidature('${c.id}')" style="background:#90EE90;">✅ ACCEPTER</button>
+        <button onclick="refuseCandidature('${c.id}')" style="background:#FFB6C1;">❌ REFUSER</button>
+        <button onclick="mailCandidature('${c.id}', 'accept')">📧 Mail Acceptation</button>
+        <button onclick="mailCandidature('${c.id}', 'refuse')">📧 Mail Refus</button>
+        <button class="danger" onclick="deleteCandidature('${c.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('candCount').textContent = '(' + items.filter(i => i.status === 'pending').length + ')';
     
     document.getElementById('candCount').textContent = '(' + items.filter(i => i.status === 'pending').length + ')';
   }, 1500);
 }
 
-function loadAnoneMessages() {
+async function loadAnoneMessages() {
   const container = document.getElementById('anoneList');
-  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Chargement...</div>';
+  container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">🔓 Déchiffrement en cours...</div>';
   
   const items = [];
+  const rawItems = [];
+  
   anoneDb.map().once((data, key) => {
-    if (data && data.message) {
-      items.push({ id: key, ...data });
+    if (data && data.encrypted) {
+      rawItems.push({ id: key, encrypted: data.encrypted, timestamp: data.timestamp });
     }
   });
   
-  setTimeout(() => {
-    if (items.length === 0) {
-      container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucun message</div>';
-      return;
+  // Attendre que les données soient chargées
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Déchiffrer chaque message
+  for (const raw of rawItems) {
+    const decrypted = await decryptData(raw.encrypted);
+    if (decrypted) {
+      items.push({ ...decrypted, id: raw.id });
     }
-    
-    items.sort((a, b) => b.timestamp - a.timestamp);
-    
-    container.innerHTML = items.map(m => `
-      <div class="message-card ${m.status === 'unread' ? 'message-unread' : ''}">
-        <div class="message-header">
-          <strong style="color:#000080;">HASH: ${m.hash || 'N/A'}</strong>
-          <span>${new Date(m.timestamp).toLocaleString('fr-FR')}</span>
-        </div>
-        <div class="message-content">${escapeHtml(m.message)}</div>
-        <div class="message-actions">
-          <button onclick="markAnoneRead('${m.id}')">✓ Lu</button>
-          <button class="danger" onclick="deleteAnone('${m.id}')">🗑️ Supprimer</button>
-        </div>
+  }
+  
+  if (items.length === 0) {
+    container.innerHTML = '<div style="color:#808080;text-align:center;padding:20px;">Aucun message</div>';
+    return;
+  }
+  
+  items.sort((a, b) => b.timestamp - a.timestamp);
+  
+  container.innerHTML = items.map(m => `
+    <div class="message-card ${m.status === 'unread' ? 'message-unread' : ''}">
+      <div class="message-header">
+        <strong style="color:#000080;">HASH: ${m.hash || 'N/A'}</strong>
+        <span>${new Date(m.timestamp).toLocaleString('fr-FR')} | 🔒 Chiffré</span>
       </div>
-    `).join('');
-    
-    document.getElementById('anoneCount').textContent = '(' + items.filter(i => i.status === 'unread').length + ')';
-  }, 1500);
+      <div class="message-content">${escapeHtml(m.message)}</div>
+      <div class="message-actions">
+        <button onclick="markAnoneRead('${m.id}')">✓ Lu</button>
+        <button class="danger" onclick="deleteAnone('${m.id}')">🗑️ Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('anoneCount').textContent = '(' + items.filter(i => i.status === 'unread').length + ')';
 }
 
-function viewCandidature(id) {
-  candidaturesDb.get(id).once((data) => {
-    if (!data) return;
-    const json = JSON.stringify(data, null, 2);
+async function viewCandidature(id) {
+  candidaturesDb.get(id).once(async (data) => {
+    if (!data || !data.encrypted) return;
+    const decrypted = await decryptData(data.encrypted);
+    const json = JSON.stringify(decrypted, null, 2);
     const el = document.getElementById('jsonOutput');
     el.textContent = json;
     el.style.display = 'block';
@@ -843,16 +884,19 @@ function viewCandidature(id) {
 // Stocker temporairement les candidatures chargées
 let loadedCandidatures = {};
 
-// Charger une candidature par ID
-function getCandidature(id, callback) {
+// Charger une candidature par ID (avec déchiffrement)
+async function getCandidature(id, callback) {
   if (loadedCandidatures[id]) {
     callback(loadedCandidatures[id]);
     return;
   }
-  candidaturesDb.get(id).once((data) => {
-    if (data) {
-      loadedCandidatures[id] = data;
-      callback(data);
+  candidaturesDb.get(id).once(async (data) => {
+    if (data && data.encrypted) {
+      const decrypted = await decryptData(data.encrypted);
+      if (decrypted) {
+        loadedCandidatures[id] = decrypted;
+        callback(decrypted);
+      }
     }
   });
 }
@@ -862,61 +906,80 @@ function acceptCandidature(id) {
   getCandidature(id, (data) => {
     if (!data) return;
     
-    if (!confirm(`Accepter ${data.name} et l'ajouter aux contributeurs ?`)) return;
+    // Vérifier les identifiants
+    if (!data.login || !data.login.pseudo || !data.login.password) {
+      alert('⚠️ Cette candidature n\'a pas d\'identifiants de connexion.\nImpossible de créer le compte automatiquement.');
+      return;
+    }
     
-    // Créer le nouveau contributeur avec la structure attendue
-    const newContributor = {
-      name: data.name,
-      file: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.html',
-      avatar: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.jpg',
-      startYear: data.startYear || new Date().getFullYear(),
-      country: data.country || 'FR',
-      type: 'Contributeur',
-      description: '',
-      alias: data.alias || '',
-      socials: {
-        twitter: data.socials?.twitter || null,
-        substack: data.socials?.substack || null,
-        website: data.socials?.website || null
-      },
-      radar: data.radar || {
-        raisonnement: 50,
-        ethique: 50,
-        logique: 50,
-        esthetique: 50,
-        metaphysique: 50,
-        sociologie: 50
-      },
-      quotes: data.quote ? [data.quote] : [],
-      books: [],
-      articles: [],
-      videos: [],
-      audio: [],
-      translations: [],
-      y2018: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2019: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2020: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2021: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2022: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2023: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2024: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2025: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
-      y2026: { books: data.production?.books || 0, articles: data.production?.articles || 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 }
-    };
+    if (!confirm(`Accepter ${data.name} et créer son compte ?\n\nPseudo: ${data.login.pseudo}`)) return;
     
-    // Ajouter aux contributeurs
-    contributors.push(newContributor);
+    // Créer le compte Gun.js
+    showStatus('Création du compte en cours...', 'info');
     
-    // Mettre à jour le statut de la candidature
-    candidaturesDb.get(id).get('status').put('accepted');
+    const tempGun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
+    const tempUser = tempGun.user();
     
-    // Rafraîchir l'interface
-    initContributorSelect();
-    renderTable();
-    showStatus(`✅ ${data.name} ajouté aux contributeurs ! N'oubliez pas de sauvegarder et exporter le JSON.`, 'success');
-    
-    // Rafraîchir la liste des candidatures
-    setTimeout(loadCandidatures, 500);
+    tempUser.create(data.login.pseudo, data.login.password, (ack) => {
+      if (ack.err && !ack.err.includes('already')) {
+        showStatus('❌ Erreur création compte: ' + ack.err, 'error');
+        return;
+      }
+      
+      // Créer le nouveau contributeur avec la structure attendue
+      const newContributor = {
+        name: data.name,
+        file: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.html',
+        avatar: data.name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.jpg',
+        startYear: data.startYear || new Date().getFullYear(),
+        country: data.country || 'FR',
+        type: 'Contributeur',
+        description: '',
+        alias: data.alias || '',
+        socials: {
+          twitter: data.socials?.twitter || null,
+          substack: data.socials?.substack || null,
+          website: data.socials?.website || null
+        },
+        radar: data.radar || {
+          raisonnement: 50,
+          ethique: 50,
+          logique: 50,
+          esthetique: 50,
+          metaphysique: 50,
+          sociologie: 50
+        },
+        quotes: data.quote ? [data.quote] : [],
+        books: [],
+        articles: [],
+        videos: [],
+        audio: [],
+        translations: [],
+        y2018: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2019: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2020: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2021: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2022: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2023: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2024: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2025: { books: 0, articles: 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 },
+        y2026: { books: data.production?.books || 0, articles: data.production?.articles || 0, retweets: 0, likes: 0, video_minutes: 0, audio_minutes: 0 }
+      };
+      
+      // Ajouter aux contributeurs
+      contributors.push(newContributor);
+      
+      // Mettre à jour le statut de la candidature
+      candidaturesDb.get(id).get('status').put('accepted');
+      
+      // Rafraîchir l'interface
+      initContributorSelect();
+      renderTable();
+      showStatus(`✅ ${data.name} accepté ! Compte créé (${data.login.pseudo}). N'oubliez pas de sauvegarder et exporter le JSON.`, 'success');
+      
+      // Rafraîchir la liste des candidatures
+      setTimeout(loadCandidatures, 500);
+    });
   });
 }
 
@@ -948,13 +1011,24 @@ function mailCandidature(id, type) {
     
     if (type === 'accept') {
       subject = encodeURIComponent('Vitalism - Candidature acceptée');
+      const loginInfo = data.login ? `
+
+Vos identifiants de connexion :
+───────────────────────────────
+Pseudo : ${data.login.pseudo}
+Mot de passe : (celui que vous avez choisi lors de votre candidature)
+───────────────────────────────
+
+Connectez-vous sur : [URL du site]/auth.html` : '';
+      
       body = encodeURIComponent(`Bonjour ${data.name},
 
 Nous avons le plaisir de vous informer que votre candidature pour rejoindre Vitalism a été acceptée !
 
 Bienvenue dans la communauté.
+${loginInfo}
 
-Vous pouvez désormais accéder à votre fiche contributeur et commencer à enrichir votre profil.
+Vous pouvez désormais accéder au forum et à la chatbox.
 
 À très bientôt,
 L'équipe Vitalism`);

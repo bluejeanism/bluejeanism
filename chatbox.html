@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%230000AA%22>:v</text></svg>">
 <title>Chatbox Vitalism</title>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
@@ -288,34 +289,52 @@ function initChat() {
   loadMessages();
   updateOnlineList();
   setInterval(updateOnlineList, 10000);
-  addSystemMessage('Connecté en tant que ' + myUsername);
+  addSystemMessage('🔒 Connecté en mode chiffré : ' + myUsername);
 }
+
+// Clé de chiffrement groupe (partagée entre tous les membres)
+const GROUP_KEY = 'vitalism-members-group-key-2024';
 
 function updatePresence() {
   if (!user.is) return;
   presence.get(myPub).put({ username: myUsername, pub: myPub, online: true, lastSeen: Date.now() });
 }
 
-function sendMessage() {
+async function sendMessage() {
   if (!user.is) return;
   const input = document.getElementById('messageInput');
   const text = input.value.trim();
   if (!text) return;
   
   const msgData = { text, username: myUsername, pub: myPub, time: Date.now() };
-  SEA.sign(msgData, user._.sea).then(signed => {
+  
+  // Chiffrer le message pour le groupe
+  const encryptedText = await SEA.encrypt(text, GROUP_KEY);
+  const encryptedData = { encryptedText, username: myUsername, pub: myPub, time: Date.now() };
+  
+  // Signer le message chiffré
+  SEA.sign(encryptedData, user._.sea).then(signed => {
     chat.get('msg_' + Date.now() + '_' + myPub.slice(0, 8)).put({ signed, pub: myPub });
   });
   input.value = '';
 }
 
 function loadMessages() {
-  chat.map().on((data, key) => {
+  chat.map().on(async (data, key) => {
     if (!data || !data.signed || displayedMessages.has(key)) return;
     displayedMessages.add(key);
-    SEA.verify(data.signed, data.pub).then(verified => {
-      if (verified && Date.now() - verified.time < 24 * 60 * 60 * 1000) displayMessage(verified, data.pub);
-    });
+    
+    const verified = await SEA.verify(data.signed, data.pub);
+    if (verified && Date.now() - verified.time < 24 * 60 * 60 * 1000) {
+      // Déchiffrer le message
+      let text = verified.text; // Ancien format non chiffré
+      if (verified.encryptedText) {
+        text = await SEA.decrypt(verified.encryptedText, GROUP_KEY);
+      }
+      if (text) {
+        displayMessage({ ...verified, text }, data.pub);
+      }
+    }
   });
 }
 

@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C@NDID@TURE_V1T4L // Formulaire d'admission</title>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text x='16' y='24' font-family='Courier New' font-size='20' font-weight='bold' fill='%230000AA' text-anchor='middle'>:V</text></svg>">
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
@@ -608,6 +609,43 @@ body::before {
           </div>
         </div>
 
+        <!-- Accès Forum & Chat -->
+        <div class="radar-section" style="background:#1a1a3a;border-color:#00ff00;">
+          <h3>🔐 ACCÈS FORUM & CHATBOX</h3>
+          <p style="font-size:11px;color:#aaa;margin-bottom:15px;">
+            Après validation de votre candidature, ces identifiants vous permettront d'accéder au forum et à la chatbox Vitalism.
+            <br><strong style="color:#ff6b6b;">⚠️ IMPORTANT : Utilisez un mot de passe UNIQUE. Ne réutilisez PAS un mot de passe existant (banque, email, etc.)</strong>
+          </p>
+          
+          <div class="field-group">
+            <div class="field required">
+              <label for="loginPseudo">Pseudo de connexion</label>
+              <input type="text" id="loginPseudo" name="loginPseudo" placeholder="Votre pseudo pour le chat/forum" pattern="[a-zA-Z0-9_-]+" minlength="3" maxlength="20" required>
+              <span class="hint">3-20 caractères, lettres/chiffres/tirets uniquement</span>
+            </div>
+          </div>
+          
+          <div class="field-group">
+            <div class="field required">
+              <label for="loginPassword">Mot de passe</label>
+              <input type="text" id="loginPassword" name="loginPassword" placeholder="Votre mot de passe sécurisé" minlength="8" required>
+              <span class="hint">Minimum 8 caractères - NOTEZ-LE PRÉCIEUSEMENT</span>
+            </div>
+            <div class="field" style="display:flex;align-items:flex-end;">
+              <button type="button" class="btn" onclick="generatePassword()" style="background:#00aa00;color:#fff;width:100%;">🎲 GÉNÉRER MOT DE PASSE SÉCURISÉ</button>
+            </div>
+          </div>
+          
+          <div style="background:#000;border:1px solid #00ff00;padding:10px;margin-top:10px;">
+            <div style="font-size:10px;color:#00ff00;margin-bottom:5px;">📋 RÉCAPITULATIF IDENTIFIANTS :</div>
+            <div style="font-family:monospace;color:#fff;">
+              Pseudo : <span id="recapPseudo" style="color:#ffff00;">---</span><br>
+              Mot de passe : <span id="recapPassword" style="color:#ffff00;">---</span>
+            </div>
+            <button type="button" class="btn" onclick="exportCredentials()" style="margin-top:10px;font-size:11px;">📥 EXPORTER MES IDENTIFIANTS (.txt)</button>
+          </div>
+        </div>
+
         <!-- Production -->
         <div class="radar-section">
           <h3>📊 PRODUCTION EXISTANTE</h3>
@@ -814,6 +852,17 @@ function validate(data) {
   if (!data.email) return 'L\'email est requis';
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) return 'Email invalide';
   if (!data.motivation) return 'La lettre de motivation est requise';
+  
+  // Validation des identifiants
+  const loginPseudo = document.getElementById('loginPseudo').value.trim();
+  const loginPassword = document.getElementById('loginPassword').value;
+  
+  if (!loginPseudo) return 'Le pseudo de connexion est requis';
+  if (loginPseudo.length < 3) return 'Le pseudo de connexion doit faire au moins 3 caractères';
+  if (!/^[a-zA-Z0-9_-]+$/.test(loginPseudo)) return 'Le pseudo de connexion ne peut contenir que des lettres, chiffres, tirets et underscores';
+  if (!loginPassword) return 'Le mot de passe est requis';
+  if (loginPassword.length < 8) return 'Le mot de passe doit faire au moins 8 caractères';
+  
   return null;
 }
 
@@ -963,11 +1012,88 @@ function showToothVideo() {
 motivationField.addEventListener('input', checkToothSecret);
 console.log('%c🦷 Il y a quelque chose dans le formulaire...', 'color: #888; font-size: 9px;');
 
-// Gun.js pour soumission
-const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
-const candidatures = gun.get('vitalism-candidatures-v1');
+// Générateur de mot de passe sécurisé
+function generatePassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*';
+  let password = '';
+  for (let i = 0; i < 16; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  document.getElementById('loginPassword').value = password;
+  updateRecap();
+}
 
-function submitCandidature() {
+// Mettre à jour le récapitulatif
+function updateRecap() {
+  const pseudo = document.getElementById('loginPseudo').value || '---';
+  const password = document.getElementById('loginPassword').value || '---';
+  document.getElementById('recapPseudo').textContent = pseudo;
+  document.getElementById('recapPassword').textContent = password;
+}
+
+// Écouter les changements
+document.getElementById('loginPseudo').addEventListener('input', updateRecap);
+document.getElementById('loginPassword').addEventListener('input', updateRecap);
+
+// Exporter les identifiants
+function exportCredentials() {
+  const pseudo = document.getElementById('loginPseudo').value;
+  const password = document.getElementById('loginPassword').value;
+  const name = document.getElementById('pseudo').value || 'Candidat';
+  
+  if (!pseudo || !password) {
+    alert('Veuillez remplir le pseudo et le mot de passe');
+    return;
+  }
+  
+  const content = `═══════════════════════════════════════════
+   VITALISM - IDENTIFIANTS D'ACCÈS
+═══════════════════════════════════════════
+
+Nom/Pseudo public : ${name}
+Date de candidature : ${new Date().toLocaleDateString('fr-FR')}
+
+───────────────────────────────────────────
+   IDENTIFIANTS FORUM & CHATBOX
+───────────────────────────────────────────
+
+Pseudo de connexion : ${pseudo}
+Mot de passe : ${password}
+
+───────────────────────────────────────────
+
+⚠️ IMPORTANT :
+• Conservez ce fichier en lieu sûr
+• Ces identifiants seront actifs après validation
+• Le mot de passe est IRRÉCUPÉRABLE en cas de perte
+• Ne partagez JAMAIS ce fichier
+
+═══════════════════════════════════════════
+`;
+
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'vitalism-identifiants-' + pseudo + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Gun.js pour soumission avec chiffrement
+const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
+const candidatures = gun.get('vitalism-candidatures-v2');
+
+// Clé de chiffrement admin (dérivée d'une phrase secrète)
+const ADMIN_SECRET = 'vitalism-admin-key-2024-secure';
+
+async function encryptForAdmin(data) {
+  const jsonStr = JSON.stringify(data);
+  const encrypted = await SEA.encrypt(jsonStr, ADMIN_SECRET);
+  return encrypted;
+}
+
+async function submitCandidature() {
   const data = collectData();
   const error = validate(data);
   
@@ -976,16 +1102,46 @@ function submitCandidature() {
     return;
   }
   
+  // Ajouter les identifiants de connexion
+  data.login = {
+    pseudo: document.getElementById('loginPseudo').value.trim(),
+    password: document.getElementById('loginPassword').value
+  };
+  
   const candidatureId = 'cand_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
   data.id = candidatureId;
   data.status = 'pending';
+  data.submittedAt = new Date().toISOString();
   
-  candidatures.get(candidatureId).put(data);
+  // Chiffrer les données sensibles
+  const encrypted = await encryptForAdmin(data);
+  
+  candidatures.get(candidatureId).put({
+    id: candidatureId,
+    encrypted: encrypted,
+    timestamp: Date.now()
+  });
   
   // Message de confirmation
   const modal = document.getElementById('previewModal');
   modal.style.display = 'flex';
-  document.getElementById('jsonOutput').textContent = '✅ CANDIDATURE ENVOYÉE !\n\nVotre candidature a été soumise avec succès.\nElle sera examinée par l\'équipe Vitalism.\n\nID: ' + candidatureId + '\n\nMerci de votre intérêt !';
+  document.getElementById('jsonOutput').textContent = `✅ CANDIDATURE ENVOYÉE !
+
+Votre candidature a été soumise avec succès.
+Elle sera examinée par l'équipe Vitalism.
+
+ID: ${candidatureId}
+
+═══════════════════════════════════════
+RAPPEL DE VOS IDENTIFIANTS :
+───────────────────────────────────────
+Pseudo : ${data.login.pseudo}
+Mot de passe : ${data.login.password}
+───────────────────────────────────────
+⚠️ Notez-les ! Ils seront actifs après validation.
+═══════════════════════════════════════
+
+Merci de votre intérêt !`;
   
   // Effacer le formulaire
   resetForm();

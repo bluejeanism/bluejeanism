@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>//AN0NE_01</title>
 <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
 <style>
 @keyframes blink { 0%,49%{opacity:1;}50%,100%{opacity:0;} }
 @keyframes flicker { 0%,100%{opacity:1;}50%{opacity:0.96;} }
@@ -243,11 +244,14 @@ typingArea.addEventListener('input', function() {
   }, 800);
 });
 
-// Gun.js pour messages
+// Gun.js pour messages avec chiffrement
 const gun = Gun({ peers: ['https://gun-manhattan.herokuapp.com/gun', 'https://gun-us.herokuapp.com/gun'] });
-const anoneMessages = gun.get('vitalism-anone-v1');
+const anoneMessages = gun.get('vitalism-anone-v2');
 
-submitBtn.addEventListener('click', function() {
+// Clé de chiffrement admin
+const ADMIN_SECRET = 'vitalism-admin-key-2024-secure';
+
+submitBtn.addEventListener('click', async function() {
   if (charCount < 10) return;
   
   // SECRET PATH - redirect to hook.html
@@ -264,16 +268,16 @@ submitBtn.addEventListener('click', function() {
     return;
   }
   
-  // Normal path - envoyer à Gun.js
+  // Normal path - envoyer à Gun.js chiffré
   submitBtn.style.opacity = '0.5';
   submitBtn.style.pointerEvents = 'none';
-  statusIndicator.textContent = 'TRANSMITTING';
+  statusIndicator.textContent = 'ENCRYPTING...';
   
   const hash = Math.random().toString(16).substring(2, 10).toUpperCase();
   const msgId = 'anone_' + Date.now() + '_' + hash;
   
-  // Sauvegarder le message
-  anoneMessages.get(msgId).put({
+  // Données à chiffrer
+  const msgData = {
     id: msgId,
     message: typingArea.textContent,
     hash: '0x' + hash,
@@ -281,11 +285,23 @@ submitBtn.addEventListener('click', function() {
     timestamp: Date.now(),
     date: new Date().toISOString(),
     status: 'unread'
+  };
+  
+  // Chiffrer le message
+  const encrypted = await SEA.encrypt(JSON.stringify(msgData), ADMIN_SECRET);
+  
+  // Sauvegarder chiffré
+  anoneMessages.get(msgId).put({
+    id: msgId,
+    encrypted: encrypted,
+    timestamp: Date.now()
   });
+  
+  statusIndicator.textContent = 'TRANSMITTING';
   
   setTimeout(() => {
     statusIndicator.textContent = 'TX_SUCCESS';
-    typingArea.textContent = `TX_SUCCESS | HASH: 0x${hash}\nDEST: ANONE_POOL[HIDDEN]\nPAYLOAD: ${charCount} BYTES\n\nMESSAGE ENREGISTRÉ\nCONNECTION_TERMINATED`;
+    typingArea.textContent = `TX_SUCCESS | HASH: 0x${hash}\nDEST: ANONE_POOL[ENCRYPTED]\nPAYLOAD: ${charCount} BYTES\n\n🔒 MESSAGE CHIFFRÉ\nCONNECTION_TERMINATED`;
     
     setTimeout(() => {
       typingArea.textContent = '';
@@ -295,7 +311,7 @@ submitBtn.addEventListener('click', function() {
       submitBtn.style.pointerEvents = 'auto';
       statusIndicator.textContent = 'LISTENING';
     }, 5000);
-  }, 2000);
+  }, 1500);
 });
 
 function saveCaretPosition(element) {
